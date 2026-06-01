@@ -1,0 +1,49 @@
+---
+description: Sandtable 沙盘推演驱动开发方法论。当用户要新增/修改功能、写需求、做计划、或要求预演/推演时启用。强制实事求是、不猜测、计划→预演→修正→再预演的闭环。
+alwaysApply: true
+---
+
+# Sandtable · 沙盘推演驱动开发（行为基线）
+
+本项目使用 Sandtable 方法论。任何"构建/修改功能、写需求、做计划"的任务，必须按以下基线执行；遇到决策点时，按需读取 `skills/<name>/SKILL.md` 加载对应技能的完整内容再执行。
+
+## 四条不可违背的底线（实事求是）
+
+1. **不猜测、不捏造**：不清楚的事不靠想象补全。通过①读代码 ②读文档 ③问开发者 三种途径弄清，并把结论写回 PRD/计划/状态。
+2. **先思考再动手**：显式列出假设；有多种解释就全部摆出而不是默默选一个；有更简单的方案要说出来。
+3. **外科手术式改动**：只改必须改的；不顺手"优化"无关代码；不做兜底逻辑、不节外生枝；每一行改动都能追溯到需求。
+4. **目标驱动**：把任务转成可验证的成功标准，循环到验证通过为止。
+
+> 违反规则的字面，就是违反规则的精神。"这个太简单不需要走流程"是最危险的合理化。
+
+## 核心闭环（一场战役）
+
+```
+INTAKE → RECON → OBJECTIVES → PLAN → 头脑预演 → 红蓝对抗 → 实现预演 → 复盘择优 → INTEGRATE → VERIFY → DONE
+        ↑______ 任一推演发现异常/被攻破/意外 → 亲自核实 → 问开发者 → 修正目标/计划 → 重演 ______↑
+```
+
+- **三类推演三位一体**（"推演"是统称）：头脑预演（问逻辑通不通）、红蓝对抗（红军 OPFOR 专攻找破绽，问能不能被打破）、实现预演（隔离 worktree 真改代码，问做出来对不对）。
+- 推演必须在**隔离的子 agent** 中进行，可并行多个；返回信号 `LOGIC_CLOSED`/`HELD`/`DONE` 或 `ANOMALY_FOUND`/`BREACH_FOUND`/`BLOCKED`。
+- **只要任一推演发现与计划不符、意料之外、或被红军攻破，立即终止并上报**；主 agent 亲自核实，给方案或向开发者求助，修正后重演，直到全线顺利，再复盘择优落地。
+
+## Slash 命令（每个=一个战术动作）
+
+`/sandtable-start` 受领任务 · `/sandtable-recon` 侦察 · `/sandtable-objectives` 目标红线 · `/sandtable-plan` 计划 · `/sandtable-refine` 迭代完善 · `/sandtable-mental` 头脑预演 · `/sandtable-redteam` 红蓝对抗 · `/sandtable-live` 实现预演 · `/sandtable-debrief` 复盘择优 · `/sandtable-rehearse` 总演习 · `/sandtable-status` 战报 · `/sandtable-resume` 接防续接
+
+## 状态与记忆（换人/换AI可续）
+
+所有过程持久化到目标项目的 `docs/sandtable/`：全局 `project.md`（目标）、`constraints.md`（红线 MUST/MUST-NOT），每个需求一个目录含 `prd.md` `plan.md` `state.md`（状态机）`journal.md`（追加式记忆）`questions.md`（阻塞问题）。异常退出后用 `/sandtable-resume` 从这些文件恢复。
+
+## 技能索引（按需加载完整内容）
+
+- `using-sandtable` — 总入口、状态机与触发规则
+- `being-truthful` — 实事求是 / 不猜测的硬门禁
+- `state-and-memory` — 状态机与持久化记忆机制
+- `gathering-intel` — 战场侦察：主动收集情报、列未知、提问
+- `writing-prd` — 写目标、PRD、红线（MUST/MUST-NOT）
+- `writing-plan` — 写细到可执行的改动计划
+- `mental-rehearsal` — 头脑预演（隐喻：图上作业 / 只读逻辑推演）
+- `red-team-wargame` — 红蓝对抗 OPFOR（专攻找破绽）
+- `implementation-rehearsal` — 实现预演（隐喻：实兵演习 / 真改代码）
+- `evaluating-rehearsals` — 战损复盘：评分与择优

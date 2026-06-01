@@ -1,0 +1,24 @@
+{
+  "name": "sandtable",
+  "displayName": "Sandtable 沙盘推演驱动开发",
+  "description": "计划→预演→发现问题→修正→再预演的闭环开发方法论。强约束实事求是、不猜测、不捏造，状态可持久、换人换AI可续，子agent并行预演后择优落地。",
+  "version": "0.1.0",
+  "author": {
+    "name": "sss",
+    "email": ""
+  },
+  "license": "MIT",
+  "keywords": [
+    "skills",
+    "planning",
+    "prd",
+    "rehearsal",
+    "dry-run",
+    "subagent",
+    "state-machine",
+    "workflow"
+  ],
+  "skills": "./skills/",
+  "commands": "./commands/",
+  "hooks": "./hooks/hooks.json"
+}
