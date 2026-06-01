@@ -26,22 +26,28 @@ INTAKE → CLARIFY → PRD → PLAN → MENTAL_REHEARSAL → IMPL_REHEARSAL → 
 
 ## 安装 / 接入
 
-### Cursor（推荐）
+### Claude Code（最方便 · 插件市场一行装）
 
-把本目录的内容并入你的项目（或拷贝相应文件）：
+```bash
+/plugin marketplace add andoop/sandtable
+/plugin install sandtable@sandtable
+```
 
-- `.cursor/rules/sandtable.mdc`（`alwaysApply: true`）——方法论自动生效。
-- `.cursor/commands/*.md`——提供 `/sandtable-start`、`/sandtable-rehearse`、`/sandtable-status`、`/sandtable-resume` 四个命令。
-- `skills/`、`templates/`——技能与模板，按需被读取。
+装好即生效。维护者发布新版本（递增 `.claude-plugin/plugin.json` 的 `version` 并 push）后，用 `/plugin update sandtable` 升级。
 
-最简单：把 `sandtable/` 整个目录放进项目根，或把 `.cursor/`、`skills/`、`templates/` 拷到你的项目根。
+### Cursor
 
-快速初始化运行时目录：在目标项目根运行 `bash scripts/sandtable-init.sh <slug> [date]`，从 `templates/` 脚手架出 `docs/sandtable/`（slug 用 kebab-case）。
+- **可靠路径**：把本仓 `.cursor/` 拷进你的项目根——`.cursor/rules/sandtable.mdc`（`alwaysApply`）让方法论自动生效，`.cursor/commands/*.md` 提供 slash 命令；再拷 `skills/`、`templates/`。或直接让 AI 读 `INSTALL.md` 自助完成（见下）。
+- **本地插件（试用）**：在仓库根 `ln -s "$(pwd)" ~/.cursor/plugins/local/sandtable` 后重载窗口，可获得 skills 与命令；但 `.cursor/rules/sandtable.mdc` 属项目级规则、不随本地插件加载，要"自动生效"仍需用上面拷 `.cursor/` 的方式。
+- **官方市场**：在 cursor.com/marketplace/publish 提交审核后可被搜索安装。
 
-### Claude Code / Codex / 其他
+### 让 AI 自助安装（任意 harness）
 
-- 作为插件：本目录含 `.claude-plugin/plugin.json`、`hooks/`（会话启动注入 `using-sandtable`）、`commands/`、`skills/`。
-- 通用：把 `AGENTS.md`（`CLAUDE.md` 指向它）并入你的指令文件即可获得行为基线。
+把这句话发给你的 agent：「阅读 https://github.com/andoop/sandtable 的 `INSTALL.md` 并据此把 Sandtable 安装进当前项目。」它会识别 harness、放置文件、且不覆盖你已有的文件。详见 `INSTALL.md`。
+
+### 手工拷贝（兜底）
+
+把 `.cursor/`、`skills/`、`templates/`、`commands/`、`hooks/`、`AGENTS.md` 拷进你的项目根（Claude Code 需 `hooks/` 才能在会话启动注入 `using-sandtable`）；或把整个 `sandtable/` 目录放进项目根。随后在项目根运行 `bash scripts/sandtable-init.sh <slug>` 脚手架出 `docs/sandtable/`（slug 用 kebab-case）。
 
 ## 用法 · 命令即战术动作
 

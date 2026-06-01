@@ -1,0 +1,19 @@
+{
+  "name": "sandtable",
+  "owner": {
+    "name": "sss"
+  },
+  "metadata": {
+    "description": "Sandtable 沙盘推演驱动开发方法论插件"
+  },
+  "plugins": [
+    {
+      "name": "sandtable",
+      "source": {
+        "source": "github",
+        "repo": "andoop/sandtable"
+      },
+      "description": "计划→预演→发现问题→修正→再预演的闭环开发方法论。强约束实事求是、不猜测、不捏造，状态可持久、换人换AI可续，子agent并行预演后择优落地。"
+    }
+  ]
+}
