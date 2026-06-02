@@ -69,3 +69,12 @@
 - 内容：实现子 agent 跑约 20 分钟（验证阶段被中断），但已 7 commit 完整实现 T1-T10、工作树干净。主 agent 亲自复核 TC1-TC9：全绿（见 rehearsals/impl-1-test-cases.md）。集成方式：从分支 `git checkout -- <源码路径>` 取入主仓 master，保留主仓更新的 feature 文档；与文档一并提交。
 - 依据/来源：worktree git log 7 提交；主仓 grep/json/bash 复核；diff --stat 确认外科手术式（being-truthful 仅写回行；mental/redteam/impl 三 SKILL 正文未动）。
 - 残余：worktree/分支待清理。
+
+## 2026-06-02 08:30 · [开发者澄清 · 用例本质回调]
+- 开发者反馈："测试用例只是 AI 对产品需求理解的具体表现，也是给人看的具体细节；测试用例不见得都能执行；头脑/代码预演能执行 case 最好，不能执行 case 就是参考。"
+- 判定：此前措辞偏重"可执行"（writing-tests 三产物表/边界写"含可执行检查命令""唯一具体载体"；三预演 prompt 用"逐条让 Then 成立/构造反例/任一 TC 推不通即 ANOMALY"），与开发者本质定位不符——把"可执行"从硬性要求降为加分项。
+- 外科手术式回调（仅措辞，无机制改动）：
+  - skills/writing-tests/SKILL.md：开头加"本质"段（理解的具体表现+给人看的细节，不见得可执行）；三产物表/边界去掉"含可执行检查命令"，改"不强求可执行、能执行最好不能则作参考"；Red Flags 增两行（不必可执行才算数 / 跑不了也别删）。
+  - templates/tests.md、templates/prd.md §5 注释、skills/writing-prd §5：同步去"含可执行检查命令"，加"不强求可执行"。
+  - 三预演 prompt（mental/impl/opfor）：注入块加注 + 工作方式条款改为"能执行就执行让 Then 成立/找反例，不能则作为理解参考核对意图相符；仅可执行 TC 的 Then 不成立或实现与用例意图相悖才 ANOMALY/BREACH，用例本身不可执行不算"。
+- 核实：grep 确认"含可执行检查命令/唯一具体载体"全仓清零；机制（状态机/路由/产物清单）未触碰。

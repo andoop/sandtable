@@ -17,6 +17,7 @@ Task tool (subagent_type: explore 或 generalPurpose, readonly: true):
 
     ## 待验证用例清单（来自 tests.md，逐条推演的突破点）
     [粘贴 tests.md 中本链路相关的 TC 全文]
+    （注：用例是 AI 对需求理解的具体表现，不见得可执行；能在逻辑上推演判定就判定，不能则作为"理解参考"核对计划/代码是否与用例所表达的意图相符。）
 
     ## 必须遵守的红线（MUST / MUST-NOT）
     [粘贴 constraints.md + prd.md 的 MUST/MUST-NOT]
@@ -30,7 +31,7 @@ Task tool (subagent_type: explore 或 generalPurpose, readonly: true):
     3. 每一步都用代码/文档证据支撑，引用 file:line。不允许"应该/大概/通常"。
     4. 显式检查：边界条件、异常路径、并发/时序、与现有逻辑的相互影响、是否违反任一红线。
     5. 遵循 Karpathy 原则：不设计未被要求的兜底，不节外生枝，最简闭环。
-    6. 逐条推演每个 TC 的 Given→When→Then 是否能闭环成立；任一 TC 推不通即 ANOMALY。
+    6. 逐条核对每个 TC：能在逻辑上推演 Given→When→Then 是否成立就推演，不能则作为理解参考。仅当 TC 与计划/代码现实**矛盾**（逻辑推不通），才算 ANOMALY；"用例本身不可执行"不算 ANOMALY。
 
     ## 终止规则（最重要）
     只要发现下列任意一种，【立即停止推演】并返回 ANOMALY_FOUND：
