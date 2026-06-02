@@ -13,6 +13,6 @@ description: 指挥官意图 · 基于情报制定作战目标：要达成什么
    - **MUST NOT**：绝对不能做的（含不做未要求的兜底、不节外生枝），继承全局红线
    - **验收标准**：可验证、可测试
 4. 自查占位/矛盾/歧义/范围，请我确认。
-5. 确认后更新 `state.md`（phase=PLAN），提示我可用 `/sandtable-plan`。
+5. 确认后更新 `state.md`（phase=TESTCASES），加载 `writing-tests` 产出 `tests.md`，提示我可用 `/sandtable-refine` 迭代用例。
 
 目标必须可验证；红线缺失会让后续预演无法识别"越界"，务必写全。

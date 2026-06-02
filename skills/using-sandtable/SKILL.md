@@ -31,6 +31,7 @@ digraph sandtable {
   INTAKE [shape=box label="INTAKE\n受领任务"];
   RECON [shape=box label="RECON\n战场侦察"];
   OBJ [shape=box label="OBJECTIVES\n目标+红线"];
+  TESTS [shape=box label="TESTCASES\n标定靶标"];
   PLAN [shape=box label="PLAN\n作战计划"];
   MENTAL [shape=box label="头脑预演"];
   RED [shape=box label="红蓝对抗(可选)"];
@@ -41,7 +42,7 @@ digraph sandtable {
   DONE [shape=doublecircle];
   FIX [shape=box label="亲自核实→问开发者→修正目标/计划"];
 
-  INTAKE -> RECON -> OBJ -> PLAN -> MENTAL -> RED -> IMPL -> EVAL;
+  INTAKE -> RECON -> OBJ -> TESTS -> PLAN -> MENTAL -> RED -> IMPL -> EVAL;
   MENTAL -> FIX [label="ANOMALY"];
   RED -> FIX [label="BREACH"];
   IMPL -> FIX [label="ANOMALY"];
@@ -57,8 +58,9 @@ digraph sandtable {
 | INTAKE | 受领任务 | 捕获原始需求（一句话/产品文档），建目录 | `state-and-memory` | `/sandtable-start` |
 | RECON | 战场侦察 | 主动收集代码/文档情报，列未知，提问 | `gathering-intel` | `/sandtable-recon` |
 | OBJECTIVES | 指挥官意图 | 定目标、MUST/MUST-NOT、红线、验收 | `writing-prd` | `/sandtable-objectives` |
+| TESTCASES | 标定靶标 | 把成功定义具体化为黑盒用例,检验理解 | `writing-tests` | （并入 /objectives, /refine 迭代）|
 | PLAN | 作战计划 | 写细到可执行的改动计划 | `writing-plan` | `/sandtable-plan` |
-| （任意阶段）| 调整部署 | 据反馈反复修改/重制目标或计划 | `writing-prd`/`writing-plan` | `/sandtable-refine` |
+| （任意阶段）| 调整部署 | 据反馈反复修改/重制目标/用例或计划 | `writing-prd`/`writing-tests`/`writing-plan` | `/sandtable-refine` |
 | MENTAL_REHEARSAL | 图上作业 | 只读子 agent 推演逻辑闭环 | `mental-rehearsal` | `/sandtable-mental` |
 | REDTEAM | 红蓝对抗 | 红军子 agent 专攻找破绽（可选，强烈推荐）| `red-team-wargame` | `/sandtable-redteam` |
 | IMPL_REHEARSAL | 实兵演习 | 子 agent 在隔离 worktree 真改代码 | `implementation-rehearsal` | `/sandtable-live` |
@@ -67,7 +69,7 @@ digraph sandtable {
 | VERIFY | 战果确认 | 跑测试/验收，确认成功标准 | `being-truthful` | — |
 | （随时）| 战报/接防 | 看状态 / 新 AI 重获记忆继续 | `state-and-memory` | `/sandtable-status` `/sandtable-resume` |
 
-每个阶段都有独立命令，可单独触发、反复迭代，无需一次跑完。`/sandtable-start` 编排前四步，`/sandtable-rehearse` 串起三类推演 + 复盘。
+每个阶段都有独立命令，可单独触发、反复迭代，无需一次跑完。`/sandtable-start` 编排前五步，`/sandtable-rehearse` 串起三类推演 + 复盘。
 
 ## 三类推演各问一个问题
 
@@ -85,7 +87,7 @@ digraph sandtable {
 只要任何推演返回 `ANOMALY_FOUND` / `BREACH_FOUND`（或复盘发现意料之外）：
 1. 主 agent **亲自核实**（读相关代码/文档，不轻信子 agent），用客观逻辑判断。
 2. 给出**合理方案**；若仍不确定或属于产品决策，**向开发者提问/索要补充**，记入 `questions.md`。
-3. 把澄清结论写回 `prd.md` / `plan.md`，并在 `journal.md` 追加决策记录。
+3. 把澄清结论写回 `prd.md` / `tests.md` / `plan.md`，并在 `journal.md` 追加决策记录。
 4. **重新推演**，循环直到全部顺利。之后用 `evaluating-rehearsals` 给各实现预演打分，选最高的落地。
 
 ## 触发规则（Red Flags = 你正在合理化）

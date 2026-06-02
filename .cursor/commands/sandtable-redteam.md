@@ -8,7 +8,7 @@ description: 红蓝对抗（OPFOR）· 派红军子 agent 专门攻击当前计�
 1. 问我（或据 state 判断）这轮打**计划**还是打**实现**。读对应材料：`plan.md` 或某个实现预演的 diff/分支，以及 `prd.md` 验收、`constraints.md` 红线。
 2. 按 `opfor-prompt.md` 给每个红军子 agent 指派攻击向量（反例/边界/假设斩首/侧翼包抄/红线渗透/回归伏击/范围蔓延/需求背离），并行开打。要求每记杀招【可复现】。
 3. 收集战报：
-   - 有 `BREACH_FOUND` → 你**亲自核实杀招是否真成立** → 成立的登记为 ANOMALY → 问我/修正 PRD/计划 → 重演。
+   - 有 `BREACH_FOUND` → 你**亲自核实杀招是否真成立** → 成立的登记为 ANOMALY → 问我/修正 PRD/用例/计划 → 重演。
    - 全部 `HELD` → 记录各向量为何没攻破，作为信心依据。
 4. 写入 `rehearsals/redteam-<n>.md`，journal 追加，更新 `state.md`（redteam 计数）。
 

@@ -41,7 +41,7 @@ digraph resolve {
 2. **读文档**：项目文档、`docs/sandtable/` 下的 `project.md`/`prd.md`/`journal.md`、README、commit 历史。
 3. **问开发者**：前两者都无法确定时，把问题写进该需求的 `questions.md`，并直接向开发者提问。一次问清楚关键问题，不要连环追问也不要憋着不问。
 
-**得到答案后**：把结论写回 `prd.md`/`plan.md` 对应位置，并在 `journal.md` 追加一条决策记录（谁、何时、决定了什么、依据是什么）。
+**得到答案后**：把结论写回 `prd.md`/`tests.md`/`plan.md` 对应位置，并在 `journal.md` 追加一条决策记录（谁、何时、决定了什么、依据是什么）。
 
 ## 区分"事实"与"假设"
 

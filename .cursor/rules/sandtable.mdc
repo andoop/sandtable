@@ -19,7 +19,7 @@ alwaysApply: true
 ## 核心闭环（一场战役）
 
 ```
-INTAKE → RECON → OBJECTIVES → PLAN → 头脑预演 → 红蓝对抗 → 实现预演 → 复盘择优 → INTEGRATE → VERIFY → DONE
+INTAKE → RECON → OBJECTIVES → 测试用例 → PLAN → 头脑预演 → 红蓝对抗 → 实现预演 → 复盘择优 → INTEGRATE → VERIFY → DONE
         ↑______ 任一推演发现异常/被攻破/意外 → 亲自核实 → 问开发者 → 修正目标/计划 → 重演 ______↑
 ```
 
@@ -33,7 +33,7 @@ INTAKE → RECON → OBJECTIVES → PLAN → 头脑预演 → 红蓝对抗 → �
 
 ## 状态与记忆（换人/换AI可续）
 
-所有过程持久化到目标项目的 `docs/sandtable/`：全局 `project.md`（目标）、`constraints.md`（红线 MUST/MUST-NOT），每个需求一个目录含 `prd.md` `plan.md` `state.md`（状态机）`journal.md`（追加式记忆）`questions.md`（阻塞问题）。异常退出后用 `/sandtable-resume` 从这些文件恢复。
+所有过程持久化到目标项目的 `docs/sandtable/`：全局 `project.md`（目标）、`constraints.md`（红线 MUST/MUST-NOT），每个需求一个目录含 `prd.md` `tests.md`（测试用例）`plan.md` `state.md`（状态机）`journal.md`（追加式记忆）`questions.md`（阻塞问题）。异常退出后用 `/sandtable-resume` 从这些文件恢复。
 
 ## 技能索引（按需加载完整内容）
 
@@ -42,6 +42,7 @@ INTAKE → RECON → OBJECTIVES → PLAN → 头脑预演 → 红蓝对抗 → �
 - `state-and-memory` — 状态机与持久化记忆机制
 - `gathering-intel` — 战场侦察：主动收集情报、列未知、提问
 - `writing-prd` — 写目标、PRD、红线（MUST/MUST-NOT）
+- `writing-tests` — 写黑盒测试用例（检验 AI 理解的闸门）
 - `writing-plan` — 写细到可执行的改动计划
 - `mental-rehearsal` — 头脑预演（隐喻：图上作业 / 只读逻辑推演）
 - `red-team-wargame` — 红蓝对抗 OPFOR（专攻找破绽）

@@ -74,13 +74,13 @@ main() {
 		fi
 	done
 
-	# --- feature 目录与 5 个模板 ---
+	# --- feature 目录与 6 个模板 ---
 	mkdir -p "$feature_dir"
 	mkdir -p "$feature_dir/rehearsals"
 	created+=("$feature_dir/")
 	created+=("$feature_dir/rehearsals/")
 
-	for f in prd.md plan.md state.md journal.md questions.md; do
+	for f in prd.md tests.md plan.md state.md journal.md questions.md; do
 		cp "$templates_dir/$f" "$feature_dir/$f"
 		created+=("$feature_dir/$f")
 	done

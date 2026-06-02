@@ -17,6 +17,9 @@ Task tool (subagent_type: explore 或 generalPurpose, readonly 视目标而定):
     ## 它声称要满足的（PRD 验收标准）
     [粘贴 prd.md 验收标准]
 
+    ## 待验证用例清单（来自 tests.md）
+    [粘贴 tests.md 中相关的 TC 全文]
+
     ## 它绝不能违反的红线（MUST / MUST-NOT）
     [粘贴 constraints.md + prd.md 的 MUST/MUST-NOT]
 
@@ -29,6 +32,7 @@ Task tool (subagent_type: explore 或 generalPurpose, readonly 视目标而定):
     2. 每一记杀招必须【可复现】：给出具体输入/场景/操作步骤 + 预期错误结果，并用 file:line 佐证。
     3. 不允许空泛的"可能有风险/建议加强"——那不算进攻成功。
     4. 实事求是：你自己也不能猜。无法确认的攻击点，标注为"疑似"并说明需要确认什么。
+    5. 逐条对每条 TC 构造使其 Then 不成立的反例；攻破任一 TC 即 BREACH。
 
     ## 返回格式
     BREACH_FOUND  （至少攻破一处）

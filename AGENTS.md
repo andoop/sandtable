@@ -19,7 +19,7 @@
 
 ## 核心闭环（状态机）
 
-`INTAKE → CLARIFY → PRD → PLAN → MENTAL_REHEARSAL → IMPL_REHEARSAL → EVALUATE → INTEGRATE → VERIFY → DONE`
+`INTAKE → CLARIFY → PRD → TESTCASES → PLAN → MENTAL_REHEARSAL → IMPL_REHEARSAL → EVALUATE → INTEGRATE → VERIFY → DONE`
 
 任一预演发现异常/意外 → 主 agent 亲自核实 → 给方案或问开发者 → 修正 PRD/计划 → 重演。循环往复，逐步加固逻辑，直至完美。
 
@@ -40,7 +40,7 @@
 
 ## 技能索引
 
-需要时读取对应 `skills/<name>/SKILL.md` 的完整内容：`using-sandtable`、`being-truthful`、`state-and-memory`、`gathering-intel`、`writing-prd`、`writing-plan`、`mental-rehearsal`、`red-team-wargame`、`implementation-rehearsal`、`evaluating-rehearsals`。
+需要时读取对应 `skills/<name>/SKILL.md` 的完整内容：`using-sandtable`、`being-truthful`、`state-and-memory`、`gathering-intel`、`writing-prd`、`writing-tests`、`writing-plan`、`mental-rehearsal`、`red-team-wargame`、`implementation-rehearsal`、`evaluating-rehearsals`。
 
 ## Slash 命令（每个=一个战术动作，可单独触发/反复迭代）
 

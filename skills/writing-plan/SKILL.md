@@ -1,6 +1,6 @@
 ---
 name: writing-plan
-description: Use when you have an approved PRD and need a concrete change plan before any code or rehearsal. Maps files to touch and breaks work into small, verifiable, ordered tasks with exact paths, code, and checks. Produces docs/sandtable/features/<id>/plan.md.
+description: Use when you have an approved PRD and test cases and need a concrete change plan before any code or rehearsal. Maps files to touch and breaks work into small, verifiable, ordered tasks with exact paths, code, and checks. Produces docs/sandtable/features/<id>/plan.md.
 ---
 
 # 写改动计划 · 细到可被预演
@@ -12,7 +12,7 @@ description: Use when you have an approved PRD and need a concrete change plan b
 ## 前置
 
 <HARD-GATE>
-计划必须基于已确认的 `prd.md`。计划里出现的每个类型/函数/接口，要么在本项目已存在（标 `file:line`），要么在本计划的某个任务里被定义。不允许引用不存在的东西。不确定的，回到 `being-truthful`。
+计划必须基于已确认的 `prd.md` 与 `tests.md`。计划须同时覆盖 `tests.md` 的每条用例；验证步骤**引用 TC 编号**、不另造预期。计划里出现的每个类型/函数/接口，要么在本项目已存在（标 `file:line`），要么在本计划的某个任务里被定义。不允许引用不存在的东西。不确定的，回到 `being-truthful`。
 </HARD-GATE>
 
 ## 步骤一：文件地图（先决定改哪些文件）
@@ -70,6 +70,7 @@ export function fn(input) { return expected }
 | 检查 | 修法 |
 |------|------|
 | PRD 覆盖：每条需求都有对应任务？ | 缺的补任务 |
+| tests.md 覆盖：每条 TC 都有对应任务/被某步骤引用验证？ | 缺的补任务/补验证步骤 |
 | 占位符扫描 | 全部补实 |
 | 类型一致：前后任务里的函数名/签名/字段名一致？ | 统一 |
 | 顺序：有依赖的任务排在被依赖之后？ | 重排 |

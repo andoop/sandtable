@@ -19,6 +19,9 @@ Task tool (subagent_type: generalPurpose):
     ## PRD 要点 + 验收标准
     [粘贴 prd.md 相关片段]
 
+    ## 待验证用例清单（来自 tests.md，逐条让 Then 成立的靶标）
+    [粘贴 tests.md 中本链路相关的 TC 全文]
+
     ## 必须遵守的红线（MUST / MUST-NOT）
     [粘贴 constraints.md + prd.md 的 MUST/MUST-NOT]
 
@@ -32,6 +35,7 @@ Task tool (subagent_type: generalPurpose):
     4. 不确定的事不要猜：能从代码/文档确认就确认（引用 file:line），否则上报。
     5. 频繁提交，保持每次提交可验证。
     6. 只在你的 worktree 内改动，不碰其他目录。
+    7. 实现完成后逐条让每个 TC 的 Then 真实成立（贴证据）；任一 TC 无法成立即 ANOMALY。
 
     ## 终止规则（最重要）
     只要发现下列任意一种，【立即停止实现】并返回 ANOMALY_FOUND，

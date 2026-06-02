@@ -1,6 +1,6 @@
 ---
 name: writing-prd
-description: Use after the request is clarified and before writing an implementation plan, to capture goals, requirements, acceptance criteria, and the MUST / MUST-NOT redlines for a feature. Produces docs/sandtable/features/<id>/prd.md.
+description: Use after the request is clarified and before writing test cases and the plan, to capture goals, requirements, acceptance criteria, and the MUST / MUST-NOT redlines for a feature. Produces docs/sandtable/features/<id>/prd.md.
 ---
 
 # 写 PRD · 目标、需求、验收、红线
@@ -12,7 +12,7 @@ PRD 是这个需求的"事实地基"。它要回答：**为什么做、做成什
 ## 硬门禁
 
 <HARD-GATE>
-PRD 写之前，必须先经过侦察（RECON，见 `gathering-intel`）。任何"不确定/缺失"的需求点，按 `being-truthful` 去读代码/文档/问开发者，不允许在 PRD 里发明需求。PRD 完成后必须请开发者确认才能进入 PLAN。
+PRD 写之前，必须先经过侦察（RECON，见 `gathering-intel`）。任何"不确定/缺失"的需求点，按 `being-truthful` 去读代码/文档/问开发者，不允许在 PRD 里发明需求。PRD 完成后必须请开发者确认才能进入 TESTCASES。
 </HARD-GATE>
 
 ## 流程
@@ -25,11 +25,11 @@ digraph prd {
   "写 PRD 各节" [shape=box];
   "自查: 占位/矛盾/歧义/范围" [shape=box];
   "开发者确认?" [shape=diamond];
-  "进入 writing-plan" [shape=doublecircle];
+  "进入 writing-tests" [shape=doublecircle];
 
   "读 project.md + constraints.md" -> "一次一个问题澄清意图" -> "提出 2-3 个方案 + 推荐" -> "写 PRD 各节" -> "自查: 占位/矛盾/歧义/范围" -> "开发者确认?";
   "开发者确认?" -> "写 PRD 各节" [label="要改"];
-  "开发者确认?" -> "进入 writing-plan" [label="通过"];
+  "开发者确认?" -> "进入 writing-tests" [label="通过"];
 }
 ```
 
@@ -39,7 +39,7 @@ digraph prd {
 2. **背景与现状**：相关代码/模块的事实，标 `file:line`。
 3. **用户故事 / 使用场景**：谁、在什么场景、做什么、期望什么结果。
 4. **功能需求**：逐条列出，可编号。每条标来源（已确认/待开发者确认）。
-5. **验收标准（成功定义）**：可验证、可测试。把模糊目标转成可判定条件（见 Karpathy 目标驱动）。
+5. **验收标准（成功定义）**：§5 只写**抽象成功定义**；一切具体可演练场景（含可执行检查命令）下沉 `tests.md`（见 writing-tests）。审阅指引：tests.md=理解闸门（先读）、§5=完成闸门（VERIFY 勾选）。
 6. **MUST（这个需求绝对要做的）**：硬性要求。
 7. **MUST NOT（绝对不能做的）**：边界与红线（含"不做兜底、不节外生枝"），继承 `constraints.md`。
 8. **非目标 / 暂不做**：YAGNI，明确砍掉的东西。
@@ -67,4 +67,4 @@ digraph prd {
 | "PRD 没说的我按常理补" | 不发明需求。缺失要问。 |
 | "MUST NOT 是多余的" | 红线缺失，预演就无法识别"越界"这类异常。 |
 
-完成并经开发者确认后，更新 `state.md` 的 phase 为 PLAN，加载 `writing-plan`。
+完成并经开发者确认后，更新 `state.md` 的 phase 为 TESTCASES，加载 `writing-tests`。

@@ -16,6 +16,7 @@ docs/sandtable/
   features/
     <YYYY-MM-DD>-<slug>/           # 一个需求一个目录
       prd.md                       # 需求/目标/验收/红线 (见 writing-prd)
+      tests.md                     # 测试用例 (见 writing-tests)
       plan.md                      # 改动计划, 任务带 checkbox (见 writing-plan)
       state.md                     # 状态机: 当前阶段 + 任务状态 (本 skill)
       journal.md                   # 追加式记忆: 决策/问答/推演结果, 只增不改
@@ -35,7 +36,7 @@ docs/sandtable/
 ```markdown
 ---
 feature: 2026-06-01-user-login
-phase: PLAN            # INTAKE|RECON|OBJECTIVES|PLAN|MENTAL_REHEARSAL|REDTEAM|IMPL_REHEARSAL|EVALUATE|INTEGRATE|VERIFY|DONE
+phase: PLAN            # INTAKE|RECON|OBJECTIVES|TESTCASES|PLAN|MENTAL_REHEARSAL|REDTEAM|IMPL_REHEARSAL|EVALUATE|INTEGRATE|VERIFY|DONE
 blocked: false         # true 时必须在 questions.md 有对应阻塞问题
 updated: 2026-06-01T23:00:00+08:00
 tasks:
@@ -61,7 +62,7 @@ rehearsals:
 **规则：**
 - 每完成一个动作就更新 `state.md` 的 `phase`/`tasks`/`updated`。
 - `blocked: true` 时，主流程暂停，必须先解决 `questions.md` 里的阻塞问题。
-- 状态回退（异常→修正）时，把 `phase` 改回 `OBJECTIVES` 或 `PLAN`，并在 journal 记录原因。
+- 状态回退（异常→修正）时，把 `phase` 改回 `OBJECTIVES`、`TESTCASES` 或 `PLAN`，并在 journal 记录原因。
 
 ## journal.md：只增不改的记忆
 

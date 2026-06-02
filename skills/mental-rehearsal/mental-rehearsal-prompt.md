@@ -15,6 +15,9 @@ Task tool (subagent_type: explore 或 generalPurpose, readonly: true):
     ## 相关 PRD 要点（含验收标准）
     [粘贴 prd.md 相关片段]
 
+    ## 待验证用例清单（来自 tests.md，逐条推演的突破点）
+    [粘贴 tests.md 中本链路相关的 TC 全文]
+
     ## 必须遵守的红线（MUST / MUST-NOT）
     [粘贴 constraints.md + prd.md 的 MUST/MUST-NOT]
 
@@ -27,6 +30,7 @@ Task tool (subagent_type: explore 或 generalPurpose, readonly: true):
     3. 每一步都用代码/文档证据支撑，引用 file:line。不允许"应该/大概/通常"。
     4. 显式检查：边界条件、异常路径、并发/时序、与现有逻辑的相互影响、是否违反任一红线。
     5. 遵循 Karpathy 原则：不设计未被要求的兜底，不节外生枝，最简闭环。
+    6. 逐条推演每个 TC 的 Given→When→Then 是否能闭环成立；任一 TC 推不通即 ANOMALY。
 
     ## 终止规则（最重要）
     只要发现下列任意一种，【立即停止推演】并返回 ANOMALY_FOUND：

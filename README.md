@@ -20,7 +20,7 @@ Sandtable 是一套给 coding agent 用的开发方法论插件，由一组可�
 ## 闭环
 
 ```
-INTAKE → CLARIFY → PRD → PLAN → MENTAL_REHEARSAL → IMPL_REHEARSAL → EVALUATE → INTEGRATE → VERIFY → DONE
+INTAKE → CLARIFY → PRD → TESTCASES → PLAN → MENTAL_REHEARSAL → IMPL_REHEARSAL → EVALUATE → INTEGRATE → VERIFY → DONE
         ↑___ 任一预演发现异常/意外 → 主 agent 亲自核实 → 问开发者 → 修正 PRD/计划 → 重演 ___↑
 ```
 
@@ -55,7 +55,7 @@ INTAKE → CLARIFY → PRD → PLAN → MENTAL_REHEARSAL → IMPL_REHEARSAL → 
 
 | 命令 | 军事隐喻 | 作用 |
 |------|---------|------|
-| `/sandtable-start` | 受领任务 | 一键编排：侦察→目标→计划（从一句话或产品文档开始）|
+| `/sandtable-start` | 受领任务 | 一键编排：侦察→目标→用例→计划（从一句话或产品文档开始）|
 | `/sandtable-recon` | 战场侦察 | 主动收集代码/文档情报、列未知、自主提问 |
 | `/sandtable-objectives` | 指挥官意图 | 定目标、MUST/MUST-NOT、红线、验收标准 |
 | `/sandtable-plan` | 作战计划 | 制定/重制细到可执行的改动计划 |
@@ -96,12 +96,13 @@ sandtable/
     state-and-memory/             # 状态机 + 持久记忆（换人换AI可续）
     gathering-intel/              # 战场侦察：主动收集情报、列未知
     writing-prd/                  # 目标、PRD、红线
+    writing-tests/                # 黑盒测试用例（检验 AI 理解的闸门）
     writing-plan/                 # 细到可执行的改动计划
     mental-rehearsal/             # 头脑预演（图上作业）+ 子agent prompt
     red-team-wargame/             # 红蓝对抗 OPFOR + opfor prompt
     implementation-rehearsal/     # 实现预演（实兵演习）+ 子agent prompt
     evaluating-rehearsals/        # 战损复盘：评分与择优
-  templates/                      # project/constraints/prd/plan/state/journal/questions 模板
+  templates/                      # project/constraints/prd/tests/plan/state/journal/questions 模板
 ```
 
 运行时在目标项目生成的工作目录：
@@ -111,7 +112,7 @@ docs/sandtable/
   project.md            # 北极星目标
   constraints.md        # 全局红线 MUST/MUST-NOT
   features/<日期-slug>/
-    prd.md  plan.md  state.md  journal.md  questions.md
+    prd.md  tests.md  plan.md  state.md  journal.md  questions.md
     rehearsals/         # 各次头脑/实现预演报告 + 评分
 ```
 
