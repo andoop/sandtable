@@ -2,7 +2,7 @@
 description: 实现预演（军事隐喻：实兵演习）· 在隔离 git worktree 里真按计划完整实现并验证，可并行多个子 agent；异常即停，全过则交复盘择优。
 ---
 
-读取并遵循 `skills/implementation-rehearsal/SKILL.md`，对当前需求执行实现预演。
+对当前需求执行实现预演；读取并遵循 `skills/implementation-rehearsal/SKILL.md`。
 
 执行：
 1. 读本需求 `plan.md`、`prd.md`、`constraints.md`、`state.md`；确认头脑预演已 closed（否则先 `/sandtable-mental`）。

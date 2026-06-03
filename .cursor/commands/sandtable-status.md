@@ -2,7 +2,7 @@
 description: 查看当前 Sandtable 需求的状态机、自动模式配额、任务进度与未决问题。
 ---
 
-读取并遵循 `skills/state-and-memory/SKILL.md`。
+查看当前需求战况（只读）；读取并遵循 `skills/state-and-memory/SKILL.md`。
 
 执行（只读，不改动）：
 1. 列出 `docs/sandtable/features/` 下的需求目录。

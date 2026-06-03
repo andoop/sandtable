@@ -2,7 +2,7 @@
 description: 红蓝对抗（OPFOR）· 派红军子 agent 专门攻击当前计划或实现，找出会让它崩的场景、隐藏耦合、悄悄违反的红线；每个被攻破处都进修正循环。
 ---
 
-读取并遵循 `skills/red-team-wargame/SKILL.md`，对当前需求发起红蓝对抗。
+对当前需求发起红蓝对抗；读取并遵循 `skills/red-team-wargame/SKILL.md`。
 
 执行：
 1. 问我（或据 state 判断）这轮打**计划**还是打**实现**。读对应材料：`plan.md` 或某个实现预演的 diff/分支，以及 `prd.md` 验收、`constraints.md` 红线。

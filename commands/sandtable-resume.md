@@ -2,7 +2,7 @@
 description: 换人/换 AI/异常退出后，按持久化状态与当前模式恢复并续接。
 ---
 
-读取并遵循 `skills/state-and-memory/SKILL.md` 的"恢复流程"。
+接防续接当前需求；读取并遵循 `skills/state-and-memory/SKILL.md` 的「恢复流程」。
 
 执行：
 1. 读全局 `docs/sandtable/project.md` 与 `constraints.md`，建立项目目标与红线认知。

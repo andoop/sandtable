@@ -2,7 +2,7 @@
 description: 头脑预演（军事隐喻：图上作业）· 只读子 agent 把整条逻辑链从头推到尾，验证闭环、无漏洞、无意外影响；异常即停上报。
 ---
 
-读取并遵循 `skills/mental-rehearsal/SKILL.md`，对当前需求执行头脑预演。
+对当前需求执行头脑预演；读取并遵循 `skills/mental-rehearsal/SKILL.md`。
 
 执行：
 1. 读本需求 `plan.md`、`prd.md`、`tests.md`、`constraints.md`、`state.md`。

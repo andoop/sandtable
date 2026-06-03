@@ -2,7 +2,7 @@
 description: 战损复盘（AAR）· 当多个实现预演都通过后，按客观评分表打分择优，选出最强的实现准备落地。
 ---
 
-读取并遵循 `skills/evaluating-rehearsals/SKILL.md`，对当前需求的实现预演结果复盘择优。
+对当前需求的实现预演结果复盘择优；读取并遵循 `skills/evaluating-rehearsals/SKILL.md`。
 
 执行：
 1. 门禁检查：仅当本轮所有实现预演都 `DONE` 时才打分。任一 `ANOMALY`/`BLOCKED` → 不打分，回修正循环（修计划→重演）。

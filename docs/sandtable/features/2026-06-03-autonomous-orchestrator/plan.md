@@ -114,7 +114,7 @@ description: Use when the developer wants Sandtable to run end-to-end with no ma
 description: 从需求到复盘全流程无人值守推进
 ---
 
-读取并遵循 `skills/autonomous-orchestration/SKILL.md`，对当前需求执行 Sandtable 全自动流程。
+对当前需求执行 Sandtable 全自动流程；读取并遵循 `skills/autonomous-orchestration/SKILL.md`。
 ```
 - [ ] 步骤2: 写明确执行步骤，避免把它缩成 `/sandtable-rehearse` 的别名。
 ```md

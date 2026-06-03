@@ -2,7 +2,7 @@
 description: 指挥官意图 · 基于情报制定作战目标：要达成什么、必须做什么(MUST)、绝对不能做什么(MUST-NOT)、红线与验收标准。
 ---
 
-读取并遵循 `skills/writing-prd/SKILL.md`，基于已有情报为当前需求确立作战目标。
+基于已有情报为当前需求确立作战目标；读取并遵循 `skills/writing-prd/SKILL.md`。
 
 执行：
 1. 读本需求 `journal.md` 的情报简报、`project.md` 北极星、`constraints.md` 全局红线。若情报不足，先提示我去跑 `/sandtable-recon`。

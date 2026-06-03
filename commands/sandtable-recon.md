@@ -2,7 +2,7 @@
 description: 战场侦察 · 主动收集代码/文档情报，摸清地形，列出未知，自主向开发者提问（不猜测）。
 ---
 
-读取并遵循 `skills/gathering-intel/SKILL.md`，对当前需求执行情报侦察。
+对当前需求执行情报侦察；读取并遵循 `skills/gathering-intel/SKILL.md`。
 
 执行：
 1. 读 `docs/sandtable/project.md`、`constraints.md` 与本需求的原始记录。

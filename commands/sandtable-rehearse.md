@@ -2,7 +2,7 @@
 description: 依次执行 Sandtable 推演与复盘：头脑预演→红蓝对抗→实现预演→复盘择优。
 ---
 
-读取并遵循 `skills/using-sandtable/SKILL.md`，对当前需求依次执行三种推演 + 复盘。
+对当前需求依次执行三种推演 + 复盘；读取并遵循 `skills/using-sandtable/SKILL.md`。
 
 执行：
 1. 若需求是“从原始需求一路无人值守推进到复盘”，改用 `/sandtable-autopilot`；本命令只负责推演与复盘，不负责前序 `RECON / OBJECTIVES / TESTCASES / PLAN`。

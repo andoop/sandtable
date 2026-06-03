@@ -2,7 +2,7 @@
 description: 调整部署 · 我读完目标/计划后，让 AI 据我的反馈修改、补充或重制，反复迭代直到我满意。
 ---
 
-读取并遵循 `skills/using-sandtable/SKILL.md`，根据我接下来的反馈完善当前需求的想法/目标/计划。
+根据我接下来的反馈完善当前需求的想法/目标/计划；读取并遵循 `skills/using-sandtable/SKILL.md`。
 
 执行：
 1. 先读本需求的 `prd.md`、`tests.md`、`plan.md`、`state.md`、`journal.md`，搞清现状。

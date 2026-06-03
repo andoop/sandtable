@@ -2,7 +2,7 @@
 description: 从需求到复盘全流程无人值守推进
 ---
 
-读取并遵循 `skills/autonomous-orchestration/SKILL.md`，对当前需求执行 Sandtable 自动模式。
+对当前需求执行 Sandtable 自动模式；读取并遵循 `skills/autonomous-orchestration/SKILL.md`。
 
 执行：
 1. 本命令显式启用 `<AUTOPILOT-OVERRIDE>`，且只对这次 `/sandtable-autopilot` 生效；之后若我显式触发手动 slash，按该手动命令的边界执行，不要静默延续 override。

@@ -2,7 +2,7 @@
 description: 启动 Sandtable 前五步流程：从一句需求开始，侦察→目标→用例→计划。
 ---
 
-读取并遵循 `skills/using-sandtable/SKILL.md`，对我接下来描述的需求启动 Sandtable 流程。
+对我接下来描述的需求启动 Sandtable 流程；读取并遵循 `skills/using-sandtable/SKILL.md`。
 
 执行（这是前五步入口；推演与复盘请使用单独命令或 `/sandtable-autopilot`）：
 1. 加载 `state-and-memory`，在目标项目创建/确认 `docs/sandtable/` 结构；若 `project.md`/`constraints.md` 不存在，先和我确认全局目标与红线（用 `templates/` 拷贝）。
