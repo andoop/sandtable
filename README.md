@@ -11,8 +11,10 @@ Sandtable 是一套给 coding agent 用的开发方法论插件，由一组可�
 - **实事求是，不猜测、不捏造**：不清楚的事通过读代码、读文档、问开发者弄清，并写回 PRD/计划。
 - **目标 / PRD / 计划 / 红线全留痕**：北极星目标、MUST/MUST-NOT 红线、PRD、改动计划。
 - **状态机 + 追加式记忆**：过程持久化到 `docs/sandtable/`，**换人、换 AI、异常退出都能用 `/sandtable-resume` 续上**。
-- **两种预演**（核心）：
+- **`/sandtable-autopilot` 无人值守推进**：开发者明确需要自动模式时，从需求输入一路推进到复盘择优；只有真正阻塞才停下问人。
+- **三类推演**（核心）：
   - **头脑预演** —— 只读，推演整条逻辑链是否闭环、无漏洞、无意料之外的影响，不做兜底、不节外生枝。
+  - **红蓝对抗** —— 红军专攻找破绽，验证方案是否会被击穿。
   - **实现预演** —— 在隔离 git worktree 里真改代码、完整实现并验证。
 - **子 agent 并行 + 异常即停**：每个预演在独立子 agent 里跑，可并行多个；任一发现意料之外立即终止上报。
 - **择优落地**：全部预演顺利后，按客观评分表选分数最高的实现集成。
@@ -20,8 +22,8 @@ Sandtable 是一套给 coding agent 用的开发方法论插件，由一组可�
 ## 闭环
 
 ```
-INTAKE → CLARIFY → PRD → TESTCASES → PLAN → MENTAL_REHEARSAL → IMPL_REHEARSAL → EVALUATE → INTEGRATE → VERIFY → DONE
-        ↑___ 任一预演发现异常/意外 → 主 agent 亲自核实 → 问开发者 → 修正 PRD/计划 → 重演 ___↑
+INTAKE → RECON → OBJECTIVES → TESTCASES → PLAN → MENTAL_REHEARSAL → REDTEAM → IMPL_REHEARSAL → EVALUATE → INTEGRATE → VERIFY → DONE
+        ↑______ 任一推演发现异常/被攻破/意外 → 主 agent 亲自核实 → 问开发者 → 修正 PRD/计划 → 重演 ______↑
 ```
 
 ## 安装 / 接入
@@ -55,7 +57,8 @@ INTAKE → CLARIFY → PRD → TESTCASES → PLAN → MENTAL_REHEARSAL → IMPL_
 
 | 命令 | 军事隐喻 | 作用 |
 |------|---------|------|
-| `/sandtable-start` | 受领任务 | 一键编排：侦察→目标→用例→计划（从一句话或产品文档开始）|
+| `/sandtable-start` | 受领任务 | 启动前五步：侦察→目标→用例→计划（从一句话或产品文档开始）|
+| `/sandtable-autopilot` | 自动推进 | 从需求到复盘无人值守推进 |
 | `/sandtable-recon` | 战场侦察 | 主动收集代码/文档情报、列未知、自主提问 |
 | `/sandtable-objectives` | 指挥官意图 | 定目标、MUST/MUST-NOT、红线、验收标准 |
 | `/sandtable-plan` | 作战计划 | 制定/重制细到可执行的改动计划 |
@@ -64,9 +67,11 @@ INTAKE → CLARIFY → PRD → TESTCASES → PLAN → MENTAL_REHEARSAL → IMPL_
 | `/sandtable-redteam` | 红蓝对抗 | 红军 OPFOR 专攻找破绽（脑洞核心）|
 | `/sandtable-live` | 实兵演习 | 实现预演：隔离 worktree 真改代码 |
 | `/sandtable-debrief` | 战损复盘 | 多个实现预演打分择优 |
-| `/sandtable-rehearse` | 总演习 | 一键串起 图上→红蓝→实兵→复盘 |
+| `/sandtable-rehearse` | 联合预演 | 依次执行 图上→红蓝→实兵→复盘 |
 | `/sandtable-status` | 战报 SITREP | 查看状态机/任务/推演结果/未决问题 |
 | `/sandtable-resume` | 接防换防 | 换人换 AI / 异常退出后恢复记忆继续 |
+
+其中 `/sandtable-start` 负责前五步，`/sandtable-rehearse` 只负责推演与复盘；明确要求无人值守连续推进时，用 `/sandtable-autopilot`。
 
 ### 三类推演三位一体
 
@@ -91,13 +96,14 @@ sandtable/
   commands/*.md                   # 插件 slash 命令（Claude/通用）
   hooks/                          # 会话启动注入 using-sandtable
   skills/
-    using-sandtable/              # 总入口：理念、状态机、触发规则
+    using-sandtable/              # 方法总览：理念、状态机、触发规则
     being-truthful/               # 实事求是 / 不猜测的硬门禁
     state-and-memory/             # 状态机 + 持久记忆（换人换AI可续）
     gathering-intel/              # 战场侦察：主动收集情报、列未知
     writing-prd/                  # 目标、PRD、红线
     writing-tests/                # 黑盒测试用例（检验 AI 理解的闸门）
     writing-plan/                 # 细到可执行的改动计划
+    autonomous-orchestration/     # 自动推进：从需求到复盘无人值守执行
     mental-rehearsal/             # 头脑预演（图上作业）+ 子agent prompt
     red-team-wargame/             # 红蓝对抗 OPFOR + opfor prompt
     implementation-rehearsal/     # 实现预演（实兵演习）+ 子agent prompt

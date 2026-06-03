@@ -47,9 +47,16 @@ tasks:
     title: 鉴权接口对接
     status: todo
 rehearsals:
-  mental:  { runs: 0, last: none }     # none|closed|anomaly
-  redteam: { runs: 0, last: none }     # none|held|breach
-  impl:    { runs: 0, last: none }     # none|done|anomaly|blocked
+  mental:  { runs: 0, last: none }     # 报告汇总：none|closed|anomaly
+  redteam: { runs: 0, last: none }     # 报告汇总：none|held|breach
+  impl:    { runs: 0, last: none }     # 报告汇总：none|done|anomaly|blocked
+autonomy:
+  mode: manual                         # manual|autopilot；是否处于自动模式的唯一权威开关
+  min_rounds: { mental: 3, redteam: 3, impl: 2 }
+  min_agents_per_round: { mental: 3, redteam: 3, impl: 2 }
+  completed_rounds: { mental: 0, redteam: 0, impl: 0 }
+  last_decision: none                  # 最近一次自动推进 / 回退重演 / 阻塞裁决
+selected_impl: none
 ---
 
 ## 当前进展
@@ -60,9 +67,14 @@ rehearsals:
 ```
 
 **规则：**
-- 每完成一个动作就更新 `state.md` 的 `phase`/`tasks`/`updated`。
+- 每完成一个动作就更新 `state.md` 的 `phase`/`tasks`/`updated`；自动模式下还必须同步刷新 `autonomy.last_decision`，必要时更新 `autonomy.completed_rounds`。
 - `blocked: true` 时，主流程暂停，必须先解决 `questions.md` 里的阻塞问题。
-- 状态回退（异常→修正）时，把 `phase` 改回 `OBJECTIVES`、`TESTCASES` 或 `PLAN`，并在 journal 记录原因。
+- `autonomy.mode` 是自动模式的唯一权威开关；不要再额外发明 `enabled` 一类并列字段。
+- 自动模式运行时，`autonomy.*` 是恢复与续跑的权威；不要只看 `rehearsals.runs` 的汇总数字。
+- `phase` 在 autopilot 下是记录位；恢复与续跑时，先判断 `autonomy.completed_rounds` 是否满足 `autonomy.min_rounds` 的配额闭包，再决定下一步阶段。
+- 手动 `/sandtable-mental`、`/sandtable-redteam`、`/sandtable-live`、`/sandtable-rehearse` 仍会更新 `rehearsals.*.runs` / `rehearsals.*.last` 与报告文件，但这些手动记录不能抵扣或回填 `autonomy.completed_rounds`。
+- 状态回退（异常→修正）时，把 `phase` 改回最早尚未重新验证的阶段，并在 `journal.md` 记录原因；若是 autopilot，还要同步刷新 `autonomy.last_decision`。
+- 遇到老需求目录缺少 `autonomy` 块时，显式按 `manual` 处理，并按 `phase` 恢复；不要用 `rehearsals.*` 反推 autopilot 配额进度。
 
 ## journal.md：只增不改的记忆
 
@@ -81,21 +93,35 @@ rehearsals:
 digraph resume {
   "读 project.md + constraints.md" [shape=box];
   "列出 features/ 找到目标需求" [shape=box];
-  "读 state.md 取 phase 与 tasks" [shape=box];
+  "读 state.md 取 phase/tasks/autonomy" [shape=box];
   "blocked?" [shape=diamond];
   "读 questions.md, 先解阻塞" [shape=box];
   "读 journal.md 近期条目重建上下文" [shape=box];
-  "从 phase 指向的阶段继续" [shape=doublecircle];
+  "autopilot?" [shape=diamond];
+  "按配额闭包决定下一步" [shape=box];
+  "按 phase 指向的阶段继续" [shape=doublecircle];
 
-  "读 project.md + constraints.md" -> "列出 features/ 找到目标需求" -> "读 state.md 取 phase 与 tasks" -> "blocked?";
+  "读 project.md + constraints.md" -> "列出 features/ 找到目标需求" -> "读 state.md 取 phase/tasks/autonomy" -> "blocked?";
   "blocked?" -> "读 questions.md, 先解阻塞" [label="是"];
   "blocked?" -> "读 journal.md 近期条目重建上下文" [label="否"];
   "读 questions.md, 先解阻塞" -> "读 journal.md 近期条目重建上下文";
-  "读 journal.md 近期条目重建上下文" -> "从 phase 指向的阶段继续";
+  "读 journal.md 近期条目重建上下文" -> "autopilot?";
+  "autopilot?" -> "按配额闭包决定下一步" [label="是"];
+  "autopilot?" -> "按 phase 指向的阶段继续" [label="否"];
+  "按配额闭包决定下一步" -> "按 phase 指向的阶段继续";
 }
 ```
 
 恢复时**不要重新发明已有决策**——journal 里记过的就按记的来；只在发现矛盾或缺失时才回到 `being-truthful` 去澄清。
+
+自动模式续跑时用这条明确分支，不要写成含糊回退简写：
+1. 若 `blocked=true`：先解 `questions.md`。
+2. 若 `autonomy.mode=autopilot` 且 `blocked=false`：
+   - 若 `completed_rounds.mental < min_rounds.mental`，下一步是 `MENTAL_REHEARSAL`；
+   - 否则若 `completed_rounds.redteam < min_rounds.redteam`，下一步是 `REDTEAM`；
+   - 否则若 `completed_rounds.impl < min_rounds.impl`，下一步是 `IMPL_REHEARSAL`；
+   - 否则下一步是 `EVALUATE`。
+3. 若 `autonomy.mode=manual`，按 `phase` 恢复。
 
 ## Red Flags
 

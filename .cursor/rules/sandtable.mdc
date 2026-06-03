@@ -29,7 +29,7 @@ INTAKE → RECON → OBJECTIVES → 测试用例 → PLAN → 头脑预演 → �
 
 ## Slash 命令（每个=一个战术动作）
 
-`/sandtable-start` 受领任务 · `/sandtable-recon` 侦察 · `/sandtable-objectives` 目标红线 · `/sandtable-plan` 计划 · `/sandtable-refine` 迭代完善 · `/sandtable-mental` 头脑预演 · `/sandtable-redteam` 红蓝对抗 · `/sandtable-live` 实现预演 · `/sandtable-debrief` 复盘择优 · `/sandtable-rehearse` 总演习 · `/sandtable-status` 战报 · `/sandtable-resume` 接防续接
+`/sandtable-start` 受领任务·前五步 · `/sandtable-autopilot` 自动推进·从需求到复盘无人值守执行 · `/sandtable-recon` 侦察 · `/sandtable-objectives` 目标红线 · `/sandtable-plan` 计划 · `/sandtable-refine` 迭代完善 · `/sandtable-mental` 头脑预演 · `/sandtable-redteam` 红蓝对抗 · `/sandtable-live` 实现预演 · `/sandtable-debrief` 复盘择优 · `/sandtable-rehearse` 联合预演·只跑推演与复盘 · `/sandtable-status` 战报 · `/sandtable-resume` 接防续接
 
 ## 状态与记忆（换人/换AI可续）
 
@@ -37,13 +37,14 @@ INTAKE → RECON → OBJECTIVES → 测试用例 → PLAN → 头脑预演 → �
 
 ## 技能索引（按需加载完整内容）
 
-- `using-sandtable` — 总入口、状态机与触发规则
+- `using-sandtable` — 方法总览、状态机与触发规则
 - `being-truthful` — 实事求是 / 不猜测的硬门禁
 - `state-and-memory` — 状态机与持久化记忆机制
 - `gathering-intel` — 战场侦察：主动收集情报、列未知、提问
 - `writing-prd` — 写目标、PRD、红线（MUST/MUST-NOT）
 - `writing-tests` — 写黑盒测试用例（检验 AI 理解的闸门）
 - `writing-plan` — 写细到可执行的改动计划
+- `autonomous-orchestration` — 自动推进：从需求到复盘无人值守执行
 - `mental-rehearsal` — 头脑预演（隐喻：图上作业 / 只读逻辑推演）
 - `red-team-wargame` — 红蓝对抗 OPFOR（专攻找破绽）
 - `implementation-rehearsal` — 实现预演（隐喻：实兵演习 / 真改代码）

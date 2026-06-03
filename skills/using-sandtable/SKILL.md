@@ -1,6 +1,6 @@
 ---
 name: using-sandtable
-description: Use when starting any work that builds or changes a feature, writes requirements/PRD, makes a plan, or whenever the user mentions 沙盘/预演/推演/rehearsal/dry-run. The entry point that explains the Sandtable loop and which sub-skill to load.
+description: Use when starting any work that builds or changes a feature, writes requirements/PRD, makes a plan, or whenever the user mentions 沙盘/预演/推演/rehearsal/dry-run. The overview skill that explains the Sandtable loop and which sub-skill to load.
 ---
 
 <SUBAGENT-STOP>
@@ -69,7 +69,12 @@ digraph sandtable {
 | VERIFY | 战果确认 | 跑测试/验收，确认成功标准 | `being-truthful` | — |
 | （随时）| 战报/接防 | 看状态 / 新 AI 重获记忆继续 | `state-and-memory` | `/sandtable-status` `/sandtable-resume` |
 
-每个阶段都有独立命令，可单独触发、反复迭代，无需一次跑完。`/sandtable-start` 编排前五步，`/sandtable-rehearse` 串起三类推演 + 复盘。
+每个阶段都有独立命令，可单独触发、反复迭代，无需一次跑完。`/sandtable-start` 负责前五步，`/sandtable-rehearse` 只负责推演与复盘，不是需求入口；若开发者要求 AI 自主连续推进，使用 `/sandtable-autopilot`。
+
+补充说明：
+- `/sandtable-start`：只负责 `INTAKE → RECON → OBJECTIVES → TESTCASES → PLAN`。
+- `/sandtable-rehearse`：只负责 `MENTAL_REHEARSAL → REDTEAM → IMPL_REHEARSAL → EVALUATE`。
+- `/sandtable-autopilot`：在当前回合显式启用自动模式，覆盖从需求输入到复盘择优的无人值守推进。
 
 ## 三类推演各问一个问题
 

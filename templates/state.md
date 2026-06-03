@@ -5,9 +5,15 @@ blocked: false
 updated: <ISO8601>
 tasks: []                # - { id: T1, title: ..., status: todo }  status: todo|doing|rehearsed|integrated|verified|done
 rehearsals:
-  mental:  { runs: 0, last: none }  # none|closed|anomaly
-  redteam: { runs: 0, last: none }  # none|held|breach
-  impl:    { runs: 0, last: none }  # none|done|anomaly|blocked
+  mental:  { runs: 0, last: none }  # 报告汇总：none|closed|anomaly
+  redteam: { runs: 0, last: none }  # 报告汇总：none|held|breach
+  impl:    { runs: 0, last: none }  # 报告汇总：none|done|anomaly|blocked
+autonomy:
+  mode: manual                       # manual|autopilot；是否处于自动模式的唯一权威开关
+  min_rounds: { mental: 3, redteam: 3, impl: 2 }
+  min_agents_per_round: { mental: 3, redteam: 3, impl: 2 }
+  completed_rounds: { mental: 0, redteam: 0, impl: 0 }  # 仅 autopilot 配额闭包计数，不要用 rehearsals.* 回填
+  last_decision: none               # 最近一次自动推进 / 回退重演 / 阻塞裁决
 selected_impl: none      # 择优后填入选定的 impl 预演报告文件名
 ---
 
