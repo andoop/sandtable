@@ -96,4 +96,4 @@ rm -rf "$SB_SRC"
 
 ---
 
-> 偏好用插件市场一行安装？见 `README.md` 的「安装 / 接入」。
+> 想走最短路径？把 README 里的那句“阅读 `INSTALL.md` 并据此把 Sandtable 安装进当前项目”直接发给你的 AI。

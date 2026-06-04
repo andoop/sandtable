@@ -150,3 +150,94 @@
   - 标题下副文、首屏主句、`Why` 段此前没有同等级句级锚点约束；`Quickstart` 也还缺“同一落点内允许两个极短子块，各自完整三件套”的明确格式。
 - 处置：已继续修订 `prd.md` / `tests.md` / `plan.md`，补入微对比、闭环图白话解释、主句/Why 句级锚点、`Quickstart` 双子块同落点与 Cursor caveat 前置规则；待第 3 轮剩余结果全部返回后，再统一判定本轮是否记为 anomaly 并重跑。
 - 依据/来源：后台子 agent “README最终压力预演3A”“README试用压力预演3C”“README对比压力预演3B重发” 的已返回部分 + 主 agent 对文档的复核。
+
+## 2026-06-04 10:03 · [异常 MENTAL_REHEARSAL]
+- 背景：`/sandtable-resume` 以 autopilot 续跑后，主 agent 重新并行派出 3 个只读子 agent 补齐第 3 轮 mental 的剩余判定。
+- 内容（已核实成立）：
+  - 3 个子 agent 全部指向同一处文档级冲突：`prd.md` 中 `FR6` 残留了两版互相矛盾的 Cursor 默认试用路径，一版要求默认走“让 AI 读 INSTALL.md 并自助安装”，另一版又把默认写成手工拷 `.cursor/`。
+  - `tests.md` 当时只写“Cursor 不能变成双选题”，但没有把唯一默认路径具体写死；这会让实现者无法从 `prd.md/tests.md/plan.md` 唯一推出 `Quickstart` 的 Cursor 子块应该采用哪条默认路径。
+  - 同一冲突也让“前两屏单跳到同一个 Quickstart”这条护栏存在上游口径漂移空间。
+- 处置：已按既有 `journal.md` 与 `plan.md` 的记录收口为唯一决策：Cursor 默认仍是“让 AI 读 `INSTALL.md` 并自助安装”，手工拷 `.cursor/` 只作为备选可靠路径；并同步修订 `prd.md`、`tests.md` 与 `state.md`，把本轮记为 anomaly 轮后立即重跑第 3 轮 mental。
+- 依据/来源：子 agent “首页理解压力预演”“文案锚点压力预演”“试用路径压力预演” 返回结果 + 主 agent 对 `prd.md/tests.md/plan.md/journal.md` 的复核。
+
+## 2026-06-04 10:04 · [异常 MENTAL_REHEARSAL]
+- 背景：修正 `FR6` 后重跑第 3 轮 mental，3 个只读子 agent 中仍有 1 个返回 anomaly；主 agent 对分歧点进行复核。
+- 内容（已核实成立）：
+  - `plan.md` 的 README 骨架把“微对比 + 两个短锚点”放进了“首屏只允许落入 1-7”的范围，但 `prd.md` / `tests.md` 的硬约束一直是“首屏只允许标题、1 句副文、`<=5` 条记忆点和 1 条试用入口摘要”，闭环图、微对比和短锚点应紧随其后、但不应回挤进首屏。
+  - 这会让执行者在不违背 `plan.md` 字面的情况下，把本应属于前两屏后半段的元素塞进首屏，破坏前两屏优先级。
+- 处置：已修订 `plan.md`：把首屏允许范围明确收紧为 `1-4`，并新增“`5-7` 必须紧接首屏出现、但不得回挤进首屏”的硬约束；同时更新 `state.md`，把本轮继续记为 anomaly 轮后再次重跑第 3 轮 mental。
+- 依据/来源：子 agent “首页理解复核预演” 返回结果 + 主 agent 对 `plan.md` / `prd.md` / `tests.md` 的复核。
+
+## 2026-06-04 10:05 · [推演 MENTAL_REHEARSAL]
+- 背景：在收口 `FR6` 互斥版本与 `plan.md` 首屏边界冲突后，主 agent 再次并行派出 3 个只读子 agent，重跑第 3 轮 mental。
+- 内容：
+  - 首页理解终复核：`LOGIC_CLOSED`
+  - 文案锚点终复核：`LOGIC_CLOSED`
+  - 试用路径终复核：`LOGIC_CLOSED`
+- 处置：已写入 `rehearsals/mental-7.md`；将该轮计为一轮有效 `mental` 通过，`autonomy.completed_rounds.mental=3`，autopilot 的 mental 配额现已补满，下一步进入 `REDTEAM`。
+- 依据/来源：子 agent “首页理解终复核”“文案锚点终复核”“试用路径终复核” 返回结果。
+
+## 2026-06-04 10:06 · [对抗 REDTEAM]
+- 背景：autopilot 在 mental 配额补满后，按计划本身发起第 1 轮红蓝对抗，分别攻击前两屏优先级/预算、`superpowers` 事实边界、以及试用链路默认路径。
+- 内容（已核实成立）：
+  - `plan.md` 仍把 `Quickstart`、`命令入口` 与旧“安装 / 接入”映射成可能分裂的试用信息来源，存在“前两屏锚点跳到一处、第一条命令落在另一处”的可复现失败路径。
+  - `plan.md` 的 section 预算总和先天超过 `160` 行硬上限，执行者即使逐块都压在上限内，也会天然超线。
+  - `superpowers` 的两句制与作用域只强约束了正式对比区块，没有把 `Why` 等其它 section 里可能夹带的新比较句一并封死。
+  - Cursor 默认路径虽然已指定为“让 AI 读 INSTALL.md 并自助安装”，但 README 级护栏还没把“重载窗口/重开工作区，使 `alwaysApply` 生效”写成 `Quickstart` 的强制接入动作，存在“README 合法过审，用户路径仍未真正接通”的风险。
+- 处置：已把这些 breach 统一回写到 `prd.md` / `tests.md` / `plan.md`：把 `Quickstart` 收紧为唯一试用落点、重算 section 预算到 `<=160`、限制全文 `superpowers` 比较句只能出现在合法两处、并把 Cursor 的重载窗口动作前置进 `Quickstart`。按 autopilot 回退规则，当前从 `REDTEAM` 回退到 `MENTAL_REHEARSAL` 重新验证这些修正。
+- 依据/来源：红军子 agent “红军进攻：首页优先级”“红军进攻：对比事实边界”“红军进攻：试用链路默认路径” 返回结果 + 主 agent 对 `prd.md/tests.md/plan.md/INSTALL.md` 的复核。
+
+## 2026-06-04 10:07 · [推演 MENTAL_REHEARSAL]
+- 背景：redteam 第 1 轮攻破后的修正已回写，主 agent 从 `MENTAL_REHEARSAL` 重新并行派出 3 个只读子 agent，验证本轮回退修正是否已经闭环。
+- 内容：
+  - 修正后 mental：首页路径：`LOGIC_CLOSED`
+  - 修正后 mental：对比边界：`LOGIC_CLOSED`
+  - 修正后 mental：Cursor 默认路径：`LOGIC_CLOSED`
+- 处置：已写入 `rehearsals/mental-8.md`；将这轮记为 redteam 回退后的第 1 轮有效 `mental` 通过，`autonomy.completed_rounds.mental=1`。下一步继续补满剩余 2 轮 mental，再重新进入 `REDTEAM`。
+- 依据/来源：子 agent “修正后 mental：首页路径”“修正后 mental：对比边界”“修正后 mental：Cursor 默认路径” 返回结果。
+
+## 2026-06-04 10:25 · [集成 INTEGRATE]
+- 背景：开发者显式执行 `/sandtable-live 直接实现吧`，要求跳过剩余 autopilot 配额与实现预演 worktree，直接在主工作区落 README 成稿。
+- 内容：
+  - 已按当前 `prd.md` / `tests.md` / `plan.md` 的收敛版本，直接重写 `README.md` 首页信息架构。
+  - 新版 README 已落入“首屏价值主张 + 核心记忆点 + 试用入口摘要 + 闭环图 + 微对比 + Why + 正式对比 + 自举证明 + 单一 Quickstart + 命令入口 + 压缩目录/底线”结构。
+  - 已把 Cursor 默认路径写成唯一首选，并在 `Quickstart` 中显式写出“重载窗口/重开工作区，使 `alwaysApply` 生效”；`superpowers` 比较句只保留在前两屏微对比与正式对比区块。
+  - 主 agent 已完成初步验收：README 当前约 110 行、`ReadLints` 无报错、关键 token 与 section 已存在。
+- 处置：因这是开发者显式手动覆盖，已把 `state.md` 的 `autonomy.mode` 切回 `manual`，并把阶段转到 `VERIFY`；后续若继续推进，应基于成稿做最终人工审读，或再发起一轮针对成稿的红队/实现复盘。
+- 依据/来源：开发者本轮 `/sandtable-live 直接实现吧` 指令 + 主 agent 对 `README.md` 的实现与核对。
+
+## 2026-06-04 10:29 · [对抗 REDTEAM]
+- 背景：开发者显式执行 `/sandtable-redteam`，本轮按 `state.md` 直接判定为“打实现”，针对当前 `README.md` 成稿发起实现级红蓝对抗。
+- 内容（已核实成立）：
+  - 正式 `Sandtable vs Superpowers` 对比区块前置过深，打破“前两屏只留 1 条微对比、完整对比应下沉”的约束。
+  - 首屏第一条记忆点把 `MENTAL_REHEARSAL`、`REDTEAM`、`IMPL_REHEARSAL` 三个名词并列塞进同一 bullet，退化成名词墙。
+  - 正式对比区块的第二句存在一句多锚点/多解释，违反“每句一个具体名词锚点”的红线。
+  - 首屏“立刻试用”摘要没有直接给出第一条命令，只承诺跳到 `Quickstart` 后再看，属于弱锚点。
+- 处置：已写入 `rehearsals/redteam-2.md`，并把 `state.md` 记为实现级 `redteam` breach。当前 README 未通过这轮红队；下一步可由开发者决定是立刻修 README 后重打，还是先保留战报。
+- 依据/来源：红军子 agent “红军进攻：首屏优先级”“红军进攻：对比红线”“红军进攻：试用链路回归” 返回结果 + 主 agent 对 `README.md/prd.md/tests.md` 的复核。
+
+## 2026-06-04 10:29 · [对抗 REDTEAM]
+- 背景：开发者随后明确选择“立即修 README，并在修完后再打一轮实现级 redteam”，主 agent 继续在主工作区修复 `redteam-2` 的实现级 breach，并按相同攻击向量做复打。
+- 内容：
+  - 已修复并复打通过的点：正式对比区块下沉、首屏记忆点拆成单能力单结果、首屏试用摘要直接给出 `/sandtable-start`、Cursor 顺序改为“安装 -> 重载窗口 -> 第一条命令”、流程图恢复 `EVALUATE -> INTEGRATE -> VERIFY -> DONE`、异常闭环补回“主 agent 核实 -> 给方案；必要时问开发者 -> 修正 -> 重演”、本地插件试用途径补上“在 Sandtable 仓库根执行”的语境。
+  - 红军对 `superpowers` 位置/句型、Cursor 本地插件语境、以及异常闭环表达的最终定点复打均返回 `HELD`。
+- 处置：已写入 `rehearsals/redteam-3.md`；当前 `README.md` 已扛住这轮实现级红队复打，状态可继续停留在 `VERIFY`。
+- 依据/来源：开发者对“fix_now”的明确选择 + 复打红军子 agent “终局红军：对比句法”“终局红军：手工安装备选”“终局红军：异常闭环最终复核” 返回结果。
+
+## 2026-06-04 10:50 · [验证 VERIFY]
+- 背景：开发者进一步指出仓库并没有实际上线 `Claude Code marketplace`，且 README 无需继续保留 `Cursor` 分栏，建议改成一句话交给自己的 AI 自动接入。
+- 内容：
+  - 已复核确认：`README.md` 里的 `Claude Code marketplace` 安装说法与仓库现状不符；而 `INSTALL.md` 已具备跨 harness 可复用的 AI 安装指令。
+  - 已将 README 的默认试用路径统一收敛为“把一句安装指令发给 AI，让它阅读 `INSTALL.md` 并安装到当前项目”，并把 `Quickstart` 改成统一三件套：安装指令、安装后接线动作说明、第一条命令。
+  - 已同步移除 README 中的 `Claude Code` / `Cursor` 分栏展开，并把 `INSTALL.md` 末尾残留的插件市场引用改成新的 AI 快速接入提示。
+  - 已同步修订本 feature 的 `prd.md` / `tests.md` / `plan.md` / `state.md`，把默认路径约束收口为统一 AI 快速接入，不再要求首页保留不存在的 marketplace 说法或 Cursor 分栏。
+- 处置：当前 README 继续停留在 `VERIFY`，等待主 agent 做最终核对。
+- 依据/来源：开发者本轮关于安装路径的明确反馈 + 主 agent 对 `README.md` / `INSTALL.md` 的复核与回写。
+
+## 2026-06-04 10:54 · [验证 VERIFY]
+- 背景：开发者继续指出 README 首屏 5 条记忆点里对 `/sandtable-autopilot` 的强调过重，Sandtable 的首页特点应更偏向“推演闭环 + 自我完善”。
+- 内容：
+  - 已把首屏记忆点中的 `/sandtable-autopilot` 条目改写为“推演会反过来改进方法论”，强调每轮异常/攻破都会回写 `docs/sandtable/`，让仓库随着演练一起收紧。
+  - 已同步修订本 feature 的 `prd.md` / `tests.md` / `plan.md` / `state.md`，把前置记忆点从“autopilot”收口为“推演驱动的自我完善”，避免 README 与验收口径继续冲突。
+- 处置：README 继续停留在 `VERIFY`；当前首页前置重心已从“自动推进能力”收回到“推演闭环 + 自举完善”。
+- 依据/来源：开发者本轮关于首页记忆点权重的明确反馈 + 主 agent 对 `README.md` 与 feature 文档的回写。
