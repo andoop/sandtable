@@ -7,9 +7,15 @@
 - **异常即回修正**: 一旦出现 `ANOMALY_FOUND`、`BREACH_FOUND` 或 `BLOCKED`，就先回写文档、修正计划再重演，绝不带着坏假设硬推。
 - **这个仓库正在自举**: Sandtable 自己就用同一套方法打磨 `README`、命令和 skill，每轮推演都回写 `docs/sandtable/`，让方法论随演练一起收紧。
 
-**立刻试用**: 无需手动 clone，把下面这一句原样发给你的 AI，它会自己读我们的安装说明并装好——
+**立刻试用**: 无需手动 clone，把下面两条官方提示词之一**原样**发给你的 AI（Cursor / Claude Code / Codex / Kiro / 其它通用 coding agent 均可）。AI 必须按你贴过去的这条提示词正文选择安装语言，并读取同一个 `INSTALL.md` 完成安装。
 
-> 阅读 https://github.com/andoop/sandtable/blob/main/INSTALL.md ，并据此把 Sandtable 安装进当前项目。
+中文版：
+
+> 阅读 https://github.com/andoop/sandtable/blob/main/INSTALL.md ，并据此按中文把 Sandtable 安装进当前项目。
+
+English:
+
+> Read https://github.com/andoop/sandtable/blob/main/INSTALL.md and use it to install Sandtable into the current project in English.
 
 安装完成后运行 `/sandtable-start`。详见 [`Quickstart`](#quickstart)。
 
@@ -53,14 +59,20 @@ Sandtable 让 agent 用三种推演逐层逼出破口，全程落盘可续：
 这个仓库不是“写给别人照做”的文档仓。当前仓库自己就在 `docs/sandtable/` 里记录 feature 目标、测试、计划、推演和回退修正，用同一套方法继续打磨 `README`、命令和 skill。
 
 ## Quickstart
-1. 无需 clone 本仓库，把下面这一句原样发给你的 AI，让它自己去读我们的安装说明：
+1. 无需 clone 本仓库，把下面两条官方提示词之一**原样**发给你的 AI，让它自己去读统一的安装说明并按该提示词语言安装对应本地资产：
 
-   > 阅读 https://github.com/andoop/sandtable/blob/main/INSTALL.md ，并据此把 Sandtable 安装进当前项目。
+   中文：
+
+   > 阅读 https://github.com/andoop/sandtable/blob/main/INSTALL.md ，并据此按中文把 Sandtable 安装进当前项目。
+
+   English:
+
+   > Read https://github.com/andoop/sandtable/blob/main/INSTALL.md and use it to install Sandtable into the current project in English.
 
 2. 按 AI 的安装结果完成最后接线；若它提示重载窗口或重开工作区以使规则生效，就照做。
 3. 第一条命令：`/sandtable-start`
 
-手工安装、不同 AI 工具（Cursor / Claude Code / Codex 等）的差异、以及本地试用路径，都写在 `INSTALL.md`，README 不再展开。
+手工安装、不同 AI 工具（Cursor / Claude Code / Codex / Kiro 等）的差异、以及本地试用路径，都写在 `INSTALL.md`，README 不再展开。Codex 与 Kiro 走同一条通用安装路径；本仓库不会为它们新增专属 rules / hooks / 脚本接线。
 
 ## 命令入口
 - `/sandtable-start`: 从一句话需求进入前五步，收束到侦察、目标、用例和计划。

@@ -8,7 +8,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 PLUGIN_ROOT="$(cd "${SCRIPT_DIR}/.." && pwd)"
 
-bootstrap_content=$(cat "${PLUGIN_ROOT}/skills/using-sandtable/SKILL.md" 2>&1 || echo "读取 using-sandtable skill 失败")
+bootstrap_content=$(cat "${PLUGIN_ROOT}/skills/using-sandtable/SKILL.md" 2>&1 || echo "Error reading using-sandtable skill")
 
 # Escape a string for safe embedding in a JSON string literal.
 escape_for_json() {
@@ -22,7 +22,7 @@ escape_for_json() {
 }
 
 bootstrap_escaped=$(escape_for_json "$bootstrap_content")
-session_context="<EXTREMELY_IMPORTANT>\n本项目使用 Sandtable（\u6c99\u76d8\u63a8\u6f14\u9a71\u52a8\u5f00\u53d1）。\n\n**下面是 'sandtable:using-sandtable' skill 的完整内容，它是你的入口。其它 skill 需要时再通过读取各自的 SKILL.md 按需加载：**\n\n${bootstrap_escaped}\n</EXTREMELY_IMPORTANT>"
+session_context="<EXTREMELY_IMPORTANT>\nThis project uses Sandtable (\u6c99\u76d8\u63a8\u6f14\u9a71\u52a8\u5f00\u53d1).\n\n**Below is the full content of the 'sandtable:using-sandtable' skill - your entry point. For all other skills, load them on demand by reading their SKILL.md:**\n\n${bootstrap_escaped}\n</EXTREMELY_IMPORTANT>"
 
 if [ -n "${CURSOR_PLUGIN_ROOT:-}" ]; then
   printf '{\n  "additional_context": "%s"\n}\n' "$session_context"

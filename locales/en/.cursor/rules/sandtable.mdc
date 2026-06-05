@@ -1,0 +1,51 @@
+---
+description: Sandtable wargame-driven development methodology. Enable when the user wants to add or modify a feature, write requirements, make a plan, or asks for rehearsal / dry-run work. Enforces truthfulness, no guessing, and the loop of plan -> rehearse -> fix -> rehearse again.
+alwaysApply: true
+---
+
+# Sandtable · Wargame-Driven Development (Behavior Baseline)
+
+This project uses the Sandtable methodology. Any task that builds or changes features, writes requirements, or creates plans must follow the baseline below. At decision points, read `skills/<name>/SKILL.md` on demand before proceeding.
+
+## Four Non-Negotiable Rules (Truthfulness)
+
+1. **Do not guess or fabricate.** Resolve unclear facts by 1) reading code, 2) reading docs, or 3) asking the developer, then write the conclusion back into the PRD / plan / state.
+2. **Think before acting.** State assumptions explicitly; surface multiple interpretations instead of silently picking one; call out simpler options when they exist.
+3. **Make surgical changes.** Change only what must change; do not "optimize" unrelated code; do not add fallback logic or side quests; every changed line must trace back to the requirement.
+4. **Stay goal-driven.** Turn the task into verifiable success criteria and loop until verification passes.
+
+> Violating the letter violates the spirit. "This is too simple to need the process" is the most dangerous rationalization.
+
+## Core Loop (One Battle)
+
+```
+INTAKE -> RECON -> OBJECTIVES -> TESTCASES -> PLAN -> MENTAL_REHEARSAL -> REDTEAM -> IMPL_REHEARSAL -> EVALUATE -> INTEGRATE -> VERIFY -> DONE
+       ^______ any rehearsal finds anomaly / breach / surprise -> verify personally -> ask developer -> fix objective / plan -> rehearse again ______^
+```
+
+- **Three rehearsals as one system**: mental rehearsal asks whether the logic closes; red-team attack asks whether it can be broken; implementation rehearsal asks whether the code can actually be built correctly.
+- Rehearsals must run in **isolated subagents**, optionally in parallel, and return `LOGIC_CLOSED` / `HELD` / `DONE` or `ANOMALY_FOUND` / `BREACH_FOUND` / `BLOCKED`.
+- **If any rehearsal finds divergence from the plan, anything unexpected, or a successful red-team attack, stop immediately and report it**. The main agent verifies it, proposes a fix or asks the developer, updates the docs, and rehearses again until the whole line holds.
+
+## Slash Commands
+
+`/sandtable-start` first five steps · `/sandtable-autopilot` unattended progression from request to debrief · `/sandtable-recon` reconnaissance · `/sandtable-objectives` goals and red lines · `/sandtable-plan` plan · `/sandtable-refine` iterative revision · `/sandtable-mental` mental rehearsal · `/sandtable-redteam` red-team attack · `/sandtable-live` implementation rehearsal · `/sandtable-debrief` score and choose · `/sandtable-rehearse` rehearsals plus debrief only · `/sandtable-status` status report · `/sandtable-resume` resume from saved state
+
+## State and Memory (Recoverable Across Humans / AIs)
+
+Persist all work under `docs/sandtable/` in the target project: global `project.md` (north star), `constraints.md` (MUST / MUST-NOT red lines), and for each feature a folder with `prd.md`, `tests.md`, `plan.md`, `state.md`, `journal.md`, and `questions.md`. After interruptions, resume from those files with `/sandtable-resume`.
+
+## Skill Index (Load on Demand)
+
+- `using-sandtable` - methodology overview, state machine, trigger rules
+- `being-truthful` - hard gate against guessing
+- `state-and-memory` - state machine and persistent memory
+- `gathering-intel` - reconnaissance: collect facts, list unknowns, ask questions
+- `writing-prd` - write goals, requirements, and red lines
+- `writing-tests` - write black-box test cases as understanding checks
+- `writing-plan` - write an executable change plan
+- `autonomous-orchestration` - unattended progression from intake through debrief
+- `mental-rehearsal` - mental rehearsal (map exercise / read-only reasoning)
+- `red-team-wargame` - red-team OPFOR attack
+- `implementation-rehearsal` - implementation rehearsal (field exercise / real code)
+- `evaluating-rehearsals` - score battle damage and choose the best result

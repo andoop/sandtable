@@ -5,7 +5,7 @@ set -euo pipefail
 SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
 HOOK_NAME="${1:-}"
 if [ -z "$HOOK_NAME" ]; then
-  echo "用法: run-hook.cmd <hook-name>" >&2
+  echo "Usage: run-hook.cmd <hook-name>" >&2
   exit 2
 fi
 shift || true
