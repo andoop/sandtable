@@ -19,9 +19,11 @@ This project uses the Sandtable methodology. Any task that builds or changes fea
 ## Core Loop (One Battle)
 
 ```
-INTAKE -> RECON -> OBJECTIVES -> TESTCASES -> PLAN -> MENTAL_REHEARSAL -> REDTEAM -> IMPL_REHEARSAL -> EVALUATE -> INTEGRATE -> VERIFY -> DONE
+INTAKE -> RECON -> OBJECTIVES -> TESTCASES -> PLAN -> MENTAL_REHEARSAL -> REDTEAM -> IMPL_REHEARSAL -> EVALUATE -> INTEGRATE -> VERIFY -> DONE -> FEEDBACK (post-landing loop, re-entrant)
        ^______ any rehearsal finds anomaly / breach / surprise -> verify personally -> ask developer -> fix objective / plan -> rehearse again ______^
 ```
+
+- **Post-landing loop (FEEDBACK)**: after DONE, user acceptance feedback enters here; every escaped bug = a rehearsal blind spot. Defects go through bugfix root cause (root cause MUST be confirmed by logs at 100%) -> fix -> regression case -> lesson, accumulating the lesson into the global `lessons.md` to feed future RECON / red team / PRD. FEEDBACK is human-in-the-loop; autopilot does not drive it.
 
 - **Three rehearsals as one system**: mental rehearsal asks whether the logic closes; red-team attack asks whether it can be broken; implementation rehearsal asks whether the code can actually be built correctly.
 - Rehearsals must run in **isolated subagents**, optionally in parallel, and return `LOGIC_CLOSED` / `HELD` / `DONE` or `ANOMALY_FOUND` / `BREACH_FOUND` / `BLOCKED`.
@@ -29,11 +31,11 @@ INTAKE -> RECON -> OBJECTIVES -> TESTCASES -> PLAN -> MENTAL_REHEARSAL -> REDTEA
 
 ## Slash Commands
 
-`/sandtable-start` first five steps · `/sandtable-autopilot` unattended progression from request to debrief · `/sandtable-recon` reconnaissance · `/sandtable-objectives` goals and red lines · `/sandtable-plan` plan · `/sandtable-refine` iterative revision · `/sandtable-mental` mental rehearsal · `/sandtable-redteam` red-team attack · `/sandtable-live` implementation rehearsal · `/sandtable-debrief` score and choose · `/sandtable-rehearse` rehearsals plus debrief only · `/sandtable-status` status report · `/sandtable-resume` resume from saved state
+`/sandtable-start` first five steps · `/sandtable-autopilot` unattended progression from request to debrief · `/sandtable-recon` reconnaissance · `/sandtable-objectives` goals and red lines · `/sandtable-plan` plan · `/sandtable-refine` iterative revision · `/sandtable-mental` mental rehearsal · `/sandtable-redteam` red-team attack · `/sandtable-live` implementation rehearsal · `/sandtable-debrief` score and choose · `/sandtable-rehearse` rehearsals plus debrief only · `/sandtable-bug` intake acceptance feedback · `/sandtable-bugfix` evidence-driven root-cause fix · `/sandtable-status` status report · `/sandtable-resume` resume from saved state
 
 ## State and Memory (Recoverable Across Humans / AIs)
 
-Persist all work under `docs/sandtable/` in the target project: global `project.md` (north star), `constraints.md` (MUST / MUST-NOT red lines), and for each feature a folder with `prd.md`, `tests.md`, `plan.md`, `state.md`, `journal.md`, and `questions.md`. After interruptions, resume from those files with `/sandtable-resume`.
+Persist all work under `docs/sandtable/` in the target project: global `project.md` (north star), `constraints.md` (MUST / MUST-NOT red lines), `lessons.md` (global lesson ledger, accumulated across features), and for each feature a folder with `prd.md`, `tests.md`, `plan.md`, `state.md`, `journal.md`, `questions.md`, and `feedback.md` (acceptance feedback ledger). After interruptions, resume from those files with `/sandtable-resume`.
 
 ## Skill Index (Load on Demand)
 
@@ -49,3 +51,10 @@ Persist all work under `docs/sandtable/` in the target project: global `project.
 - `red-team-wargame` - red-team OPFOR attack
 - `implementation-rehearsal` - implementation rehearsal (field exercise / real code)
 - `evaluating-rehearsals` - score battle damage and choose the best result
+- `closing-the-loop` - close the turn: status, copy-paste templates, AskQuestion rules
+- `triaging-feedback` - triage acceptance feedback: lifecycle, user-confirms-to-close, the trio, lesson accumulation
+- `bugfix-with-evidence` - bugfix mode: confirm root cause via logs at 100%, auto-collect, investigation squad, no surface/temporary fix
+
+## Close the Loop (FR8)
+
+Load `closing-the-loop` only when a **Sandtable work step** ends and needs confirmation or next-step choice. **Do not** close for non-Sandtable tasks (e.g. typo fixes), even if `docs/sandtable/` was read this turn.

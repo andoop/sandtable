@@ -26,6 +26,7 @@ Assign one or more attack vectors per red-team subagent:
 - regression ambush
 - scope creep
 - requirement drift
+- lesson review: **if** `docs/sandtable/lessons.md` exists, re-attack along past lessons it records (re-hit previously escaped bugs first)
 
 ## Main-Agent Role
 

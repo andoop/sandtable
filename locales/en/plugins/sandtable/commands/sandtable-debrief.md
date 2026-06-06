@@ -11,3 +11,5 @@ Execute:
 4. Choose the highest score; if scores are close, prefer the simpler option with the smaller change set.
 5. Write the chosen implementation into `state.md` as `selected_impl`, set `phase=INTEGRATE`, record the scores and rationale in `journal.md`, and clean up unselected worktrees / branches.
 6. Give me a brief comparison (total score per option, key differences, and why X won), then wait for confirmation before integration. User instruction may override the choice.
+
+8. When done, load `skills/closing-the-loop/SKILL.md`, read `state.md`, and output the close block (skip for in-command chain steps; use status bulletin for in-chain switches). Do not run unlisted next phases except `/sandtable-autopilot` and `/sandtable-rehearse`.

@@ -16,3 +16,5 @@ description: 调整部署 · 我读完目标/计划后，让 AI 据我的反馈�
 6. 把修改点摘要给我，等我确认或继续提反馈。
 
 可反复触发本命令，直到我说"就这样"。重大改动后记得重新预演。
+
+8. 完成后加载 `skills/closing-the-loop/SKILL.md`，读 `state.md`，输出收尾（本命令已列出的链内后续步骤除外；链内切换用战报 profile）。不得越权执行**本命令未列出**的下一阶段（`/sandtable-autopilot`、`/sandtable-rehearse` 除外）。

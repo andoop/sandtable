@@ -29,6 +29,7 @@ description: Use to adversarially attack a plan or an implementation before comm
 | **回归伏击** | 这个改动会打破哪个现有功能/测试 |
 | **范围蔓延** | 揪出未被要求的兜底/灵活性/节外生枝（越界即破绽） |
 | **需求背离** | 做的东西其实没满足 PRD 的某条验收标准 |
+| **教训复盘** | **若存在** `docs/sandtable/lessons.md`，拿命中过的历史教训作为本轮攻击向量复打（过去逃逸的 bug 优先复攻） |
 
 ## 编排（主 agent = 蓝军指挥）
 

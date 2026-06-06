@@ -11,3 +11,5 @@ Execute:
 4. If all return `DONE` -> write reports to `rehearsals/impl-<n>-<branch>.md`, update `state.md` (`impl.last=done`), and tell me I can use `/sandtable-redteam` (against the implementation) or `/sandtable-debrief`.
 
 Iron law: every rehearsal must stay in its own worktree; stop immediately on anomalies instead of editing the plan yourself; no scope creep, no fallback logic; do not trust `DONE` without checking the real diff.
+
+8. When done, load `skills/closing-the-loop/SKILL.md`, read `state.md`, and output the close block (skip for in-command chain steps; use status bulletin for in-chain switches). Do not run unlisted next phases except `/sandtable-autopilot` and `/sandtable-rehearse`.

@@ -14,3 +14,5 @@ Execute:
 7. Only when `autonomy.mode=manual` or `blocked=true`, summarize in 3-5 lines: what we are doing, where we stopped, why we stopped, and what the next step is, then wait for my confirmation before continuing.
 
 Go back to `being-truthful` only when you detect contradiction or missing information. Do not silently extend autopilot semantics onto a later manual slash command I trigger explicitly.
+
+8. When done, load `skills/closing-the-loop/SKILL.md`, read `state.md`, and output the close block (skip for in-command chain steps; use status bulletin for in-chain switches). Do not run unlisted next phases except `/sandtable-autopilot` and `/sandtable-rehearse`.

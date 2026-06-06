@@ -13,3 +13,5 @@ Execute:
 6. Write `plan.md`, update `state.md` (write the task list, set `phase=MENTAL_REHEARSAL`), and tell me I can continue with `/sandtable-mental`.
 
 Do not guess about uncertain points. Go back to reconnaissance or ask.
+
+8. When done, load `skills/closing-the-loop/SKILL.md`, read `state.md`, and output the close block (skip for in-command chain steps; use status bulletin for in-chain switches). Do not run unlisted next phases except `/sandtable-autopilot` and `/sandtable-rehearse`.

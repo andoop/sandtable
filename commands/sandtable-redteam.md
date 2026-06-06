@@ -13,3 +13,5 @@ description: 红蓝对抗（OPFOR）· 派红军子 agent 专门攻击当前计�
 4. 写入 `rehearsals/redteam-<n>.md`，journal 追加，更新 `state.md`（redteam 计数）。
 
 铁律：红军往死里打、不找补；空泛"可能有风险"不算攻破，必须给可复现杀招；主 agent 不轻信红军也不轻信蓝军。
+
+8. 完成后加载 `skills/closing-the-loop/SKILL.md`，读 `state.md`，输出收尾（本命令已列出的链内后续步骤除外；链内切换用战报 profile）。不得越权执行**本命令未列出**的下一阶段（`/sandtable-autopilot`、`/sandtable-rehearse` 除外）。

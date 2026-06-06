@@ -19,9 +19,11 @@
 
 ## 核心闭环（状态机）
 
-`INTAKE → RECON → OBJECTIVES → TESTCASES → PLAN → MENTAL_REHEARSAL → REDTEAM → IMPL_REHEARSAL → EVALUATE → INTEGRATE → VERIFY → DONE`
+`INTAKE → RECON → OBJECTIVES → TESTCASES → PLAN → MENTAL_REHEARSAL → REDTEAM → IMPL_REHEARSAL → EVALUATE → INTEGRATE → VERIFY → DONE → FEEDBACK`
 
 任一预演发现异常/意外 → 主 agent 亲自核实 → 给方案或问开发者 → 修正 PRD/计划 → 重演。循环往复，逐步加固逻辑，直至完美。
+
+**落地后闭环（FEEDBACK，可重入）**：DONE 后用户验收反馈进入；缺陷类经 bugfix 根因（必靠日志100%确认）→修复→回归用例→教训，教训累积进全局 `lessons.md` 反哺未来推演。FEEDBACK 人在环，autopilot 不驱动（其范围止于 EVALUATE/DONE）。
 
 ## 预演的两条铁律
 
@@ -40,8 +42,12 @@
 
 ## 技能索引
 
-需要时读取对应 `skills/<name>/SKILL.md` 的完整内容：`using-sandtable`、`being-truthful`、`state-and-memory`、`gathering-intel`、`writing-prd`、`writing-tests`、`writing-plan`、`autonomous-orchestration`、`mental-rehearsal`、`red-team-wargame`、`implementation-rehearsal`、`evaluating-rehearsals`。
+需要时读取对应 `skills/<name>/SKILL.md` 的完整内容：`using-sandtable`、`being-truthful`、`state-and-memory`、`gathering-intel`、`writing-prd`、`writing-tests`、`writing-plan`、`autonomous-orchestration`、`mental-rehearsal`、`red-team-wargame`、`implementation-rehearsal`、`evaluating-rehearsals`、`closing-the-loop`、`triaging-feedback`、`bugfix-with-evidence`。
+
+## 回合收尾（FR8）
+
+仅 **Sandtable 工作步**结束且需确认/选下一步时加载 `closing-the-loop`。**禁止**对非 Sandtable 任务（如修 typo）输出收尾，即使本回合读过 `docs/sandtable/`。
 
 ## Slash 命令（每个=一个战术动作，可单独触发/反复迭代）
 
-`/sandtable-start`（受领任务·前五步）、`/sandtable-autopilot`（自动推进·从需求到复盘无人值守执行）、`/sandtable-recon`（战场侦察）、`/sandtable-objectives`（指挥官意图·目标红线）、`/sandtable-plan`（作战计划）、`/sandtable-refine`（调整部署·迭代完善）、`/sandtable-mental`（头脑预演）、`/sandtable-redteam`（红蓝对抗）、`/sandtable-live`（实现预演）、`/sandtable-debrief`（战损复盘·择优）、`/sandtable-rehearse`（联合预演·只跑推演与复盘）、`/sandtable-status`（战报）、`/sandtable-resume`（接防·重获记忆）。
+`/sandtable-start`（受领任务·前五步）、`/sandtable-autopilot`（自动推进·从需求到复盘无人值守执行）、`/sandtable-recon`（战场侦察）、`/sandtable-objectives`（指挥官意图·目标红线）、`/sandtable-plan`（作战计划）、`/sandtable-refine`（调整部署·迭代完善）、`/sandtable-mental`（头脑预演）、`/sandtable-redteam`（红蓝对抗）、`/sandtable-live`（实现预演）、`/sandtable-debrief`（战损复盘·择优）、`/sandtable-rehearse`（联合预演·只跑推演与复盘）、`/sandtable-bug`（受理验收反馈）、`/sandtable-bugfix`（证据驱动根因修障）、`/sandtable-status`（战报）、`/sandtable-resume`（接防·重获记忆）。

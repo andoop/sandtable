@@ -40,6 +40,7 @@ digraph sandtable {
   INTEGRATE [shape=box label="INTEGRATE\nLand the change"];
   VERIFY [shape=box];
   DONE [shape=doublecircle];
+  FEEDBACK [shape=box label="FEEDBACK\nPost-landing loop (re-entrant)"];
   FIX [shape=box label="Verify personally -> ask developer -> fix objectives / plan"];
 
   INTAKE -> RECON -> OBJ -> TESTS -> PLAN -> MENTAL -> RED -> IMPL -> EVAL;
@@ -50,6 +51,8 @@ digraph sandtable {
   EVAL -> INTEGRATE [label="Yes, debrief and choose"];
   FIX -> OBJ [label="Run again"];
   INTEGRATE -> VERIFY -> DONE;
+  DONE -> FEEDBACK [label="user acceptance feedback"];
+  FEEDBACK -> FIX [label="defect -> root cause / rehearse"];
 }
 ```
 
@@ -67,6 +70,7 @@ digraph sandtable {
 | EVALUATE | After-action review | Score implementations and choose the best | `evaluating-rehearsals` | `/sandtable-debrief` |
 | INTEGRATE | Integrate | Land the selected implementation | - | - |
 | VERIFY | Confirm results | Run validation and confirm success criteria | `being-truthful` | - |
+| FEEDBACK | After-action | Intake acceptance feedback, triage, route defects to bugfix root cause (logs at 100%), regression + lesson | `triaging-feedback` / `bugfix-with-evidence` | `/sandtable-bug` `/sandtable-bugfix` |
 | (Any time) | Status / resume | Inspect state or recover after interruption | `state-and-memory` | `/sandtable-status` `/sandtable-resume` |
 
 Each phase has its own command and can be triggered independently and repeatedly. `/sandtable-start` owns only the first five steps; `/sandtable-rehearse` owns only rehearsals plus debrief, not intake; if the developer wants uninterrupted progression, use `/sandtable-autopilot`.
@@ -75,6 +79,7 @@ Additional notes:
 - `/sandtable-start`: only `INTAKE -> RECON -> OBJECTIVES -> TESTCASES -> PLAN`
 - `/sandtable-rehearse`: only `MENTAL_REHEARSAL -> REDTEAM -> IMPL_REHEARSAL -> EVALUATE`
 - `/sandtable-autopilot`: explicitly enables autonomous progression for the current run, from request intake through debrief
+- **Post-landing loop (FEEDBACK)**: after DONE, user acceptance feedback enters here, driven manually by `/sandtable-bug` (intake & triage) and `/sandtable-bugfix` (evidence-driven root cause, **must be confirmed by logs at 100%**); after the fix, produce a regression case + the root-cause/prevention/lesson trio, accumulating the lesson into the global `lessons.md` to feed future RECON / red team / PRD. **FEEDBACK is human-in-the-loop; autopilot does not drive it** (autopilot scope ends at EVALUATE/DONE).
 
 ## The Three Questions the Rehearsals Ask
 
@@ -94,6 +99,10 @@ Whenever any rehearsal returns `ANOMALY_FOUND` / `BREACH_FOUND` (or the debrief 
 2. Provide a **reasonable fix**; if uncertainty remains or it is a product decision, **ask the developer** and record the question in `questions.md`.
 3. Write the clarified result back into `prd.md` / `tests.md` / `plan.md`, and append the decision to `journal.md`.
 4. **Rehearse again** until the line holds. Then use `evaluating-rehearsals` to score the implementation rehearsals and select the strongest one.
+
+## Close the Loop (end of Sandtable work steps)
+
+Only when this turn is a **Sandtable work step** (positive trigger in `closing-the-loop` FR8), load `skills/closing-the-loop/SKILL.md` and output the close block. **Do not** close for non-Sandtable tasks (e.g. typo fixes), even if `docs/sandtable/` was read. Use AskQuestion for manual multi-branch; use status bulletin + resume in-command for autopilot non-blocked.
 
 ## Trigger Rules (Red Flags = You Are Rationalizing)
 

@@ -40,6 +40,7 @@ digraph sandtable {
   INTEGRATE [shape=box label="INTEGRATE\n落地"];
   VERIFY [shape=box];
   DONE [shape=doublecircle];
+  FEEDBACK [shape=box label="FEEDBACK\n落地后闭环(可重入)"];
   FIX [shape=box label="亲自核实→问开发者→修正目标/计划"];
 
   INTAKE -> RECON -> OBJ -> TESTS -> PLAN -> MENTAL -> RED -> IMPL -> EVAL;
@@ -50,6 +51,8 @@ digraph sandtable {
   EVAL -> INTEGRATE [label="是, 复盘择优"];
   FIX -> OBJ [label="重走"];
   INTEGRATE -> VERIFY -> DONE;
+  DONE -> FEEDBACK [label="用户验收反馈"];
+  FEEDBACK -> FIX [label="缺陷→根因/重演"];
 }
 ```
 
@@ -67,6 +70,7 @@ digraph sandtable {
 | EVALUATE | 战损复盘 | 全部顺利则打分择优 | `evaluating-rehearsals` | `/sandtable-debrief` |
 | INTEGRATE | 落地 | 把选定实现落到主分支 | — | — |
 | VERIFY | 战果确认 | 跑测试/验收，确认成功标准 | `being-truthful` | — |
+| FEEDBACK | 战后讲评 | 受理验收反馈,分诊,缺陷转 bugfix 根因(日志100%),回归+教训沉淀 | `triaging-feedback` / `bugfix-with-evidence` | `/sandtable-bug` `/sandtable-bugfix` |
 | （随时）| 战报/接防 | 看状态 / 新 AI 重获记忆继续 | `state-and-memory` | `/sandtable-status` `/sandtable-resume` |
 
 每个阶段都有独立命令，可单独触发、反复迭代，无需一次跑完。`/sandtable-start` 负责前五步，`/sandtable-rehearse` 只负责推演与复盘，不是需求入口；若开发者要求 AI 自主连续推进，使用 `/sandtable-autopilot`。
@@ -75,6 +79,7 @@ digraph sandtable {
 - `/sandtable-start`：只负责 `INTAKE → RECON → OBJECTIVES → TESTCASES → PLAN`。
 - `/sandtable-rehearse`：只负责 `MENTAL_REHEARSAL → REDTEAM → IMPL_REHEARSAL → EVALUATE`。
 - `/sandtable-autopilot`：在当前回合显式启用自动模式，覆盖从需求输入到复盘择优的无人值守推进。
+- **落地后闭环（FEEDBACK）**：DONE 后用户验收反馈进入，由 `/sandtable-bug`（受理分诊）与 `/sandtable-bugfix`（证据驱动根因，**必靠日志100%**）手动推进；缺陷修复后产出回归用例 + 根因/预防/教训三件套，教训累积进全局 `lessons.md` 反哺未来 RECON/红军/PRD。**FEEDBACK 人在环，autopilot 不驱动**（autopilot 范围止于 EVALUATE/DONE）。
 
 ## 三类推演各问一个问题
 
@@ -94,6 +99,10 @@ digraph sandtable {
 2. 给出**合理方案**；若仍不确定或属于产品决策，**向开发者提问/索要补充**，记入 `questions.md`。
 3. 把澄清结论写回 `prd.md` / `tests.md` / `plan.md`，并在 `journal.md` 追加决策记录。
 4. **重新推演**，循环直到全部顺利。之后用 `evaluating-rehearsals` 给各实现预演打分，选最高的落地。
+
+## 回合收尾（Sandtable 工作步结束时）
+
+仅当本回合为 **Sandtable 工作步**（正触发见 `closing-the-loop` FR8）时，加载 `skills/closing-the-loop/SKILL.md` 并输出收尾。非 Sandtable 任务（如修 typo）**禁止**收尾，即使读过 `docs/sandtable/`。手动多分支用 AskQuestion；autopilot 非阻塞用战报收尾并同命令续跑。
 
 ## 触发规则（Red Flags = 你正在合理化）
 

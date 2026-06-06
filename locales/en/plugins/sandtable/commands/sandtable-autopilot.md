@@ -14,4 +14,4 @@ Execute:
    - red-team attack: at least 3 rounds, with at least 3 red-team subagents per round
    - implementation rehearsal: at least 2 rounds, with at least 2 independent worktree subagents per round
 6. On any `ANOMALY_FOUND` / `BREACH_FOUND` / `BLOCKED`: verify it personally first, write the result back into `prd.md` / `tests.md` / `plan.md` / `state.md` / `journal.md`, then rehearse again from the earliest stage that has not been re-validated; only write `questions.md` and ask me if the issue is truly blocked.
-7. After all minimum quotas are satisfied, run the debrief automatically, update `selected_impl`, and report the chosen approach, the verification results, and remaining risks.
+7. Do not wait between phases; on phase switch update state and output **status bulletin** close, then continue in the same command. After all quotas and debrief, load `closing-the-loop` for **full close** (with copy-paste templates). If `blocked=true`, use **full close** and AskQuestion (FR5 overrides autopilot silence).

@@ -16,3 +16,5 @@ Execute:
 6. Summarize the changes back to me and wait for confirmation or more feedback.
 
 This command may be triggered repeatedly until I say "leave it like this." After major changes, remember to rehearse again.
+
+8. When done, load `skills/closing-the-loop/SKILL.md`, read `state.md`, and output the close block (skip for in-command chain steps; use status bulletin for in-chain switches). Do not run unlisted next phases except `/sandtable-autopilot` and `/sandtable-rehearse`.

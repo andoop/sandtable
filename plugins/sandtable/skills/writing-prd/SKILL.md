@@ -19,7 +19,7 @@ PRD 写之前，必须先经过侦察（RECON，见 `gathering-intel`）。任�
 
 ```dot
 digraph prd {
-  "读 project.md + constraints.md" [shape=box];
+  "读 project.md + constraints.md + lessons.md(若存在)" [shape=box];
   "一次一个问题澄清意图" [shape=box];
   "提出 2-3 个方案 + 推荐" [shape=box];
   "写 PRD 各节" [shape=box];
@@ -27,7 +27,7 @@ digraph prd {
   "开发者确认?" [shape=diamond];
   "进入 writing-tests" [shape=doublecircle];
 
-  "读 project.md + constraints.md" -> "一次一个问题澄清意图" -> "提出 2-3 个方案 + 推荐" -> "写 PRD 各节" -> "自查: 占位/矛盾/歧义/范围" -> "开发者确认?";
+  "读 project.md + constraints.md + lessons.md(若存在)" -> "一次一个问题澄清意图" -> "提出 2-3 个方案 + 推荐" -> "写 PRD 各节" -> "自查: 占位/矛盾/歧义/范围" -> "开发者确认?";
   "开发者确认?" -> "写 PRD 各节" [label="要改"];
   "开发者确认?" -> "进入 writing-tests" [label="通过"];
 }

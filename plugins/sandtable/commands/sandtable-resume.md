@@ -14,3 +14,5 @@ description: 换人/换 AI/异常退出后，按持久化状态与当前模式�
 7. 仅当 `autonomy.mode=manual` 或 `blocked=true` 时，用 3–5 行向我复述："我们在做什么、进行到哪、上次为什么停、下一步要做什么"，等我确认后继续。
 
 只在发现矛盾或缺失时才回到 `being-truthful` 去澄清；不要把 autopilot 的恢复语义静默覆盖到我之后显式触发的手动 slash。
+
+8. 完成后加载 `skills/closing-the-loop/SKILL.md`，读 `state.md`，输出收尾（本命令已列出的链内后续步骤除外；链内切换用战报 profile）。不得越权执行**本命令未列出**的下一阶段（`/sandtable-autopilot`、`/sandtable-rehearse` 除外）。

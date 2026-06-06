@@ -12,3 +12,5 @@ description: 战场侦察 · 主动收集代码/文档情报，摸清地形，�
 5. 把情报简报写入 `journal.md`，更新 `state.md`（phase=OBJECTIVES）。
 
 纪律：不猜测、不捏造；每条事实标来源；问题一次问清关键的，不挤牙膏也不憋着。
+
+8. 完成后加载 `skills/closing-the-loop/SKILL.md`，读 `state.md`，输出收尾（本命令已列出的链内后续步骤除外；链内切换用战报 profile）。不得越权执行**本命令未列出**的下一阶段（`/sandtable-autopilot`、`/sandtable-rehearse` 除外）。

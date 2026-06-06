@@ -13,3 +13,5 @@ Execute:
 4. Write the round to `rehearsals/redteam-<n>.md`, append to `journal.md`, and update `state.md` (red-team counts).
 
 Iron law: let the red team attack brutally; vague "there may be risk" does not count, only reproducible strikes do; the main agent trusts neither red nor blue without checking.
+
+8. When done, load `skills/closing-the-loop/SKILL.md`, read `state.md`, and output the close block (skip for in-command chain steps; use status bulletin for in-chain switches). Do not run unlisted next phases except `/sandtable-autopilot` and `/sandtable-rehearse`.

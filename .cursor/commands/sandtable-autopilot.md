@@ -14,4 +14,4 @@ description: 从需求到复盘全流程无人值守推进
    - 红蓝对抗至少 3 轮，每轮至少 3 个红军子 agent；
    - 实现预演至少 2 轮，每轮至少 2 个独立 worktree 子 agent。
 6. 任一 `ANOMALY_FOUND` / `BREACH_FOUND` / `BLOCKED`：先亲自核实，写回 `prd.md` / `tests.md` / `plan.md` / `state.md` / `journal.md`，然后按最早尚未重新验证的阶段重演；只有真正阻塞才写 `questions.md` 并向我提问。
-7. 全部最低配额达标后，自动执行复盘择优，更新 `selected_impl`，并报告最终选定方案、验证结果与剩余风险。
+7. 各阶段之间不等待用户确认；阶段切换时更新 state、输出**战报收尾** profile，并在同一命令内继续执行。全部配额达标并完成复盘择优后，加载 `closing-the-loop` 输出**完整收尾**（含可复制模版）。`blocked=true` 时输出**完整收尾**并可用 AskQuestion（FR5 优先于 autopilot 静默纪律）。

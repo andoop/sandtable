@@ -16,3 +16,5 @@ description: 指挥官意图 · 基于情报制定作战目标：要达成什么
 5. 确认后更新 `state.md`（phase=TESTCASES），加载 `writing-tests` 产出 `tests.md`，提示我可用 `/sandtable-refine` 迭代用例。
 
 目标必须可验证；红线缺失会让后续预演无法识别"越界"，务必写全。
+
+8. 完成后加载 `skills/closing-the-loop/SKILL.md`，读 `state.md`，输出收尾（本命令已列出的链内后续步骤除外；链内切换用战报 profile）。不得越权执行**本命令未列出**的下一阶段（`/sandtable-autopilot`、`/sandtable-rehearse` 除外）。
