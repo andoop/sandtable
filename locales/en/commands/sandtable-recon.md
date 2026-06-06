@@ -12,3 +12,5 @@ Execute:
 5. Write the intel brief into `journal.md`, and update `state.md` (`phase=OBJECTIVES`).
 
 Discipline: do not guess or fabricate; give every fact a source; ask the important questions in one batch rather than drip-feeding or suppressing them.
+
+8. When done, load `skills/closing-the-loop/SKILL.md`, read `state.md`, and output the close block (skip for in-command chain steps; use status bulletin for in-chain switches). Do not run unlisted next phases except `/sandtable-autopilot` and `/sandtable-rehearse`.

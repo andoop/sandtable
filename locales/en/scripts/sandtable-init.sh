@@ -59,7 +59,7 @@ main() {
 	local created=()
 	local skipped=()
 	local f
-	for f in project.md constraints.md; do
+	for f in project.md constraints.md lessons.md; do
 		if [[ -e "$root/$f" ]]; then
 			skipped+=("$root/$f")
 		else

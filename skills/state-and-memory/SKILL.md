@@ -13,6 +13,7 @@ description: Use at the start of any Sandtable work and whenever you need to rec
 docs/sandtable/
   project.md                       # 北极星: 项目目标/背景/范围 (全局, 唯一)
   constraints.md                   # 全局红线: MUST / MUST-NOT (全局, 唯一)
+  lessons.md                       # 全局教训台账, 跨 feature 累积 (见 triaging-feedback)
   features/
     <YYYY-MM-DD>-<slug>/           # 一个需求一个目录
       prd.md                       # 需求/目标/验收/红线 (见 writing-prd)
@@ -21,11 +22,15 @@ docs/sandtable/
       state.md                     # 状态机: 当前阶段 + 任务状态 (本 skill)
       journal.md                   # 追加式记忆: 决策/问答/推演结果, 只增不改
       questions.md                 # 待开发者澄清的阻塞问题
+      feedback.md                  # 验收反馈台账 (见 triaging-feedback; 落地后才有)
       rehearsals/
         mental-<n>.md              # 头脑预演报告
         redteam-<n>.md             # 红蓝对抗战报
         impl-<n>-<branch>.md       # 实现预演报告 + 评分
 ```
+
+> 注：bugfix 采集的日志原文**不**入库（常含密钥/PII），落仓库外/临时目录；`feedback.md` 只记摘录+行号。
+> FEEDBACK 阶段：DONE 后用户验收反馈进入；缺陷类经 bugfix 根因→修复→回归→教训，教训累积进全局 `lessons.md`。FEEDBACK 人在环，autopilot 不驱动。
 
 模板见本插件 `templates/`，可直接拷贝改名。
 
@@ -36,7 +41,7 @@ docs/sandtable/
 ```markdown
 ---
 feature: 2026-06-01-user-login
-phase: PLAN            # INTAKE|RECON|OBJECTIVES|TESTCASES|PLAN|MENTAL_REHEARSAL|REDTEAM|IMPL_REHEARSAL|EVALUATE|INTEGRATE|VERIFY|DONE
+phase: PLAN            # INTAKE|RECON|OBJECTIVES|TESTCASES|PLAN|MENTAL_REHEARSAL|REDTEAM|IMPL_REHEARSAL|EVALUATE|INTEGRATE|VERIFY|DONE|FEEDBACK
 blocked: false         # true 时必须在 questions.md 有对应阻塞问题
 updated: 2026-06-01T23:00:00+08:00
 tasks:
@@ -87,6 +92,10 @@ selected_impl: none
 ```
 **永远不要删改历史条目**——这是换人换 AI 后重建理解的依据。
 
+## 相关技能
+
+- `closing-the-loop` — 回合收尾：战况、可复制模版、AskQuestion 纪律（见 `skills/closing-the-loop/SKILL.md`）
+
 ## 恢复流程（/sandtable-resume 的内核）
 
 ```dot
@@ -116,7 +125,8 @@ digraph resume {
 
 自动模式续跑时用这条明确分支，不要写成含糊回退简写：
 1. 若 `blocked=true`：先解 `questions.md`。
-2. 若 `autonomy.mode=autopilot` 且 `blocked=false`：
+1.5 **若 `phase` ∈ {`DONE`, `FEEDBACK`}（落地后）**：autopilot 配额闭包**不适用**，一律**按 `phase` 恢复**；`FEEDBACK` 是人在环阶段，autopilot 不驱动，**不得**因三类配额已达标而被误路由回 `EVALUATE`（由 `/sandtable-bug`、`/sandtable-bugfix` 手动推进）。
+2. 若 `autonomy.mode=autopilot` 且 `blocked=false`（且未命中 1.5）：
    - 若 `completed_rounds.mental < min_rounds.mental`，下一步是 `MENTAL_REHEARSAL`；
    - 否则若 `completed_rounds.redteam < min_rounds.redteam`，下一步是 `REDTEAM`；
    - 否则若 `completed_rounds.impl < min_rounds.impl`，下一步是 `IMPL_REHEARSAL`；

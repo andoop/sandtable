@@ -13,6 +13,7 @@ description: Use at the start of any Sandtable work and whenever you need to rec
 docs/sandtable/
   project.md
   constraints.md
+  lessons.md                 # global lesson ledger, accumulated across features (see triaging-feedback)
   features/
     <YYYY-MM-DD>-<slug>/
       prd.md
@@ -21,11 +22,15 @@ docs/sandtable/
       state.md
       journal.md
       questions.md
+      feedback.md            # acceptance feedback ledger (see triaging-feedback; exists only post-landing)
       rehearsals/
         mental-<n>.md
         redteam-<n>.md
         impl-<n>-<branch>.md
 ```
+
+> Note: bugfix-collected raw logs are NOT committed (often contain secrets/PII); they land outside the repo / in a temp dir, and `feedback.md` keeps only excerpts + line numbers.
+> FEEDBACK phase: after DONE, user acceptance feedback enters; defects go through bugfix root cause -> fix -> regression -> lesson, accumulating into the global `lessons.md`. FEEDBACK is human-in-the-loop; autopilot does not drive it.
 
 Templates live in this plugin’s `templates/`.
 
@@ -36,7 +41,7 @@ Templates live in this plugin’s `templates/`.
 ```markdown
 ---
 feature: 2026-06-01-user-login
-phase: PLAN
+phase: PLAN            # INTAKE|RECON|OBJECTIVES|TESTCASES|PLAN|MENTAL_REHEARSAL|REDTEAM|IMPL_REHEARSAL|EVALUATE|INTEGRATE|VERIFY|DONE|FEEDBACK
 blocked: false
 updated: 2026-06-01T23:00:00+08:00
 tasks:
@@ -111,7 +116,8 @@ Do not reinvent already-recorded decisions when resuming. Only go back to `being
 
 Autopilot continuation must follow this exact branch:
 1. If `blocked=true`: resolve `questions.md` first.
-2. If `autonomy.mode=autopilot` and `blocked=false`:
+1.5 **If `phase` ∈ {`DONE`, `FEEDBACK`} (post-landing)**: autopilot quota closure does **not** apply; always **resume by `phase`**. `FEEDBACK` is human-in-the-loop, autopilot does not drive it, and it must **not** be mis-routed back to `EVALUATE` just because the three quotas are met (advance manually via `/sandtable-bug`, `/sandtable-bugfix`).
+2. If `autonomy.mode=autopilot` and `blocked=false` (and 1.5 did not match):
    - if `completed_rounds.mental < min_rounds.mental`, next is `MENTAL_REHEARSAL`
    - else if `completed_rounds.redteam < min_rounds.redteam`, next is `REDTEAM`
    - else if `completed_rounds.impl < min_rounds.impl`, next is `IMPL_REHEARSAL`

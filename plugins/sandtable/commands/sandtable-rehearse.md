@@ -17,6 +17,6 @@ description: 依次执行 Sandtable 推演与复盘：头脑预演→红蓝对�
    - 任一 `ANOMALY_FOUND`/`BLOCKED` → 亲自核实 → 问我 → 修正计划 → 回第 2 步重演。
    - 全部 `DONE` → 进入复盘。
 6. **复盘择优**：加载 `evaluating-rehearsals` 打分，把选定方案写入 `state.md`。〔= `/sandtable-debrief`〕
-7. 每轮报告写入 `rehearsals/`，journal 追加。择优后告诉我选了哪个、为什么，等我确认再 INTEGRATE 落地。
+7. 每轮报告写入 `rehearsals/`，journal 追加。链内阶段切换仅**战报收尾**（禁止省略）；命令结束/阻塞/异常停时加载 `closing-the-loop` 输出**完整收尾**（含择优说明与可复制模版）。
 
 两条铁律：异常即停上报、推演在隔离子 agent 中并行进行。不轻信子 agent 结论，抽查其引用与 diff。

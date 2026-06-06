@@ -16,3 +16,5 @@ Execute:
 5. After confirmation, update `state.md` (`phase=TESTCASES`), load `writing-tests`, produce `tests.md`, and tell me I can iterate on the cases with `/sandtable-refine`.
 
 The objective must be verifiable. Missing red lines prevent later rehearsals from recognizing when the plan crosses the boundary, so write them completely.
+
+8. When done, load `skills/closing-the-loop/SKILL.md`, read `state.md`, and output the close block (skip for in-command chain steps; use status bulletin for in-chain switches). Do not run unlisted next phases except `/sandtable-autopilot` and `/sandtable-rehearse`.

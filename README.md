@@ -32,7 +32,9 @@ flowchart TD
   I --> J[INTEGRATE]
   J --> K[VERIFY]
   K --> L[DONE]
-  F -- anomaly / breach / blocked --> M[主 agent 核实]
+  L --> P[FEEDBACK 落地后闭环]
+  P -- 缺陷→根因(日志100%)→修复→回归→教训 --> M[主 agent 核实]
+  F -- anomaly / breach / blocked --> M
   G -- anomaly / breach / blocked --> M
   H -- anomaly / breach / blocked --> M
   M --> R[给方案；必要时问开发者]
@@ -85,6 +87,8 @@ Sandtable 让 agent 用三种推演逐层逼出破口，全程落盘可续：
 - `/sandtable-live`: 在隔离 worktree 做实现预演。
 - `/sandtable-debrief`: 给多个实现预演打分择优。
 - `/sandtable-rehearse`: 串联图上作业、红蓝对抗、实现预演和复盘。
+- `/sandtable-bug`: 受理验收反馈，落 `feedback.md` 并分诊（落地后闭环入口）。
+- `/sandtable-bugfix`: 证据驱动根因修障（bugfix 模式，根因必靠日志100%确认）。
 - `/sandtable-resume`: 按 `state.md` 与 `journal.md` 恢复现场继续。
 - `/sandtable-status`: 查看阶段、任务、推演结果和未决问题。
 

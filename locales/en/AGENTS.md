@@ -19,9 +19,11 @@ You are working with the Sandtable methodology. The goal is to turn a one-line r
 
 ## Core Loop (State Machine)
 
-`INTAKE -> RECON -> OBJECTIVES -> TESTCASES -> PLAN -> MENTAL_REHEARSAL -> REDTEAM -> IMPL_REHEARSAL -> EVALUATE -> INTEGRATE -> VERIFY -> DONE`
+`INTAKE -> RECON -> OBJECTIVES -> TESTCASES -> PLAN -> MENTAL_REHEARSAL -> REDTEAM -> IMPL_REHEARSAL -> EVALUATE -> INTEGRATE -> VERIFY -> DONE -> FEEDBACK`
 
 If any rehearsal finds an anomaly or unexpected fact: the main agent verifies it personally, proposes a fix or asks the developer, updates the PRD / plan, and rehearses again. Repeat until the line holds.
+
+**Post-landing loop (FEEDBACK, re-entrant):** after DONE, the user's acceptance feedback enters here; defects go through bugfix root cause (root cause MUST be confirmed by logs at 100%) -> fix -> regression case -> lesson, accumulating the lesson into the global `lessons.md` to feed future rehearsals. FEEDBACK is human-in-the-loop; autopilot does not drive it (autopilot scope ends at EVALUATE/DONE).
 
 ## Two Iron Laws of Rehearsal
 
@@ -40,8 +42,12 @@ Explicit user instruction > Sandtable methodology > default behavior. If the use
 
 ## Skill Index
 
-When needed, read the full contents of `skills/<name>/SKILL.md`: `using-sandtable`, `being-truthful`, `state-and-memory`, `gathering-intel`, `writing-prd`, `writing-tests`, `writing-plan`, `autonomous-orchestration`, `mental-rehearsal`, `red-team-wargame`, `implementation-rehearsal`, `evaluating-rehearsals`.
+When needed, read the full contents of `skills/<name>/SKILL.md`: `using-sandtable`, `being-truthful`, `state-and-memory`, `gathering-intel`, `writing-prd`, `writing-tests`, `writing-plan`, `autonomous-orchestration`, `mental-rehearsal`, `red-team-wargame`, `implementation-rehearsal`, `evaluating-rehearsals`, `closing-the-loop`, `triaging-feedback`, `bugfix-with-evidence`.
+
+## Close the Loop (FR8)
+
+Load `closing-the-loop` only when a **Sandtable work step** ends. **Do not** close for non-Sandtable tasks, even if `docs/sandtable/` was read.
 
 ## Slash Commands
 
-`/sandtable-start` (first five steps), `/sandtable-autopilot` (advance from raw request through debrief unattended), `/sandtable-recon` (reconnaissance), `/sandtable-objectives` (goals and red lines), `/sandtable-plan` (plan), `/sandtable-refine` (iterate and revise), `/sandtable-mental` (mental rehearsal), `/sandtable-redteam` (red-team attack), `/sandtable-live` (implementation rehearsal), `/sandtable-debrief` (score and choose), `/sandtable-rehearse` (run rehearsals plus debrief only), `/sandtable-status` (status report), `/sandtable-resume` (resume from disk state).
+`/sandtable-start` (first five steps), `/sandtable-autopilot` (advance from raw request through debrief unattended), `/sandtable-recon` (reconnaissance), `/sandtable-objectives` (goals and red lines), `/sandtable-plan` (plan), `/sandtable-refine` (iterate and revise), `/sandtable-mental` (mental rehearsal), `/sandtable-redteam` (red-team attack), `/sandtable-live` (implementation rehearsal), `/sandtable-debrief` (score and choose), `/sandtable-rehearse` (run rehearsals plus debrief only), `/sandtable-bug` (intake acceptance feedback), `/sandtable-bugfix` (evidence-driven root-cause fix), `/sandtable-status` (status report), `/sandtable-resume` (resume from disk state).

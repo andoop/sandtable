@@ -18,7 +18,7 @@ description: Use right after intake, before setting objectives or writing a plan
 1. **Terrain (relevant code):** entry points, key modules, data flow, state storage. Cite `file:line`.
 2. **Existing conventions:** naming, layering, testing, error handling, existing patterns to follow instead of inventing new ones.
 3. **Dependencies and boundaries:** upstream / downstream systems, external services, config.
-4. **History:** relevant commits, docs, and prior decisions in `journal.md`.
+4. **History:** relevant commits, docs, and prior decisions in `journal.md`. **If** `docs/sandtable/lessons.md` exists, read it and list relevant past lessons as checks for this recon (past bugs arm this rehearsal).
 5. **Risk hotspots:** fragile edges, hidden coupling, performance / security-sensitive areas.
 6. **Unknowns:** anything still unresolved after reading code and docs.
 

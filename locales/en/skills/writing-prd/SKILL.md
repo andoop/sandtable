@@ -19,7 +19,7 @@ You must perform reconnaissance (`gathering-intel`) before writing the PRD. Any 
 
 ```dot
 digraph prd {
-  "Read project.md + constraints.md" [shape=box];
+  "Read project.md + constraints.md + lessons.md (if present)" [shape=box];
   "Clarify intent one question at a time" [shape=box];
   "Present 2-3 options + recommendation" [shape=box];
   "Write PRD sections" [shape=box];
@@ -27,7 +27,7 @@ digraph prd {
   "Developer confirmed?" [shape=diamond];
   "Enter writing-tests" [shape=doublecircle];
 
-  "Read project.md + constraints.md" -> "Clarify intent one question at a time" -> "Present 2-3 options + recommendation" -> "Write PRD sections" -> "Self-check: placeholders / contradictions / ambiguity / scope" -> "Developer confirmed?";
+  "Read project.md + constraints.md + lessons.md (if present)" -> "Clarify intent one question at a time" -> "Present 2-3 options + recommendation" -> "Write PRD sections" -> "Self-check: placeholders / contradictions / ambiguity / scope" -> "Developer confirmed?";
   "Developer confirmed?" -> "Write PRD sections" [label="Needs changes"];
   "Developer confirmed?" -> "Enter writing-tests" [label="Approved"];
 }

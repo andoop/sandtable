@@ -11,3 +11,5 @@ description: 头脑预演（军事隐喻：图上作业）· 只读子 agent 把
 4. 全部 `LOGIC_CLOSED` → 把报告写入 `rehearsals/mental-<n>.md`，更新 `state.md`（mental.last=closed），提示我可用 `/sandtable-redteam` 做红蓝对抗或 `/sandtable-live` 实现预演。
 
 铁律：纯只读不改代码；异常即停；不脑补兜底；不轻信子 agent，抽查其引用。
+
+8. 完成后加载 `skills/closing-the-loop/SKILL.md`，读 `state.md`，输出收尾（本命令已列出的链内后续步骤除外；链内切换用战报 profile）。不得越权执行**本命令未列出**的下一阶段（`/sandtable-autopilot`、`/sandtable-rehearse` 除外）。

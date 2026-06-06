@@ -11,3 +11,5 @@ description: 实现预演（军事隐喻：实兵演习）· 在隔离 git workt
 4. 全部 `DONE` → 把报告写入 `rehearsals/impl-<n>-<branch>.md`，更新 `state.md`（impl.last=done），提示我可用 `/sandtable-redteam`（对实现打）或 `/sandtable-debrief` 复盘择优。
 
 铁律：每个预演独立 worktree 互不污染；异常即停不自行改计划；不越界不兜底；不轻信 DONE，抽查真实 diff。
+
+8. 完成后加载 `skills/closing-the-loop/SKILL.md`，读 `state.md`，输出收尾（本命令已列出的链内后续步骤除外；链内切换用战报 profile）。不得越权执行**本命令未列出**的下一阶段（`/sandtable-autopilot`、`/sandtable-rehearse` 除外）。

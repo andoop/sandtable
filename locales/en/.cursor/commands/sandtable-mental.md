@@ -11,3 +11,5 @@ Execute:
 4. If all return `LOGIC_CLOSED` -> write the report to `rehearsals/mental-<n>.md`, update `state.md` (`mental.last=closed`), and tell me I can proceed to `/sandtable-redteam` or `/sandtable-live`.
 
 Iron law: read-only only; no code changes; stop immediately on anomalies; do not invent fallback behavior; do not trust subagents blindly, spot-check their citations.
+
+8. When done, load `skills/closing-the-loop/SKILL.md`, read `state.md`, and output the close block (skip for in-command chain steps; use status bulletin for in-chain switches). Do not run unlisted next phases except `/sandtable-autopilot` and `/sandtable-rehearse`.

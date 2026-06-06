@@ -18,7 +18,7 @@ description: Use right after intake, before defining objectives or a plan, to ac
 1. **地形（相关代码）**：入口、关键模块、数据流、状态存储。每条标 `file:line`。
 2. **既有约定**：命名/分层/测试/错误处理的现有模式（照搬，别另立）。
 3. **依赖与边界**：会牵动哪些上下游、外部服务、配置。
-4. **历史**：相关 commit、`docs/`、`journal.md` 里已有的决策。
+4. **历史**：相关 commit、`docs/`、`journal.md` 里已有的决策。**若存在** `docs/sandtable/lessons.md` 则必读，把命中的历史教训列为本次侦察检查项（过去的 bug 武装本次推演）。
 5. **风险与雷区**：易错点、隐藏耦合、性能/安全敏感处。
 6. **未知清单**：所有读代码/读文档都无法确定的点。
 

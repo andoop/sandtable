@@ -11,3 +11,5 @@ description: 战损复盘（AAR）· 当多个实现预演都通过后，按客�
 4. 选最高分；分数接近时取更简单、改动更小者。
 5. 把选定方案写入 `state.md` 的 `selected_impl`，phase=INTEGRATE，journal 记录打分与理由，未选中的 worktree/分支清理。
 6. 给我一份简短对比（各方案总分、关键差异、为何选 X），等我确认再落地（用户指令可推翻选择）。
+
+8. 完成后加载 `skills/closing-the-loop/SKILL.md`，读 `state.md`，输出收尾（本命令已列出的链内后续步骤除外；链内切换用战报 profile）。不得越权执行**本命令未列出**的下一阶段（`/sandtable-autopilot`、`/sandtable-rehearse` 除外）。

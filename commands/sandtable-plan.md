@@ -13,3 +13,5 @@ description: 作战计划 · 把已确认的目标拆成细到可执行、可被
 6. 写入 `plan.md`，更新 `state.md`（写入 tasks 列表，phase=MENTAL_REHEARSAL），提示我可用 `/sandtable-mental`。
 
 不确定的事不猜，回到侦察/询问。
+
+8. 完成后加载 `skills/closing-the-loop/SKILL.md`，读 `state.md`，输出收尾（本命令已列出的链内后续步骤除外；链内切换用战报 profile）。不得越权执行**本命令未列出**的下一阶段（`/sandtable-autopilot`、`/sandtable-rehearse` 除外）。

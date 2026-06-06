@@ -1,6 +1,6 @@
 ---
 feature: <YYYY-MM-DD>-<slug>
-phase: INTAKE            # INTAKE|RECON|OBJECTIVES|TESTCASES|PLAN|MENTAL_REHEARSAL|REDTEAM|IMPL_REHEARSAL|EVALUATE|INTEGRATE|VERIFY|DONE
+phase: INTAKE            # INTAKE|RECON|OBJECTIVES|TESTCASES|PLAN|MENTAL_REHEARSAL|REDTEAM|IMPL_REHEARSAL|EVALUATE|INTEGRATE|VERIFY|DONE|FEEDBACK
 blocked: false
 updated: <ISO8601>
 tasks: []                # - { id: T1, title: ..., status: todo }  status: todo|doing|rehearsed|integrated|verified|done

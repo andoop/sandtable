@@ -17,6 +17,6 @@ Execute:
    - Any `ANOMALY_FOUND` / `BLOCKED` -> verify personally -> ask me -> fix the plan -> return to step 2 and rehearse again.
    - All `DONE` -> continue to debrief.
 6. **Debrief and choose**: load `evaluating-rehearsals`, score the implementations, and write the selected one into `state.md`. [same as `/sandtable-debrief`]
-7. Write each round into `rehearsals/`, append to `journal.md`, and after the choice tell me which option won and why. Wait for my confirmation before `INTEGRATE`.
+7. Write each round into `rehearsals/` and `journal.md`. In-chain phase switches use **status bulletin** only (never omit). On command end / block / anomaly stop, load `closing-the-loop` for **full close** (choice + copy-paste templates).
 
 Two iron laws: stop and report on anomalies immediately, and run rehearsals in isolated subagents. Do not trust subagent conclusions without spot-checking their citations and diffs.
