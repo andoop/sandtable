@@ -1,8 +1,8 @@
 ---
 feature: 2026-06-06-post-landing-loop
-phase: VERIFY           # INTAKE|RECON|OBJECTIVES|TESTCASES|PLAN|MENTAL_REHEARSAL|REDTEAM|IMPL_REHEARSAL|EVALUATE|INTEGRATE|VERIFY|DONE|FEEDBACK
-blocked: false          # 单一实现完成于分支 sandtable/post-landing-loop；TC1–TC28 结构校验通过；待开发者验收+合并
-updated: 2026-06-06T17:50:00+08:00
+phase: DONE             # INTAKE|RECON|OBJECTIVES|TESTCASES|PLAN|MENTAL_REHEARSAL|REDTEAM|IMPL_REHEARSAL|EVALUATE|INTEGRATE|VERIFY|DONE|FEEDBACK
+blocked: false          # 已合并到 main（commit 7879e71，未 push）；TC1–TC28 结构校验通过
+updated: 2026-06-06T18:00:00+08:00
 tasks:
   - { id: T1, title: 新建 triaging-feedback skill（中文源）, status: todo }
   - { id: T2, title: 新建 bugfix-with-evidence skill（中文源，含日志100%门禁+推演武器）, status: todo }

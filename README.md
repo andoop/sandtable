@@ -79,6 +79,19 @@ Sandtable 让 agent 用三种推演逐层逼出破口，全程落盘可续：
 
 手工安装、不同 AI 工具（Cursor / Claude Code / Codex / Kiro 等）的差异、以及本地试用路径，都写在 `INSTALL.md`，README 不再展开。`.cursor/commands` 只服务 Cursor；Codex 的命令入口来自 Sandtable Codex plugin，不承诺自动发现 Cursor 命令。
 
+## 更新（已安装用户）
+已安装 Sandtable 的项目要升级到最新方法论资产，把下面官方提示词之一**原样**发给你的 AI（与安装对称；更新只覆盖方法论资产，**绝不触碰**你的 `docs/sandtable/` 战役记忆，覆盖前自动备份到 `.sandtable-backup/`）：
+
+中文：
+
+> 阅读 https://github.com/andoop/sandtable/blob/main/UPDATE.md ，并据此按中文把当前项目里已安装的 Sandtable 更新到最新。
+
+English：
+
+> Read https://github.com/andoop/sandtable/blob/main/UPDATE.md and use it to update the already-installed Sandtable in the current project to the latest, in English.
+
+细节见 [`UPDATE.md`](UPDATE.md)。注意：**重跑安装提示词无法更新**（安装器"已存在即跳过"）；请用与安装时相同的语言更新。
+
 ## 命令入口
 - `/sandtable-start`: 从一句话需求进入前五步，收束到侦察、目标、用例和计划。
 - `/sandtable-autopilot`: 按配额自动推进 `RECON -> ... -> EVALUATE`，真阻塞才停。

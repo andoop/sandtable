@@ -155,3 +155,9 @@
   - 注意：工作树原有未提交改动（closing-the-loop 等，全部命令 M）随分支带入，非本实现产物；合并时需区分。未提交（仅在分支工作树）。
 - 依据/来源：本轮实现编辑 + git status + bash -n。
 - 下一步：开发者验收（VERIFY）+ 决定是否合并到 main（INTEGRATE）。未经允许不提交。
+
+## 2026-06-06 18:00 · [集成] 已合并到 main
+- 背景：开发者选"合并到 main"。
+- 内容：因 closing-the-loop 未提交改动与本需求共用文件（using-sandtable/state-and-memory），工作树无法非交互式按需求拆分；故 `git add -A` 提交全部工作树为单 commit `7879e71`，并 `git checkout main && git merge --ff-only` 快进合并。main 现领先 origin/main 1 个 commit，**未 push**（未获授权）。commit message 已注明本 commit 同时打包了 closing-the-loop 在制改动与 closed-loop-guidance/superpowers-harness-parity 的规划文档。
+- 依据/来源：git commit 7879e71；git merge --ff-only。
+- 状态：phase=DONE。如需可按需进入 FEEDBACK（/sandtable-bug）继续落地后闭环；push 待开发者指令。
