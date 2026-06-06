@@ -1,0 +1,13 @@
+---
+description: 实现预演（军事隐喻：实兵演习）· 在隔离 git worktree 里真按计划完整实现并验证，可并行多个子 agent；异常即停，全过则交复盘择优。
+---
+
+对当前需求执行实现预演；读取并遵循 `skills/implementation-rehearsal/SKILL.md`。
+
+执行：
+1. 读本需求 `plan.md`、`prd.md`、`constraints.md`、`state.md`；确认头脑预演已 closed（否则先 `/sandtable-mental`）。
+2. 为每个预演创建**独立 git worktree/分支**，按 `implementation-rehearsal-prompt.md` 并行派发实现子 agent，要求完整实现、不留细节（无 TODO/占位）。
+3. 任一 `ANOMALY_FOUND`/`BLOCKED` → 你亲自核实 → 问我 → 修正计划 → 重演。
+4. 全部 `DONE` → 把报告写入 `rehearsals/impl-<n>-<branch>.md`，更新 `state.md`（impl.last=done），提示我可用 `/sandtable-redteam`（对实现打）或 `/sandtable-debrief` 复盘择优。
+
+铁律：每个预演独立 worktree 互不污染；异常即停不自行改计划；不越界不兜底；不轻信 DONE，抽查真实 diff。

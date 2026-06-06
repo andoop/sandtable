@@ -36,7 +36,7 @@ English official prompt:
 - 两条官方提示词同时出现
 - 只是用户自行改写、转述、删改后的非官方版本
 
-不要要求额外 `lang=...` 或独立语言 flag。Codex 与 Kiro 也走这条通用路径，不新增它们各自的专属 rules、专属 hooks 或安装脚本。
+不要要求额外 `lang=...` 或独立语言 flag。`.cursor/commands` 只服务 Cursor；Codex 的命令入口由 Sandtable Codex plugin 提供，Kiro / 通用 agent 仍使用 `AGENTS.md` 行为基线与普通消息入口。
 
 ### 1. 安装总规则（严格遵守）
 
@@ -44,7 +44,7 @@ English official prompt:
 - 语言相关资产按整个 locale pack 预检：只要该语言包中任一目标路径已存在，就不得继续复制这个 locale pack 的任何语言相关资产；必须直接报告“语言切换未完成 / 安装不完整”，并列出冲突路径。共享机器文件可继续独立处理。
 - `AGENTS.md` 仍是受保护文件、绝不覆盖；但在本次 locale-pack 安装规则下，它同时属于语言相关资产，所以只要 `AGENTS.md` 已存在，就视为 locale-pack 冲突，停止复制该语言包并如实报告，而不是继续追加。
 - 外科手术式：只安装本说明列出的文件；不要顺手安装其它仓库文件。
-- 诚实报告（硬性）：只要跳过的是核心项（`skills/`、`templates/`、`commands/`、`AGENTS.md`、`.cursor/rules/sandtable.mdc`、`hooks/run-hook.cmd`、`hooks/session-start` 之一），最终都必须报告“安装不完整”。存在性检查只是辅助，跳过清单才是权威。
+- 诚实报告（硬性）：只要跳过的是核心项（`skills/`、`templates/`、`commands/`、`plugins/sandtable/commands`、`plugins/sandtable/skills`、`AGENTS.md`、`.cursor/rules/sandtable.mdc`、`plugins/sandtable/.codex-plugin/plugin.json`、`.agents/plugins/marketplace.json`、`hooks/run-hook.cmd`、`hooks/session-start` 之一），最终都必须报告“安装不完整”。存在性检查只是辅助，跳过清单才是权威。
 
 ### 2. 取得 Sandtable 源
 
@@ -65,6 +65,8 @@ git clone --depth 1 https://github.com/andoop/sandtable "$SB_SRC"
   - `AGENTS.md` ← `$SB_SRC/AGENTS.md`
   - `.cursor/rules/sandtable.mdc` ← `$SB_SRC/.cursor/rules/sandtable.mdc`
   - `commands/*.md` ← `$SB_SRC/commands/*.md`
+  - `plugins/sandtable/commands/*.md` ← `$SB_SRC/plugins/sandtable/commands/*.md`
+  - `plugins/sandtable/skills/**` ← `$SB_SRC/plugins/sandtable/skills/**`
   - `.cursor/commands/*.md` ← `$SB_SRC/.cursor/commands/*.md`
   - `skills/**` ← `$SB_SRC/skills/**`
   - `templates/**` ← `$SB_SRC/templates/**`
@@ -75,6 +77,8 @@ git clone --depth 1 https://github.com/andoop/sandtable "$SB_SRC"
   - `AGENTS.md` ← `$SB_SRC/locales/en/AGENTS.md`
   - `.cursor/rules/sandtable.mdc` ← `$SB_SRC/locales/en/.cursor/rules/sandtable.mdc`
   - `commands/*.md` ← `$SB_SRC/locales/en/commands/*.md`
+  - `plugins/sandtable/commands/*.md` ← `$SB_SRC/locales/en/plugins/sandtable/commands/*.md`
+  - `plugins/sandtable/skills/**` ← `$SB_SRC/locales/en/plugins/sandtable/skills/**`
   - `.cursor/commands/*.md` ← `$SB_SRC/locales/en/.cursor/commands/*.md`
   - `skills/**` ← `$SB_SRC/locales/en/skills/**`
   - `templates/**` ← `$SB_SRC/templates/en/**` 复制到目标项目的 `templates/`
@@ -84,12 +88,15 @@ git clone --depth 1 https://github.com/andoop/sandtable "$SB_SRC"
 - 共享机器资产（不随语言切换，始终从根目录复制）：
   - `hooks/hooks.json` ← `$SB_SRC/hooks/hooks.json`
   - `hooks/hooks-cursor.json` ← `$SB_SRC/hooks/hooks-cursor.json`
+  - `plugins/sandtable/.codex-plugin/plugin.json` ← `$SB_SRC/plugins/sandtable/.codex-plugin/plugin.json`
+  - `.agents/plugins/marketplace.json` ← `$SB_SRC/.agents/plugins/marketplace.json`
 
 说明：
 
 - `templates/` 必须始终是唯一模板根目录；英文模板也必须安装到用户项目的 `templates/`，不能变成第二个平行模板根。
 - `CLAUDE.md` 不维护独立语言副本；若目标项目没有 `CLAUDE.md`，继续按原规则创建 `CLAUDE.md -> AGENTS.md` 的符号链接即可，语言跟随 `AGENTS.md` 内容本身。
 - `scripts/test-sandtable-init.sh` 是仓库内部测试脚本，绝不安装到用户项目。
+- Codex plugin manifest 和 marketplace 注册文件是共享机器资产；它们不随语言切换，但 `plugins/sandtable/commands/*.md` 与 `plugins/sandtable/skills/**` 必须跟随 locale pack。
 
 ### 4. locale pack 预检（语言相关资产整包守卫）
 
@@ -98,6 +105,8 @@ git clone --depth 1 https://github.com/andoop/sandtable "$SB_SRC"
 - `./AGENTS.md`
 - `./.cursor/rules/sandtable.mdc`
 - `./commands`
+- `./plugins/sandtable/commands`
+- `./plugins/sandtable/skills`
 - `./.cursor/commands`
 - `./skills`
 - `./templates`
@@ -109,7 +118,7 @@ git clone --depth 1 https://github.com/andoop/sandtable "$SB_SRC"
 
 1. 只要上述任一目标路径已存在，就不要复制任何该 locale pack 的语言相关资产。
 2. 立即报告 `Locale pack conflict` / `语言包冲突`，列出全部冲突路径，并在总结中标记为“语言切换未完成 / 安装不完整”。
-3. 共享机器资产（`hooks/hooks.json`、`hooks/hooks-cursor.json`）可继续按各自目标路径独立判断并复制。
+3. 共享机器资产（`hooks/hooks.json`、`hooks/hooks-cursor.json`、`plugins/sandtable/.codex-plugin/plugin.json`、`.agents/plugins/marketplace.json`）可继续按各自目标路径独立判断并复制。
 
 这条规则尤其适用于“先装中文，后来又贴英文官方提示词”的场景：你不能覆盖已有中文文件，也不能继续部分复制英文资产形成半切换状态。
 
@@ -150,6 +159,9 @@ done
 cp -R "$TEMPLATES_SRC" ./templates
 mkdir -p ./scripts
 cp "$SCRIPT_SRC" ./scripts/sandtable-init.sh
+mkdir -p ./plugins/sandtable
+cp -R "$LANG_SRC/plugins/sandtable/commands" ./plugins/sandtable/commands
+cp -R "$LANG_SRC/plugins/sandtable/skills" ./plugins/sandtable/skills
 ```
 
 行为基线 `AGENTS.md`（locale pack 预检通过后才会执行；绝不覆盖）：
@@ -188,7 +200,26 @@ mkdir -p ./hooks
 [ -e ./CLAUDE.md ] || ln -s AGENTS.md ./CLAUDE.md
 ```
 
-- 其它（Codex / Kiro / 通用）：步骤 5.1 的 `AGENTS.md` 即为行为基线，不新增专属接线。
+- Codex（通过 Sandtable Codex plugin 提供命令入口；目标已存在则跳过并报告）：
+
+```bash
+mkdir -p ./plugins/sandtable/.codex-plugin ./.agents/plugins
+[ -e ./plugins/sandtable/.codex-plugin/plugin.json ] && echo "跳过 ./plugins/sandtable/.codex-plugin/plugin.json（已存在）" \
+  || cp "$SB_SRC/plugins/sandtable/.codex-plugin/plugin.json" ./plugins/sandtable/.codex-plugin/plugin.json
+[ -e ./.agents/plugins/marketplace.json ] && echo "跳过 ./.agents/plugins/marketplace.json（已存在）" \
+  || cp "$SB_SRC/.agents/plugins/marketplace.json" ./.agents/plugins/marketplace.json
+```
+
+把项目内 marketplace 注册给 Codex，并安装/启用本地 Sandtable plugin（这不是发布插件，只是本机 Codex 注册本地 marketplace；执行前向用户说明会写入 Codex 本机插件配置）：
+
+```bash
+codex plugin marketplace add "$PWD"
+codex plugin add sandtable --marketplace sandtable-local
+```
+
+Codex 插件命令使用插件命名空间；安装后优先尝试 `/sandtable:sandtable-start`。若当前 Codex 客户端的 `/` 菜单不展示本地插件命令，不得谎报“slash 提示已生效”；如实报告为客户端 autocomplete 限制，并说明插件仍已在本机注册/启用。
+
+- Kiro / 通用 agent：步骤 5.1 的 `AGENTS.md` 即为行为基线；没有专属 slash 接线时，把 `/sandtable-start` 作为普通消息发给 AI 执行。
 
 ### 6. 初始化运行时工作区（可选，推荐）
 
@@ -206,12 +237,16 @@ mkdir -p ./hooks
 
 ```bash
 # 通用核心
-for p in skills/using-sandtable/SKILL.md skills/being-truthful/SKILL.md templates AGENTS.md scripts/sandtable-init.sh; do
+for p in skills/using-sandtable/SKILL.md skills/being-truthful/SKILL.md templates AGENTS.md scripts/sandtable-init.sh commands/sandtable-start.md; do
   [ -e "./$p" ] && echo "ok ./$p" || echo "MISSING ./$p（安装不完整）"
 done
 # Cursor 用户追加
 for p in .cursor/rules/sandtable.mdc .cursor/commands; do
   [ -e "./$p" ] && echo "ok ./$p" || echo "MISSING ./$p（Cursor 不完整）"
+done
+# Codex 用户追加
+for p in plugins/sandtable/.codex-plugin/plugin.json plugins/sandtable/commands/sandtable-start.md plugins/sandtable/skills/using-sandtable/SKILL.md .agents/plugins/marketplace.json; do
+  [ -e "./$p" ] && echo "ok ./$p" || echo "MISSING ./$p（Codex 不完整）"
 done
 # Claude Code 用户追加（hooks 文件级检查）
 for p in hooks/hooks.json hooks/hooks-cursor.json hooks/run-hook.cmd hooks/session-start; do
@@ -219,7 +254,9 @@ for p in hooks/hooks.json hooks/hooks-cursor.json hooks/run-hook.cmd hooks/sessi
 done
 ```
 
-Cursor 提示用户重载窗口后 `alwaysApply` 规则生效。最后提示用 `/sandtable-start` 开始第一场战役。
+Codex 还必须人工或由 AI 读取 `./.agents/plugins/marketplace.json`，确认 `plugins` 数组里存在 `name` 为 `sandtable` 的条目，且 `source.path` 为 `./plugins/sandtable`、`policy.authentication` 为 `ON_INSTALL`、`category` 为 `Developer Tools`；若不符合，报告 `Codex 不完整`。这项 JSON 结构检查不要依赖 `jq`、Python、Node 或其它非 POSIX/coreutils 工具。
+
+Cursor 提示用户重载窗口后 `alwaysApply` 规则生效。Codex 提示用户按 Codex 本地插件流程启用 Sandtable Local，并优先尝试 `/sandtable:sandtable-start`。最后按工具入口开始第一场战役。
 
 ### 7. 清理
 

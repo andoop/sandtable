@@ -17,7 +17,7 @@ English:
 
 > Read https://github.com/andoop/sandtable/blob/main/INSTALL.md and use it to install Sandtable into the current project in English.
 
-安装完成后运行 `/sandtable-start`。详见 [`Quickstart`](#quickstart)。
+安装完成后按你的工具进入 Sandtable 命令：Cursor 使用 `.cursor/commands`，Codex 使用 Sandtable Codex plugin/commands，Claude Code / Kiro / 通用 agent 可直接把命令名作为消息发给 AI 执行。详见 [`Quickstart`](#quickstart)。
 
 ```mermaid
 flowchart TD
@@ -69,10 +69,13 @@ Sandtable 让 agent 用三种推演逐层逼出破口，全程落盘可续：
 
    > Read https://github.com/andoop/sandtable/blob/main/INSTALL.md and use it to install Sandtable into the current project in English.
 
-2. 按 AI 的安装结果完成最后接线；若它提示重载窗口或重开工作区以使规则生效，就照做。
-3. 第一条命令：`/sandtable-start`
+2. 按 AI 的安装结果完成最后接线；若它提示重载窗口、重开工作区或启用本地插件以使规则生效，就照做。
+3. 按工具选择命令入口：
+   - Cursor：通过 `.cursor/commands` 提供 slash 命令，使用 `/sandtable-start` 开始。
+   - Codex：通过 `plugins/sandtable` 与 `.agents/plugins/marketplace.json` 提供本地 Sandtable plugin；先用 `codex plugin marketplace add "$PWD"` 和 `codex plugin add sandtable --marketplace sandtable-local` 注册/启用后，优先尝试 `/sandtable:sandtable-start`。Codex 当前版本是否在 `/` 菜单展示本地插件命令取决于客户端能力；不把 Cursor 的裸 slash 自动提示当作 Codex 保证。
+   - Claude Code / Kiro / 通用 agent：没有专属 slash 接线时，把 `/sandtable-start` 作为普通消息发给 AI，让它按 `AGENTS.md` 与 `commands/sandtable-start.md` 执行。
 
-手工安装、不同 AI 工具（Cursor / Claude Code / Codex / Kiro 等）的差异、以及本地试用路径，都写在 `INSTALL.md`，README 不再展开。Codex 与 Kiro 走同一条通用安装路径；本仓库不会为它们新增专属 rules / hooks / 脚本接线。
+手工安装、不同 AI 工具（Cursor / Claude Code / Codex / Kiro 等）的差异、以及本地试用路径，都写在 `INSTALL.md`，README 不再展开。`.cursor/commands` 只服务 Cursor；Codex 的命令入口来自 Sandtable Codex plugin，不承诺自动发现 Cursor 命令。
 
 ## 命令入口
 - `/sandtable-start`: 从一句话需求进入前五步，收束到侦察、目标、用例和计划。
@@ -110,6 +113,11 @@ sandtable/
   .cursor/rules/sandtable.mdc
   .cursor/commands/*.md
   commands/*.md
+  .agents/plugins/marketplace.json
+  plugins/sandtable/
+    .codex-plugin/plugin.json
+    commands/*.md
+    skills/**
   hooks/
   skills/
     autonomous-orchestration/
