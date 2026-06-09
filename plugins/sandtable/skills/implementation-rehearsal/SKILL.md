@@ -37,7 +37,7 @@ digraph impl {
   "任一 ANOMALY/BLOCKED?" -> "亲自核实 → 问开发者 → 修正 PRD/计划" [label="是"];
   "亲自核实 → 问开发者 → 修正 PRD/计划" -> "为每个预演创建独立 worktree/分支" [label="重演"];
   "任一 ANOMALY/BLOCKED?" -> "全部 DONE" [label="否"];
-  "全部 DONE" -> "evaluating-rehearsals 打分择优" -> "更新 state: 选定方案, phase=INTEGRATE";
+  "全部 DONE" -> "完整性闸门通过?" -> "evaluating-rehearsals 打分择优" -> "更新 state: 选定方案, phase=INTEGRATE";
 }
 ```
 
@@ -53,11 +53,11 @@ git worktree add ../<repo>-rehearsal-2 -b sandtable/rehearse/<feature>-2
 
 | 状态 | 主 agent 动作 |
 |------|---------------|
-| `DONE` | 收下 diff + 测试结果，进入打分 |
+| `DONE` | 收下 diff + 测试结果，执行完整性闸门；只有覆盖矩阵、live TODO 表、主 agent 独立结构化基准与真实 diff / 改动文件清单核对全部通过后，才进入打分/评估 |
 | `ANOMALY_FOUND` | 亲自核实 → 问开发者 → 修正计划 → 重演（不要让同一子 agent 带着错误假设硬上） |
 | `BLOCKED` | 评估卡点：缺上下文就补；任务太大就拆；计划本身错就回 PLAN |
 
-主 agent **不轻信** `DONE`：抽查 diff 是否真实现了需求、测试是否真在验证行为、有没有偷偷加未要求的东西（越界）。
+主 agent **不轻信** `DONE`：先收集 diff 与测试结果，再执行完整性闸门，核对覆盖矩阵、live TODO 表、主 agent 独立结构化基准与真实 diff / 改动文件清单；闸门通过后才可评分/评估。
 
 每轮把结果写入 `rehearsals/impl-<n>-<branch>.md`，journal 追加一条。
 
@@ -68,7 +68,23 @@ git worktree add ../<repo>-rehearsal-2 -b sandtable/rehearse/<feature>-2
 | "预演里发现计划有点不对，我顺手改了计划接着写" | 立即 ANOMALY 上报。计划修正是主 agent + 开发者的事。 |
 | "在主工作区直接试做更快" | 会污染。必须独立 worktree。 |
 | "留个 TODO 占位，预演意思到了就行" | 实现预演要求完整，不留细节。 |
-| "子 agent 说 DONE，直接合并" | 先 evaluating-rehearsals 打分 + 抽查，再 INTEGRATE。 |
+| "子 agent 说 DONE，直接合并" | 先核对覆盖矩阵、live TODO 表、主 agent 独立结构化基准与真实 diff / 改动文件清单；完整性闸门通过后才评分或 INTEGRATE。 |
 | "顺便把旁边的代码也优化了" | 外科手术式改动。越界即 anomaly。 |
 
-子 agent 派发模板见 `./implementation-rehearsal-prompt.md`。全部 DONE 后加载 `evaluating-rehearsals`。
+子 agent 派发模板见 `./implementation-rehearsal-prompt.md`。全部 DONE 且完整性闸门通过后才加载 `evaluating-rehearsals`。
+
+## 本需求补充 · 实现预演完整性闸门
+
+`DONE` 只是候选自报完成，不得直接进入 `evaluating-rehearsals` / debrief / EVALUATE。全部候选自报 `DONE` 后，主 agent 必须先执行完整性闸门，简单候选可亲自检查，复杂或高风险候选可按需派只读 mental/redteam 风格子 agent 辅助。
+
+闸门必须包含：
+- 主 agent 独立读取当前 `prd.md`、`tests.md`、`plan.md`，重算结构化核对基准；候选报告内嵌基准、覆盖矩阵或 TODO 表只能作为输入，不能作为事实来源。
+- 稳定键派生：`FRx` 来自 PRD 原编号；`PRD-AC1...n` 来自 PRD 独立验收标准章节顶层 bullet；`MUST-1...n` 与 `MNOT-1...n` 来自 MUST / MUST NOT 顶层 bullet；`TCx` 来自 tests 原编号；`PLAN Tx/步骤x` 来自 `plan.md` checkbox 原文编号和标题，保留小数编号。
+- 正文 hash：提取条目的规范化 UTF-8 文本，LF 换行，去除行尾空白，保留条目内部顺序和缩进语义后计算 SHA-256。任一 FR/PRD-AC/MUST/MNOT/TC/PLAN checkbox 的增删、改名、正文变化或 hash 缺失都导致基准不同。
+- 闸门结论记录核对时间、候选 worktree/分支、当前三文档结构化基准、真实 diff 或改动文件清单摘要。不得只用 impl 报告 mtime、粗粒度摘要或标识集合判断是否过期。
+- 对照真实 diff / 改动文件清单核查覆盖矩阵和 live 执行 TODO 表；diff 为空、缺少计划要求文件族、缺少主 agent diff 核对结论、少报键、聚合键、无依据 `not-applicable`、`missing` 或 `blocked`，均不得通过。
+
+候选 `DONE` 报告必须包含：
+- 覆盖矩阵：`PRD 覆盖 FRx`、`PRD 验收标准 PRD-ACx`、`PRD 红线 MUST-x/MNOT-x`、`TESTS TCx`、`PLAN Tx/步骤x`，逐项列状态与证据，不得用任务级汇总代替步骤级 checkbox。
+- live 执行 TODO 表：列 `项` / `来源` / `状态` / `证据`；`项` 使用 `PRD FRx`、`PRD-ACx`、`MUST-x`、`MNOT-x`、`TCx`、`PLAN Tx/步骤x`；`状态` 只能是 `done` / `not-applicable` / `blocked` / `missing`。该表只属于候选报告，不新增独立 TODO 文件，不替代 `plan.md` / `state.md`。
+- 覆盖矩阵与 live TODO 表在 PRD FR、PRD-AC、MUST/MNOT、TC、PLAN 步骤键集合上一一对应；冲突时以更细粒度的 `missing` / `blocked` 为准。

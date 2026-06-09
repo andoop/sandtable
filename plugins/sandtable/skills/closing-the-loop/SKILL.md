@@ -11,8 +11,8 @@ description: Use at the end of every Sandtable work turn—after a slash command
 1. **正触发**：本回合为 Sandtable 工作步，且阶段动作完成或需用户确认/选下一步 → 必须输出收尾（见 profile）。
 2. **负触发 · 第三态**：本回合**非 Sandtable 工作步** → **禁止**收尾（即使已读写 `docs/sandtable/`，TC8b）。
 3. **负触发**：与 Sandtable 无关 → **禁止**收尾（无论是否触达 `docs/sandtable/`）。
-4. `autonomy.mode=manual` 且 ≥2 条合理下一步 → **必须**调用 AskQuestion（工具可用时）；无工具时用编号模版列表。
-5. `autonomy.mode=autopilot` 且 `blocked=false` → **禁止** AskQuestion 问「是否继续」；同命令内续跑。`blocked=true` → 完整收尾 + FR5 AskQuestion（阻塞优先）。
+4. `autonomy.mode=manual` 且 ≥2 条合理下一步、且本回合用户尚未明确选择路径 → **必须**调用 AskQuestion（工具可用时）；无工具时用编号模版列表。
+5. `autonomy.mode=autopilot` 且 `blocked=false` → **禁止** AskQuestion 问「是否继续」；同命令内续跑；但续接命中 PRD 未确认门禁时必须停在 PRD 确认点。`blocked=true` → 完整收尾 + FR5 AskQuestion（阻塞优先）。
 6. 有活跃 feature 时读其 `state.md`；**不得**为 typo 等非 Sandtable 任务主动读盘以触发收尾。
 </HARD-GATE>
 
@@ -34,7 +34,7 @@ description: Use at the end of every Sandtable work turn—after a slash command
 
 ### 📋 复制即用
 ```text
-（完整下一条用户消息，含 slash + 必要上下文）
+（未选择路径时提供完整下一条用户消息；已选择且已执行时不得重复当前选择）
 ```
 
 ### 🔀 其他路径（可选）
@@ -64,7 +64,7 @@ description: Use at the end of every Sandtable work turn—after a slash command
 ## 样例 · OBJECTIVES, PRD 待确认
 
 ```text
-PRD 方向认可。请把 state.phase 更新为 TESTCASES 并继续写 tests.md。
+PRD 方向认可。请记录可追溯 PRD 确认证据，并继续写 tests.md。
 ```
 
 ```text
@@ -95,3 +95,14 @@ PRD 方向认可。请把 state.phase 更新为 TESTCASES 并继续写 tests.md�
 | "autopilot 每阶段都弹 AskQuestion" | 非阻塞 autopilot 用战报收尾，不弹。 |
 | "链内切换可以省略战报" | 禁止省略；至少战报收尾。 |
 | "PRD 待确认时推荐进 TESTCASES" | 违反 writing-prd 硬门禁。 |
+
+## 本需求补充 · 已选择路径直接执行与 PRD 确认证据
+
+- 优先级：真实阻塞 (`blocked=true`、缺产品意图/权限/登录/外部资源/关键事实) 最高，必须写 `questions.md`、设置 `blocked=true` 并提问；其次是 PRD 未确认门禁；之后才执行用户选择。
+- 若用户已经通过 AskQuestion 选择下一步，或自然语言明确表达“确认并继续 / 按 X 继续 / 就选 X”，且没有真实阻塞，agent 必须在同一回合执行该选择对应动作。不得再次 AskQuestion，也不得只输出同一动作的复制命令要求用户重复输入。
+- 若该选择本身构成 PRD 确认，执行 TESTCASES/PLAN/MENTAL/REDTEAM/IMPL/rehearse/live/debrief 前或同时，必须把可核实 PRD 确认证据写入 `state.md` 或 `journal.md`：AskQuestion 记录 answer id 或 `source: askquestion:<id>` + 选项原文/确认时间；自然语言记录用户原话摘录 + 确认时间 + 用户消息来源。
+- `/sandtable-start` 写完 PRD 且未获确认时仍停在 PRD 确认点；但同回合 AskQuestion 或自然语言已经确认 PRD 并要求继续时，应先落盘证据再直接进入 TESTCASES 写 `tests.md`，旧“本命令在此结束”边界不得压过已选择即续跑。
+- `/sandtable-objectives`、`/sandtable-refine`、`/sandtable-resume` 收到“PRD 已确认，请继续写 tests.md”时，先记录自然语言确认三元组，再直接加载 `writing-tests`；`phase=OBJECTIVES` 且 `prd.md` 已存在时不得重新进入 `writing-prd`。
+- `/sandtable-plan`、`writing-tests`、`writing-plan` 开始前必须检查 PRD 确认门禁；同条 PRD 确认触发写 tests/plan 时，必须在写入前或同时落盘证据。缺 `tests.md` 但 PRD 已确认时回 TESTCASES；PRD 未确认时停在确认点。
+- 修改 PRD 的 refine 反馈仍按 refine 修改；修改 tests/plan 或继续推演必须先满足 PRD 确认门禁。`blocked=true` 且用户同时说继续时，阻塞优先，不执行选择。
+- 完整收尾分两类：未选择路径时可给推荐和复制模板；已选择且已执行时只报告执行结果、当前 phase、下一建议，复制模板只能指向下一阶段，不能重复当前已执行选择。

@@ -52,8 +52,8 @@ rehearsals:
   impl:    { runs: 0, last: none }
 autonomy:
   mode: manual
-  min_rounds: { mental: 3, redteam: 3, impl: 2 }
-  min_agents_per_round: { mental: 3, redteam: 3, impl: 2 }
+  min_rounds: { mental: 1, redteam: 1, impl: 1 } # minimum coverage / 最低覆盖
+  min_agents_per_round: { mental: 1, redteam: 1, impl: 1 } # minimum coverage / 最低覆盖
   completed_rounds: { mental: 0, redteam: 0, impl: 0 }
   last_decision: none
 selected_impl: none
@@ -93,7 +93,7 @@ digraph resume {
   "Read questions.md and resolve blockers first" [shape=box];
   "Read recent journal.md entries to rebuild context" [shape=box];
   "autopilot?" [shape=diamond];
-  "Choose next step from quota closure" [shape=box];
+  "Choose next step from minimum coverage plus autonomous judgment" [shape=box];
   "Continue at the indicated phase" [shape=doublecircle];
 
   "Read project.md + constraints.md" -> "List features/ and choose the target requirement" -> "Read state.md for phase / tasks / autonomy" -> "blocked?";
@@ -101,9 +101,9 @@ digraph resume {
   "blocked?" -> "Read recent journal.md entries to rebuild context" [label="No"];
   "Read questions.md and resolve blockers first" -> "Read recent journal.md entries to rebuild context";
   "Read recent journal.md entries to rebuild context" -> "autopilot?";
-  "autopilot?" -> "Choose next step from quota closure" [label="Yes"];
+  "autopilot?" -> "Choose next step from minimum coverage plus autonomous judgment" [label="Yes"];
   "autopilot?" -> "Continue at the indicated phase" [label="No"];
-  "Choose next step from quota closure" -> "Continue at the indicated phase";
+  "Choose next step from minimum coverage plus autonomous judgment" -> "Continue at the indicated phase";
 }
 ```
 
@@ -126,3 +126,12 @@ Autopilot continuation must follow this exact branch:
 | "The journal is too verbose; I’ll skip it." | Without the journal, the next AI effectively starts from zero. |
 | "I’ll edit an old journal entry to fix it." | History is append-only. Fixes are new entries. |
 | "We’re blocked, but I’ll keep doing other parts." | `blocked=true` means the main flow stops. Resolve `questions.md` first. |
+
+## Feature Addendum: Minimum Coverage, Autonomous Judgment, Resume Gate
+
+- `autonomy.min_rounds` and `autonomy.min_agents_per_round` mean minimum coverage, defaulting to `{ mental: 1, redteam: 1, impl: 1 }`. Do not migrate or overwrite historical features that already recorded 3/3/2.
+- Only a cold start initializes `phase=RECON` and runs the full `RECON -> OBJECTIVES -> TESTCASES -> PLAN` document chain. If `state.md` or any feature artifact already exists, resume in place and preserve existing `min_rounds`, `min_agents_per_round`, `completed_rounds`, and `phase`.
+- Before resuming into TESTCASES/PLAN/MENTAL/REDTEAM/IMPL, enforce the PRD confirmation gate. Confirmation must be traceable to developer input and persisted to `state.md` or `journal.md` before or while continuing. AskQuestion confirmation needs an answer id or `source: askquestion:<id>`; natural-language confirmation needs the quoted user text, confirmation time, and user-message source. Agent-authored progress logs, `autonomy.last_decision`, `phase>=TESTCASES`, vague “AskQuestion answer”, or source-less `prd_confirmed` fields do not count.
+- If documents are incomplete, resume from the earliest missing artifact. If `prd.md` exists but is not confirmed, stop at PRD confirmation instead of moving to tests or plan.
+- Rehearsal scheduling first fills mental -> redteam -> impl minimum coverage. Once minimum coverage is met, the main agent decides autonomously whether to add more rehearsal or enter `EVALUATE`, based on risk, change surface, lessons hit, recently fixed anomalies, implementation divergence, test confidence, and spot checks. Do not ask the user whether to continue unless truly blocked.
+- Implementation `DONE` is not enough to count the impl round or enter `EVALUATE`; the completeness gate must pass, and EVALUATE must re-check the current PRD/tests/plan structured baseline, coverage matrix, live TODO table, and real diff / changed file list.

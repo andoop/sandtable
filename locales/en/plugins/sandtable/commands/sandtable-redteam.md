@@ -15,3 +15,10 @@ Execute:
 Iron law: let the red team attack brutally; vague "there may be risk" does not count, only reproducible strikes do; the main agent trusts neither red nor blue without checking.
 
 8. When done, load `skills/closing-the-loop/SKILL.md`, read `state.md`, and output the close block (skip for in-command chain steps; use status bulletin for in-chain switches). Do not run unlisted next phases except `/sandtable-autopilot` and `/sandtable-rehearse`.
+
+## Feature Addendum: Real Reproducible Breaches
+
+- OPFOR must not help the design, but it also must not invent impossible or unrelated attack surfaces just to win.
+- Return `BREACH_FOUND` only for real, relevant, reproducible breaks against PRD acceptance, MUST/MUST-NOT, plan, or implementation behavior.
+- Vague risk, speculation, missing trigger steps, or unrelated scenarios are residual risk, not breach.
+- If `prd.md` exists without traceable developer confirmation, do not dispatch OPFOR. If the same message confirms the PRD, persist the confirmation evidence before or while dispatching.
