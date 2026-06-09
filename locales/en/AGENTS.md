@@ -21,7 +21,7 @@ You are working with the Sandtable methodology. The goal is to turn a one-line r
 
 `INTAKE -> RECON -> OBJECTIVES -> TESTCASES -> PLAN -> MENTAL_REHEARSAL -> REDTEAM -> IMPL_REHEARSAL -> EVALUATE -> INTEGRATE -> VERIFY -> DONE -> FEEDBACK`
 
-If any rehearsal finds an anomaly or unexpected fact: the main agent verifies it personally, proposes a fix or asks the developer, updates the PRD / plan, and rehearses again. Repeat until the line holds.
+If any rehearsal finds an anomaly or unexpected fact that affects PRD/plan/code-reality closure, acceptance, feasibility, or key decisions: the main agent verifies it personally, proposes a fix or asks the developer, updates the PRD / plan, and rehearses again. Repeat until the line holds.
 
 **Post-landing loop (FEEDBACK, re-entrant):** after DONE, the user's acceptance feedback enters here; defects go through bugfix root cause (root cause MUST be confirmed by logs at 100%) -> fix -> regression case -> lesson, accumulating the lesson into the global `lessons.md` to feed future rehearsals. FEEDBACK is human-in-the-loop; autopilot does not drive it (autopilot scope ends at EVALUATE/DONE).
 
@@ -51,3 +51,17 @@ Load `closing-the-loop` only when a **Sandtable work step** ends. **Do not** clo
 ## Slash Commands
 
 `/sandtable-start` (first five steps), `/sandtable-autopilot` (advance from raw request through debrief unattended), `/sandtable-recon` (reconnaissance), `/sandtable-objectives` (goals and red lines), `/sandtable-plan` (plan), `/sandtable-refine` (iterate and revise), `/sandtable-mental` (mental rehearsal), `/sandtable-redteam` (red-team attack), `/sandtable-live` (implementation rehearsal), `/sandtable-debrief` (score and choose), `/sandtable-rehearse` (run rehearsals plus debrief only), `/sandtable-bug` (intake acceptance feedback), `/sandtable-bugfix` (evidence-driven root-cause fix), `/sandtable-status` (status report), `/sandtable-resume` (resume from disk state).
+
+## Feature Addendum: Real-Issue Mental Rehearsal
+
+- Mental rehearsal is for real issues that affect PRD/plan/code-reality closure, acceptance, implementation feasibility, or key decisions.
+- Do not manufacture `ANOMALY_FOUND` from unrelated edge cases, impossible triggers, or scenarios that cannot affect acceptance.
+- The truthfulness rule still applies: do not continue with key unknowns. Irrelevant side questions become residual risk, not anomaly.
+- If `prd.md` exists without traceable developer confirmation, do not dispatch mental subagents. If the same message confirms the PRD, persist the confirmation evidence to `state.md` or `journal.md` before or while dispatching.
+
+## Feature Addendum: Real Reproducible Breaches
+
+- OPFOR must not help the design, but it also must not invent impossible or unrelated attack surfaces just to win.
+- Return `BREACH_FOUND` only for real, relevant, reproducible breaks against PRD acceptance, MUST/MUST-NOT, plan, or implementation behavior.
+- Vague risk, speculation, missing trigger steps, or unrelated scenarios are residual risk, not breach.
+- If `prd.md` exists without traceable developer confirmation, do not dispatch OPFOR. If the same message confirms the PRD, persist the confirmation evidence before or while dispatching.

@@ -94,7 +94,7 @@ English：
 
 ## 命令入口
 - `/sandtable-start`: 从一句话需求进入前五步，收束到侦察、目标、用例和计划。
-- `/sandtable-autopilot`: 按配额自动推进 `RECON -> ... -> EVALUATE`，真阻塞才停。
+- `/sandtable-autopilot`: 按最低覆盖自动推进，并在达标后自主判断是否追加或评估 `RECON -> ... -> EVALUATE`，真阻塞才停。
 - `/sandtable-mental`: 只读推演逻辑闭环。
 - `/sandtable-redteam`: 红军 OPFOR 找可复现破口。
 - `/sandtable-live`: 在隔离 worktree 做实现预演。

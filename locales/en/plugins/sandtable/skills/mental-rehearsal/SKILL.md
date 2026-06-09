@@ -40,3 +40,10 @@ The main agent must not trust a "logic closed" report blindly; spot-check the re
 | "That error path probably never happens." | "Probably" means unverified. Confirm it or report it. |
 | "The subagent said it closes, so it’s fine." | Spot-check its citations and reasoning. |
 | "One subagent can walk every chain." | Split independent chains for better focus and cross-checking. |
+
+## Feature Addendum: Real-Issue Mental Rehearsal
+
+- Mental rehearsal is for real issues that affect PRD/plan/code-reality closure, acceptance, implementation feasibility, or key decisions.
+- Do not manufacture `ANOMALY_FOUND` from unrelated edge cases, impossible triggers, or scenarios that cannot affect acceptance.
+- The truthfulness rule still applies: do not continue with key unknowns. Irrelevant side questions become residual risk, not anomaly.
+- If `prd.md` exists without traceable developer confirmation, do not dispatch mental subagents. If the same message confirms the PRD, persist the confirmation evidence to `state.md` or `journal.md` before or while dispatching.

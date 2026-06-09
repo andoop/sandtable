@@ -21,7 +21,7 @@
 
 `INTAKE → RECON → OBJECTIVES → TESTCASES → PLAN → MENTAL_REHEARSAL → REDTEAM → IMPL_REHEARSAL → EVALUATE → INTEGRATE → VERIFY → DONE → FEEDBACK`
 
-任一预演发现异常/意外 → 主 agent 亲自核实 → 给方案或问开发者 → 修正 PRD/计划 → 重演。循环往复，逐步加固逻辑，直至完美。
+任一预演发现会影响闭环、验收、实现可行性或关键决策的异常/意外 → 主 agent 亲自核实 → 给方案或问开发者 → 修正 PRD/计划 → 重演。循环往复，逐步加固逻辑，直至完美。
 
 **落地后闭环（FEEDBACK，可重入）**：DONE 后用户验收反馈进入；缺陷类经 bugfix 根因（必靠日志100%确认）→修复→回归用例→教训，教训累积进全局 `lessons.md` 反哺未来推演。FEEDBACK 人在环，autopilot 不驱动（其范围止于 EVALUATE/DONE）。
 
@@ -51,3 +51,17 @@
 ## Slash 命令（每个=一个战术动作，可单独触发/反复迭代）
 
 `/sandtable-start`（受领任务·前五步）、`/sandtable-autopilot`（自动推进·从需求到复盘无人值守执行）、`/sandtable-recon`（战场侦察）、`/sandtable-objectives`（指挥官意图·目标红线）、`/sandtable-plan`（作战计划）、`/sandtable-refine`（调整部署·迭代完善）、`/sandtable-mental`（头脑预演）、`/sandtable-redteam`（红蓝对抗）、`/sandtable-live`（实现预演）、`/sandtable-debrief`（战损复盘·择优）、`/sandtable-rehearse`（联合预演·只跑推演与复盘）、`/sandtable-bug`（受理验收反馈）、`/sandtable-bugfix`（证据驱动根因修障）、`/sandtable-status`（战报）、`/sandtable-resume`（接防·重获记忆）。
+
+## 本需求补充 · 真实问题口径
+
+- 头脑推演的目标是发现会影响 PRD/plan/code reality 闭环、验收、实现可行性或关键决策的真实问题。
+- 不为了制造 `ANOMALY_FOUND` 构造与本需求无关、无现实触发路径、不会影响验收的偏题场景。
+- `being-truthful` 的不猜测原则继续适用：关键未知不能带着继续；但无关边缘疑问不得因为泛化措辞升级为 anomaly。
+- 若 `prd.md` 已存在但无可核实开发者确认记录，不得派发 mental 子 agent；同条消息确认 PRD 时，必须在派发前或同时把确认证据持久化到 `state.md` 或 `journal.md`。
+
+## 本需求补充 · 真实可复现攻破口径
+
+- 红军不替方案找补，但也不能为了击溃而发明无现实触发路径的脑洞。
+- 只有真实、相关、可复现地攻破 PRD 验收、MUST/MUST-NOT、计划或实现路径时，才返回 `BREACH_FOUND`。
+- 空泛风险、纯猜测、无输入/步骤/证据、与本需求无关的场景可记录为残余风险或下一轮重点，但不得驱动修正循环。
+- 若 `prd.md` 已存在但无可核实开发者确认记录，不得派发红军；同条消息确认 PRD 时，必须在派发前或同时持久化确认证据。

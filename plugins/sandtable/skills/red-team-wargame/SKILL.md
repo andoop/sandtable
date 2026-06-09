@@ -1,11 +1,11 @@
 ---
 name: red-team-wargame
-description: Use to adversarially attack a plan or an implementation before committing to it. Dispatches OPFOR (red-team) subagents whose sole mission is to defeat the design - find the scenario where it breaks, the hidden coupling, the silently violated redline.
+description: Use to adversarially attack a plan or an implementation before committing to it. Dispatches OPFOR (red-team) subagents whose mission is to find real, relevant, reproducible ways the design breaks - hidden coupling, violated redlines, or unmet acceptance.
 ---
 
 # 红蓝对抗 · OPFOR Wargame（让"敌军"来击溃你的计划）
 
-**军事原则：你想不到的破绽，对手会替你找到。** 普通评审是"友军检查"，容易手下留情；红蓝对抗是**敌我对抗**——红军（OPFOR）唯一使命就是**击溃**当前计划/实现。蓝军（你的方案）必须扛住所有进攻才算合格。**每一次成功的进攻 = 一个 ANOMALY，喂给修正循环。**
+**军事原则：你想不到的破绽，对手会替你找到。** 普通评审是"友军检查"，容易手下留情；红蓝对抗是**敌我对抗**——红军（OPFOR）的使命是寻找真实、相关、可复现的攻破场景来检验当前计划/实现。蓝军（你的方案）必须扛住所有进攻才算合格。**每一次成功的进攻 = 一个 ANOMALY，喂给修正循环。**
 
 **开始时声明：** "我在用 red-team-wargame 发起红蓝对抗。"
 
@@ -17,7 +17,7 @@ description: Use to adversarially attack a plan or an implementation before comm
 
 ## 红军的进攻向量（OPFOR 攻击面）
 
-给每个红军子 agent 指定一个或多个攻击向量，逼它往死里打：
+给每个红军子 agent 指定一个或多个攻击向量，要求真实可复现地进攻：
 
 | 进攻向量 | 红军要找的"杀招" |
 |---------|------------------|
@@ -54,7 +54,7 @@ digraph redteam {
 
 ## 裁决规则（防止"假胜利"）
 
-- 红军必须**给出可复现的杀招**（具体输入/场景/步骤 + 预期错误），空泛的"可能有风险"不算成功进攻。
+- 红军必须**给出真实、相关、可复现的杀招**（具体输入/场景/步骤 + 可观察错误或证据）。空泛风险、纯猜测、无现实触发路径、与本需求验收无关的脑洞不算 `BREACH_FOUND`。
 - 主 agent（蓝军）**亲自核实每个杀招是否真成立**，不轻信红军也不轻信蓝军。
 - 红军"没找到破绽"不等于安全——记录它打了哪些向量、为何没破，作为信心依据。
 - 每轮对抗写入 `rehearsals/redteam-<n>.md`，journal 追加。state 的 `rehearsals.redteam` 计数。
@@ -77,3 +77,10 @@ digraph redteam {
 | "蓝军自己说扛住了" | 主 agent 亲自核实杀招是否成立。 |
 
 子 agent 派发模板见 `./opfor-prompt.md`。
+
+## 本需求补充 · 真实可复现攻破口径
+
+- 红军不替方案找补，但也不能为了击溃而发明无现实触发路径的脑洞。
+- 只有真实、相关、可复现地攻破 PRD 验收、MUST/MUST-NOT、计划或实现路径时，才返回 `BREACH_FOUND`。
+- 空泛风险、纯猜测、无输入/步骤/证据、与本需求无关的场景可记录为残余风险或下一轮重点，但不得驱动修正循环。
+- 若 `prd.md` 已存在但无可核实开发者确认记录，不得派发红军；同条消息确认 PRD 时，必须在派发前或同时持久化确认证据。

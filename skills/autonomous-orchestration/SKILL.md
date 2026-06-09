@@ -1,6 +1,6 @@
 ---
 name: autonomous-orchestration
-description: Use when the developer wants Sandtable to advance from intake through debrief without manual handoff between phases. Defines autonomous progression, minimum rehearsal quotas, rollback rules, and on-disk state updates.
+description: Use when the developer wants Sandtable to advance from intake through debrief without manual handoff between phases. Defines autonomous progression, minimum rehearsal minimum coverages, rollback rules, and on-disk state updates.
 ---
 
 # 全自主自动沙盘编排
@@ -11,10 +11,10 @@ description: Use when the developer wants Sandtable to advance from intake throu
 
 <HARD-GATE>
 1. 自动模式必须完整覆盖 `INTAKE → RECON → OBJECTIVES → TESTCASES → PLAN → MENTAL_REHEARSAL → REDTEAM → IMPL_REHEARSAL → EVALUATE`。
-2. 最低配额是硬门槛，不可降级：
-   - mental：至少 3 轮，每轮至少 3 个只读子 agent；
-   - redteam：至少 3 轮，每轮至少 3 个红军子 agent；
-   - impl：至少 2 轮，每轮至少 2 个独立 worktree 子 agent。
+2. 最低覆盖是硬底线，不可低于 mental/redteam/impl 各一轮；达标后由主 agent 自主裁决追加或评估：
+   - mental：至少 1 轮，每轮至少 1 个只读子 agent；
+   - redteam：至少 1 轮，每轮至少 1 个红军子 agent；
+   - impl：至少 1 轮，每轮至少 1 个独立 worktree 子 agent。
 3. 任一 `ANOMALY_FOUND` / `BREACH_FOUND` / `BLOCKED` 都要先由主 agent 亲自核实；写回 `prd.md` / `tests.md` / `plan.md` / `state.md` / `journal.md` 后，再从最早尚未重新验证的阶段重演。异常轮不计入配额。
 4. 只有真正需要开发者提供的产品意图、登录、授权、批准或工具权限时，才允许写 `questions.md` 并停下。
 </HARD-GATE>
@@ -30,27 +30,24 @@ description: Use when the developer wants Sandtable to advance from intake throu
 ## 自动流程
 
 1. 先加载 `state-and-memory`，确认 `docs/sandtable/`、feature 目录与 `state.md` 存在；若 feature 不存在，按模板创建并把 `phase` 设为 `INTAKE`。
-2. 一进入自动模式，就把 `state.md` 写成：
-   - `autonomy.mode=autopilot`
-   - `autonomy.min_rounds={ mental: 3, redteam: 3, impl: 2 }`
-   - `autonomy.min_agents_per_round={ mental: 3, redteam: 3, impl: 2 }`
-   - `autonomy.last_decision=进入 autopilot，开始 RECON`
-   - `phase=RECON`
-3. 自动完成 `RECON → OBJECTIVES → TESTCASES → PLAN`。正常路径下主 agent 自主决定下一步，不逐步等开发者确认。
-3.5 自动阶段**切换时**加载 `closing-the-loop` 的**战报收尾** profile；不 AskQuestion；**同一 `/sandtable-autopilot` 命令内**立即执行下一合法阶段。命令完全结束或 `blocked=true` 时输出**完整收尾**。
+2. 先判断这是冷启动/显式重启，还是续接既有 feature：
+   - 冷启动（新 feature、无既有 `state.md`/feature 文档，或开发者显式要求从原始需求重来）才初始化 `autonomy.mode=autopilot`、`autonomy.min_rounds={ mental: 1, redteam: 1, impl: 1 }`、`autonomy.min_agents_per_round={ mental: 1, redteam: 1, impl: 1 }`、`autonomy.completed_rounds={ mental: 0, redteam: 0, impl: 0 }`、`autonomy.last_decision=进入 autopilot，开始 RECON；最低覆盖为 mental/redteam/impl 各一轮`，并把 `phase=RECON`。
+   - 续接既有 feature/docs/state 时，只写入/保留 `autonomy.mode=autopilot`，不得覆盖既有 `min_rounds`、`min_agents_per_round`、`completed_rounds` 或 `phase`；只刷新必要的 `autonomy.last_decision` 说明按现状续接。
+3. 只有冷启动路径可以自动补齐 `RECON → OBJECTIVES → TESTCASES → PLAN`。续接路径必须先检查文档齐备度和 PRD 确认门禁：进入 TESTCASES/PLAN/MENTAL/REDTEAM/IMPL 前，若 `prd.md` 已存在但没有可追溯开发者确认记录，必须停在 PRD 确认点；本回合明确确认 PRD 时，必须先/同时把确认证据写入 `state.md` 或 `journal.md`，才允许继续。
+3.5 自动阶段**切换时**加载 `closing-the-loop` 的**战报收尾** profile；不 AskQuestion；**同一 `/sandtable-autopilot` 命令内**立即执行下一合法阶段。但续接命中 PRD 未确认门禁时必须结束本命令并停在 PRD 确认点；命令完全结束或 `blocked=true` 时输出**完整收尾**。
 4. 每次自动推进或回退重演时，都同步更新 `state.md.updated`、`phase` 与 `autonomy.last_decision`，并在 `journal.md` 追加本次裁决的原因。
-5. 进入推演链后，按配额闭包推进：
+5. 进入推演链后，先补足最低覆盖，再自主裁决推进：
    - `autonomy.completed_rounds.mental < autonomy.min_rounds.mental` 时，继续 mental；
    - mental 达标后，若 `autonomy.completed_rounds.redteam < autonomy.min_rounds.redteam`，继续 redteam；
    - redteam 达标后，若 `autonomy.completed_rounds.impl < autonomy.min_rounds.impl`，继续 impl；
-   - 三类配额全部达标后，进入 `EVALUATE`。
-6. `phase` 在 autopilot 下是记录位；恢复与续跑时，优先看 `autonomy.completed_rounds` 是否闭包达标，再决定下一步。
+   - 三类最低覆盖全部达成后，且 impl 完整性闸门仍有效时，主 agent 根据风险、改动面、异常历史、实现差异、测试信心和抽查结果，自主选择追加某类推演/实现预演或进入 `EVALUATE`，并写入 `autonomy.last_decision`。
+6. `phase` 在 autopilot 下是记录位；恢复与续跑时，先执行 PRD 确认门禁和文档齐备度检查，再按 `autonomy.completed_rounds`、完整性闸门有效性和自主裁决规则决定下一步。
 
 ## 轮次判定
 
-- mental 一轮完成：该轮至少 3 个只读子 agent，且全部返回 `LOGIC_CLOSED`。
-- redteam 一轮完成：该轮至少 3 个红军子 agent，且全部返回 `HELD`。
-- impl 一轮完成：该轮至少 2 个独立 worktree 子 agent，且全部返回 `DONE`。
+- mental 一轮完成：该轮至少 1 个只读子 agent，且全部返回 `LOGIC_CLOSED`。
+- redteam 一轮完成：该轮至少 1 个红军子 agent，且全部返回 `HELD`。
+- impl 一轮完成：该轮至少 1 个独立 worktree 子 agent，且全部返回 `DONE`。
 - 任一子 agent 在该轮返回异常/攻破/阻塞：本轮不计入 `autonomy.completed_rounds`；先修正，再重跑当前阶段。
 
 ## 阻塞与回退裁决
@@ -76,4 +73,13 @@ description: Use when the developer wants Sandtable to advance from intake throu
 | "照老习惯先问用户要不要继续下一步" | 自动模式默认自己继续；除非是真阻塞。 |
 | "这轮发现异常了，先算完成，后面补轮" | 不行。异常轮不计入配额，修正后重跑。 |
 | "手动跑过一次 mental，可以顺手抵掉 autopilot 的一轮" | 不行。手动 `rehearsals.*` 不能回填 `autonomy.completed_rounds`。 |
-| "state.md 里已经写了 phase，就不用看 quota" | 不行。autopilot 恢复与续跑先看配额闭包，再看 `phase`。 |
+| "state.md 里已经写了 phase，就不用看 minimum coverage" | 不行。autopilot 恢复与续跑先看最低覆盖与自主裁决，再看 `phase`。 |
+
+## 本需求补充 · 最低覆盖、自主裁决与续接门禁
+
+- `autonomy.min_rounds` 和 `autonomy.min_agents_per_round` 表示最低覆盖，默认 `{ mental: 1, redteam: 1, impl: 1 }`；历史 feature 已写入 3/3/2 时不得强制迁移或覆盖。
+- 冷启动才初始化 `phase=RECON` 并自动补齐 `RECON -> OBJECTIVES -> TESTCASES -> PLAN`。已有 `state.md` 或任一 feature 文档时按续接处理，保留既有 `min_rounds`、`min_agents_per_round`、`completed_rounds` 与 `phase`。
+- 续接进入 TESTCASES/PLAN/MENTAL/REDTEAM/IMPL 前必须先检查 PRD 确认门禁：确认必须可追溯到开发者输入，并在继续前或同时持久化到 `state.md` 或 `journal.md`。AskQuestion 需有 answer id 或 `source: askquestion:<id>`；自然语言确认需记录用户原话摘录、确认时间和用户消息来源。agent 自写推进日志、`autonomy.last_decision`、`phase>=TESTCASES`、仅写“AskQuestion 答复”或无来源的 `prd_confirmed` 不算确认。
+- 文档未齐备时从最早缺失阶段补齐；但 `prd.md` 已存在且未确认时必须停在 PRD 确认点，不得因缺 `tests.md` 或 `plan.md` 继续。
+- 推演链先补足 mental -> redteam -> impl 最低覆盖。最低覆盖达成后，主 agent 必须依据风险、改动面、历史教训、异常是否刚修复、实现候选差异、测试信心和抽查结果，自主追加或进入 `EVALUATE`，并记录 `autonomy.last_decision`；非真实阻塞不得询问用户是否继续。
+- impl 自报 `DONE` 不能直接计入轮次或进入 `EVALUATE`；必须先通过完整性闸门，并在进入 `EVALUATE` 前二次校验当前 PRD/tests/plan 结构化基准、覆盖矩阵、live TODO 表、真实 diff / 改动文件清单。

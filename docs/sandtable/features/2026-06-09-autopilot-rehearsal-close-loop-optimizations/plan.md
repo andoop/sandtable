@@ -1,0 +1,861 @@
+# 自动模式、推演口径、live 完整性与 close loop 优化改动计划
+
+**目标:** 把已确认的 PRD 和 TESTCASES 落成一组可预演、可验证的 Sandtable 方法论资产改动。  
+**架构:** 以中文根源 `skills/`、`commands/`、`templates/` 为单一编辑主线，同步镜像到 `plugins/sandtable/`、`.cursor/commands/` 与 `locales/en/`。本轮只改方法论文档和命令提示词，不引入脚本、依赖或运行时代码。  
+**对应 PRD:** `prd.md`  
+**推演要求:** 本计划将由头脑预演、红蓝对抗、实现预演子 agent 逐任务推演。
+
+## 文件地图
+
+### 自动模式与状态语义
+
+- 修改: `skills/autonomous-orchestration/SKILL.md`
+- 修改: `plugins/sandtable/skills/autonomous-orchestration/SKILL.md`
+- 修改: `plugins/sandtable/skills/SKILL.md`
+- 修改: `locales/en/skills/autonomous-orchestration/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/autonomous-orchestration/SKILL.md`
+- 修改: `commands/sandtable-autopilot.md`
+- 修改: `.cursor/commands/sandtable-autopilot.md`
+- 修改: `plugins/sandtable/commands/sandtable-autopilot.md`
+- 修改: `locales/en/commands/sandtable-autopilot.md`
+- 修改: `locales/en/.cursor/commands/sandtable-autopilot.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-autopilot.md`
+- 修改: `commands/sandtable-resume.md`
+- 修改: `.cursor/commands/sandtable-resume.md`
+- 修改: `plugins/sandtable/commands/sandtable-resume.md`
+- 修改: `locales/en/commands/sandtable-resume.md`
+- 修改: `locales/en/.cursor/commands/sandtable-resume.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-resume.md`
+- 修改: `skills/state-and-memory/SKILL.md`
+- 修改: `plugins/sandtable/skills/state-and-memory/SKILL.md`
+- 修改: `locales/en/skills/SKILL.md`
+- 修改: `locales/en/skills/state-and-memory/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/state-and-memory/SKILL.md`
+- 修改: `templates/state.md`
+- 修改: `templates/en/state.md`
+- 修改: `README.md`
+
+单一职责：把 3/3/2 固定配额改为 1/1/1 最低覆盖，并补上“达标后自主追加或进入评估”的裁决语义。
+
+### 头脑推演与红蓝对抗口径
+
+- 修改: `skills/mental-rehearsal/SKILL.md`
+- 修改: `skills/mental-rehearsal/mental-rehearsal-prompt.md`
+- 修改: `plugins/sandtable/skills/mental-rehearsal/SKILL.md`
+- 修改: `plugins/sandtable/skills/mental-rehearsal/mental-rehearsal-prompt.md`
+- 修改: `locales/en/skills/mental-rehearsal/SKILL.md`
+- 修改: `locales/en/skills/mental-rehearsal/mental-rehearsal-prompt.md`
+- 修改: `locales/en/plugins/sandtable/skills/mental-rehearsal/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/mental-rehearsal/mental-rehearsal-prompt.md`
+- 修改: `commands/sandtable-mental.md`
+- 修改: `.cursor/commands/sandtable-mental.md`
+- 修改: `plugins/sandtable/commands/sandtable-mental.md`
+- 修改: `locales/en/commands/sandtable-mental.md`
+- 修改: `locales/en/.cursor/commands/sandtable-mental.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-mental.md`
+- 修改: `skills/being-truthful/SKILL.md`
+- 修改: `plugins/sandtable/skills/being-truthful/SKILL.md`
+- 修改: `locales/en/skills/being-truthful/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/being-truthful/SKILL.md`
+- 修改: `AGENTS.md`
+- 修改: `CLAUDE.md`
+- 修改: `.cursor/rules/sandtable.mdc`
+- 修改: `locales/en/AGENTS.md`
+- 修改: `locales/en/.cursor/rules/sandtable.mdc`
+- 修改: `skills/using-sandtable/SKILL.md`
+- 修改: `plugins/sandtable/skills/using-sandtable/SKILL.md`
+- 修改: `locales/en/skills/using-sandtable/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/using-sandtable/SKILL.md`
+- 修改: `skills/using-sandtable/SKILL.md`
+- 修改: `plugins/sandtable/skills/using-sandtable/SKILL.md`
+- 修改: `locales/en/skills/using-sandtable/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/using-sandtable/SKILL.md`
+- 修改: `skills/being-truthful/SKILL.md`
+- 修改: `plugins/sandtable/skills/being-truthful/SKILL.md`
+- 修改: `locales/en/skills/being-truthful/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/being-truthful/SKILL.md`
+- 修改: `skills/red-team-wargame/SKILL.md`
+- 修改: `skills/red-team-wargame/opfor-prompt.md`
+- 修改: `plugins/sandtable/skills/red-team-wargame/SKILL.md`
+- 修改: `plugins/sandtable/skills/red-team-wargame/opfor-prompt.md`
+- 修改: `locales/en/skills/red-team-wargame/SKILL.md`
+- 修改: `locales/en/skills/red-team-wargame/opfor-prompt.md`
+- 修改: `locales/en/plugins/sandtable/skills/red-team-wargame/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/red-team-wargame/opfor-prompt.md`
+- 修改: `commands/sandtable-redteam.md`
+- 修改: `.cursor/commands/sandtable-redteam.md`
+- 修改: `plugins/sandtable/commands/sandtable-redteam.md`
+- 修改: `locales/en/commands/sandtable-redteam.md`
+- 修改: `locales/en/.cursor/commands/sandtable-redteam.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-redteam.md`
+- 修改: `skills/using-sandtable/SKILL.md`
+- 修改: `plugins/sandtable/skills/using-sandtable/SKILL.md`
+- 修改: `locales/en/skills/using-sandtable/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/using-sandtable/SKILL.md`
+- 修改: `commands/sandtable-start.md`
+- 修改: `.cursor/commands/sandtable-start.md`
+- 修改: `plugins/sandtable/commands/sandtable-start.md`
+- 修改: `locales/en/commands/sandtable-start.md`
+- 修改: `locales/en/.cursor/commands/sandtable-start.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-start.md`
+- 修改: `commands/sandtable-objectives.md`
+- 修改: `.cursor/commands/sandtable-objectives.md`
+- 修改: `plugins/sandtable/commands/sandtable-objectives.md`
+- 修改: `locales/en/commands/sandtable-objectives.md`
+- 修改: `locales/en/.cursor/commands/sandtable-objectives.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-objectives.md`
+- 修改: `commands/sandtable-refine.md`
+- 修改: `.cursor/commands/sandtable-refine.md`
+- 修改: `plugins/sandtable/commands/sandtable-refine.md`
+- 修改: `locales/en/commands/sandtable-refine.md`
+- 修改: `locales/en/.cursor/commands/sandtable-refine.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-refine.md`
+- 修改: `commands/sandtable-plan.md`
+- 修改: `.cursor/commands/sandtable-plan.md`
+- 修改: `plugins/sandtable/commands/sandtable-plan.md`
+- 修改: `locales/en/commands/sandtable-plan.md`
+- 修改: `locales/en/.cursor/commands/sandtable-plan.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-plan.md`
+- 修改: `commands/sandtable-resume.md`
+- 修改: `.cursor/commands/sandtable-resume.md`
+- 修改: `plugins/sandtable/commands/sandtable-resume.md`
+- 修改: `locales/en/commands/sandtable-resume.md`
+- 修改: `locales/en/.cursor/commands/sandtable-resume.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-resume.md`
+- 修改: `skills/writing-prd/SKILL.md`
+- 修改: `plugins/sandtable/skills/writing-prd/SKILL.md`
+- 修改: `locales/en/skills/writing-prd/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/writing-prd/SKILL.md`
+- 修改: `skills/writing-tests/SKILL.md`
+- 修改: `plugins/sandtable/skills/writing-tests/SKILL.md`
+- 修改: `locales/en/skills/writing-tests/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/writing-tests/SKILL.md`
+- 修改: `skills/writing-plan/SKILL.md`
+- 修改: `plugins/sandtable/skills/writing-plan/SKILL.md`
+- 修改: `locales/en/skills/writing-plan/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/writing-plan/SKILL.md`
+- 修改: `commands/sandtable-start.md`
+- 修改: `.cursor/commands/sandtable-start.md`
+- 修改: `plugins/sandtable/commands/sandtable-start.md`
+- 修改: `locales/en/commands/sandtable-start.md`
+- 修改: `locales/en/.cursor/commands/sandtable-start.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-start.md`
+- 修改: `commands/sandtable-objectives.md`
+- 修改: `.cursor/commands/sandtable-objectives.md`
+- 修改: `plugins/sandtable/commands/sandtable-objectives.md`
+- 修改: `locales/en/commands/sandtable-objectives.md`
+- 修改: `locales/en/.cursor/commands/sandtable-objectives.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-objectives.md`
+- 修改: `commands/sandtable-refine.md`
+- 修改: `.cursor/commands/sandtable-refine.md`
+- 修改: `plugins/sandtable/commands/sandtable-refine.md`
+- 修改: `locales/en/commands/sandtable-refine.md`
+- 修改: `locales/en/.cursor/commands/sandtable-refine.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-refine.md`
+- 修改: `commands/sandtable-plan.md`
+- 修改: `.cursor/commands/sandtable-plan.md`
+- 修改: `plugins/sandtable/commands/sandtable-plan.md`
+- 修改: `locales/en/commands/sandtable-plan.md`
+- 修改: `locales/en/.cursor/commands/sandtable-plan.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-plan.md`
+- 修改: `commands/sandtable-resume.md`
+- 修改: `.cursor/commands/sandtable-resume.md`
+- 修改: `plugins/sandtable/commands/sandtable-resume.md`
+- 修改: `locales/en/commands/sandtable-resume.md`
+- 修改: `locales/en/.cursor/commands/sandtable-resume.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-resume.md`
+- 修改: `skills/writing-prd/SKILL.md`
+- 修改: `plugins/sandtable/skills/writing-prd/SKILL.md`
+- 修改: `locales/en/skills/writing-prd/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/writing-prd/SKILL.md`
+- 修改: `skills/writing-tests/SKILL.md`
+- 修改: `plugins/sandtable/skills/writing-tests/SKILL.md`
+- 修改: `locales/en/skills/writing-tests/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/writing-tests/SKILL.md`
+- 修改: `skills/writing-plan/SKILL.md`
+- 修改: `plugins/sandtable/skills/writing-plan/SKILL.md`
+- 修改: `locales/en/skills/writing-plan/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/writing-plan/SKILL.md`
+- 修改: `commands/sandtable-start.md`
+- 修改: `.cursor/commands/sandtable-start.md`
+- 修改: `plugins/sandtable/commands/sandtable-start.md`
+- 修改: `locales/en/commands/sandtable-start.md`
+- 修改: `locales/en/.cursor/commands/sandtable-start.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-start.md`
+- 修改: `commands/sandtable-objectives.md`
+- 修改: `.cursor/commands/sandtable-objectives.md`
+- 修改: `plugins/sandtable/commands/sandtable-objectives.md`
+- 修改: `locales/en/commands/sandtable-objectives.md`
+- 修改: `locales/en/.cursor/commands/sandtable-objectives.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-objectives.md`
+- 修改: `commands/sandtable-refine.md`
+- 修改: `.cursor/commands/sandtable-refine.md`
+- 修改: `plugins/sandtable/commands/sandtable-refine.md`
+- 修改: `locales/en/commands/sandtable-refine.md`
+- 修改: `locales/en/.cursor/commands/sandtable-refine.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-refine.md`
+- 修改: `commands/sandtable-resume.md`
+- 修改: `.cursor/commands/sandtable-resume.md`
+- 修改: `plugins/sandtable/commands/sandtable-resume.md`
+- 修改: `locales/en/commands/sandtable-resume.md`
+- 修改: `locales/en/.cursor/commands/sandtable-resume.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-resume.md`
+- 修改: `skills/writing-prd/SKILL.md`
+- 修改: `plugins/sandtable/skills/writing-prd/SKILL.md`
+- 修改: `locales/en/skills/writing-prd/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/writing-prd/SKILL.md`
+
+单一职责：保留异常即停、可复现攻破和不猜测原则，同时明确“真实问题”与“现实触发路径”口径。
+
+### 实现预演完成检查
+
+- 修改: `skills/implementation-rehearsal/SKILL.md`
+- 修改: `skills/implementation-rehearsal/implementation-rehearsal-prompt.md`
+- 修改: `plugins/sandtable/skills/implementation-rehearsal/SKILL.md`
+- 修改: `plugins/sandtable/skills/implementation-rehearsal/implementation-rehearsal-prompt.md`
+- 修改: `locales/en/skills/implementation-rehearsal/SKILL.md`
+- 修改: `locales/en/skills/implementation-rehearsal/implementation-rehearsal-prompt.md`
+- 修改: `locales/en/plugins/sandtable/skills/implementation-rehearsal/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/implementation-rehearsal/implementation-rehearsal-prompt.md`
+- 修改: `skills/evaluating-rehearsals/SKILL.md`
+- 修改: `plugins/sandtable/skills/evaluating-rehearsals/SKILL.md`
+- 修改: `locales/en/skills/evaluating-rehearsals/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/evaluating-rehearsals/SKILL.md`
+- 修改: `commands/sandtable-live.md`
+- 修改: `.cursor/commands/sandtable-live.md`
+- 修改: `plugins/sandtable/commands/sandtable-live.md`
+- 修改: `locales/en/commands/sandtable-live.md`
+- 修改: `locales/en/.cursor/commands/sandtable-live.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-live.md`
+- 修改: `commands/sandtable-rehearse.md`
+- 修改: `.cursor/commands/sandtable-rehearse.md`
+- 修改: `plugins/sandtable/commands/sandtable-rehearse.md`
+- 修改: `locales/en/commands/sandtable-rehearse.md`
+- 修改: `locales/en/.cursor/commands/sandtable-rehearse.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-rehearse.md`
+- 修改: `commands/sandtable-debrief.md`
+- 修改: `.cursor/commands/sandtable-debrief.md`
+- 修改: `plugins/sandtable/commands/sandtable-debrief.md`
+- 修改: `locales/en/commands/sandtable-debrief.md`
+- 修改: `locales/en/.cursor/commands/sandtable-debrief.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-debrief.md`
+
+单一职责：要求实现预演 `DONE` 提供 PRD/tests/plan 覆盖矩阵，并要求主 agent 亲自或按需派只读子 agent 核查完整性后才进入 debrief。
+
+### close loop 已选择即续跑
+
+- 修改: `skills/closing-the-loop/SKILL.md`
+- 修改: `plugins/sandtable/skills/closing-the-loop/SKILL.md`
+- 修改: `locales/en/skills/closing-the-loop/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/closing-the-loop/SKILL.md`
+- 修改: `skills/using-sandtable/SKILL.md`
+- 修改: `plugins/sandtable/skills/using-sandtable/SKILL.md`
+- 修改: `locales/en/skills/using-sandtable/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/using-sandtable/SKILL.md`
+- 修改: `commands/sandtable-start.md`
+- 修改: `.cursor/commands/sandtable-start.md`
+- 修改: `plugins/sandtable/commands/sandtable-start.md`
+- 修改: `locales/en/commands/sandtable-start.md`
+- 修改: `locales/en/.cursor/commands/sandtable-start.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-start.md`
+- 修改: `commands/sandtable-objectives.md`
+- 修改: `.cursor/commands/sandtable-objectives.md`
+- 修改: `plugins/sandtable/commands/sandtable-objectives.md`
+- 修改: `locales/en/commands/sandtable-objectives.md`
+- 修改: `locales/en/.cursor/commands/sandtable-objectives.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-objectives.md`
+- 修改: `commands/sandtable-refine.md`
+- 修改: `.cursor/commands/sandtable-refine.md`
+- 修改: `plugins/sandtable/commands/sandtable-refine.md`
+- 修改: `locales/en/commands/sandtable-refine.md`
+- 修改: `locales/en/.cursor/commands/sandtable-refine.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-refine.md`
+- 修改: `commands/sandtable-plan.md`
+- 修改: `.cursor/commands/sandtable-plan.md`
+- 修改: `plugins/sandtable/commands/sandtable-plan.md`
+- 修改: `locales/en/commands/sandtable-plan.md`
+- 修改: `locales/en/.cursor/commands/sandtable-plan.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-plan.md`
+- 修改: `commands/sandtable-resume.md`
+- 修改: `.cursor/commands/sandtable-resume.md`
+- 修改: `plugins/sandtable/commands/sandtable-resume.md`
+- 修改: `locales/en/commands/sandtable-resume.md`
+- 修改: `locales/en/.cursor/commands/sandtable-resume.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-resume.md`
+- 修改: `skills/writing-prd/SKILL.md`
+- 修改: `plugins/sandtable/skills/writing-prd/SKILL.md`
+- 修改: `locales/en/skills/writing-prd/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/writing-prd/SKILL.md`
+- 修改: `skills/writing-tests/SKILL.md`
+- 修改: `plugins/sandtable/skills/writing-tests/SKILL.md`
+- 修改: `locales/en/skills/writing-tests/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/writing-tests/SKILL.md`
+- 修改: `skills/writing-plan/SKILL.md`
+- 修改: `plugins/sandtable/skills/writing-plan/SKILL.md`
+- 修改: `locales/en/skills/writing-plan/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/writing-plan/SKILL.md`
+
+单一职责：当用户已经通过 AskQuestion 或自然语言明确选择路径时，agent 直接执行对应下一步；完整收尾用于未选择、命令边界或真实阻塞。
+
+## 任务 T1: 自动模式改为最低覆盖 + 自主追加
+
+**文件:**
+- 修改: `skills/autonomous-orchestration/SKILL.md`
+- 修改: `plugins/sandtable/skills/autonomous-orchestration/SKILL.md`
+- 修改: `plugins/sandtable/skills/SKILL.md`
+- 修改: `locales/en/skills/autonomous-orchestration/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/autonomous-orchestration/SKILL.md`
+- 修改: `commands/sandtable-autopilot.md`
+- 修改: `.cursor/commands/sandtable-autopilot.md`
+- 修改: `plugins/sandtable/commands/sandtable-autopilot.md`
+- 修改: `locales/en/commands/sandtable-autopilot.md`
+- 修改: `locales/en/.cursor/commands/sandtable-autopilot.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-autopilot.md`
+
+- [ ] 步骤1: 在中文自动编排 skill 中把硬门槛从 3/3/2 改为最低覆盖 1/1/1。
+  - 将“最低配额是硬门槛，不可降级”改为“最低覆盖是硬底线，不可低于一轮”。
+  - 将 mental/redteam/impl 文本改为：
+    - mental：至少 1 轮，每轮至少 1 个只读子 agent；
+    - redteam：至少 1 轮，每轮至少 1 个红军子 agent；
+    - impl：至少 1 轮，每轮至少 1 个独立 worktree 子 agent。
+  - 保留异常轮不计入 `completed_rounds`、异常后核实修正重演的规则。
+- [ ] 步骤2: 在同一 skill 的自动流程中把初始化值改为：
+  - `autonomy.min_rounds={ mental: 1, redteam: 1, impl: 1 }`
+  - `autonomy.min_agents_per_round={ mental: 1, redteam: 1, impl: 1 }`
+  - `autonomy.last_decision=进入 autopilot，开始 RECON；最低覆盖为 mental/redteam/impl 各一轮`
+  - 区分冷启动、续接与首次切换：仅新建 feature、无既有 `state.md`/feature 文档，或开发者显式要求从原始需求重来时初始化 `min_rounds` / `min_agents_per_round` / `completed_rounds` 与 `phase=RECON`；当前 feature 已有 `state.md` 或任一 feature 文档时，即使此前 `autonomy.mode=manual`、首次触发 `/sandtable-autopilot`，也按续接处理，不得覆盖既有 `min_rounds` / `min_agents_per_round` / `completed_rounds`、不得把 `phase` 强行改回 `RECON`，应按现有 `state.md` 与文档齐备度继续。
+- [ ] 步骤2.5: 把自动流程中的 `RECON → OBJECTIVES → TESTCASES → PLAN` 明确限定为冷启动文档链：
+  - 冷启动（新 feature、无既有 `prd.md` / `tests.md` / `plan.md`，或开发者显式要求从原始需求重来）才自动完成 `RECON → OBJECTIVES → TESTCASES → PLAN`。
+  - 续接当前 feature 时，PRD 确认门禁是进入任何 TESTCASES/PLAN/MENTAL/REDTEAM/IMPL 调度前的全局前置条件：只要 `prd.md` 已存在但没有可核实的开发者 PRD 确认，无论三文档是否齐备、`state.phase` 是否已经到 PLAN，都必须先停在 PRD 确认点，不得进入最低覆盖调度。可核实确认只能来自可追溯的开发者输入事件：本回合明确确认也必须在继续前或同时写入 `state.md` 或 `journal.md`；AskQuestion answer id 或 `source: askquestion:<id>` + 选项原文/确认时间；或 `state.md`/journal 中记录的用户确认原话摘录 + 确认时间 + 用户消息来源。agent 自己写的推进日志、`autonomy.last_decision`、单纯 `phase>=TESTCASES`、仅写“AskQuestion 答复”但无 id、只有确认时间、无对应用户输入事件的“用户原话摘录”或 agent 自设 `prd_confirmed` 字段都不得算作 PRD 已确认。
+  - 续接当前 feature 且 PRD 已确认、三文档已存在、开发者未显式要求重来时，一律跳过文档链；即使 `state.md.phase=PLAN` 也不得重写文档，应直接进入最低覆盖调度，下一步通常是 `MENTAL_REHEARSAL`。
+  - 续接当前 feature 但三文档未齐备时，不得整链重跑、不得跳过缺失文档进入推演；必须从最早缺失阶段补齐。PRD 确认门禁优先于文档齐备度：若 `prd.md` 已存在但没有上述可核实开发者确认，不得因缺 `tests.md` 或 `plan.md` 进入 TESTCASES/PLAN，必须停在 PRD 确认点；仅当本回合确认已经按上述格式持久化到 `state.md` 或 `journal.md`，或历史记录中存在可核实开发者 PRD 确认，才允许按“有 `prd.md` 但无 `tests.md` → 进入 TESTCASES 写 `tests.md`”处理。有 `prd.md`/`tests.md` 但无 `plan.md` 时进入 PLAN 写 `plan.md`；仅完成 RECON 但无 PRD 时进入 OBJECTIVES/PRD。补齐后再进入最低覆盖调度。
+  - 续接时不得重写既有 `prd.md` / `tests.md` / `plan.md`，除非前一步已经进入修正循环并明确要求调整这些文档。
+- [ ] 步骤3: 改写“进入推演链后，按配额闭包推进”为“先满足最低覆盖，再自主裁决”：
+  - 若 mental 未达最低覆盖，下一步 mental。
+  - 否则若 redteam 未达最低覆盖，下一步 redteam。
+  - 在判断 impl 是否达标前，先检查最近 impl 报告/完整性闸门结论是否仍对应当前 `prd.md` / `tests.md` / `plan.md`；若闸门过期，视同 impl 未达标，不得进入 `EVALUATE`。
+  - 否则若 impl 未达最低覆盖，下一步 impl。
+  - 三类最低覆盖全部达成后，主 agent 根据风险、改动面、历史教训命中、异常是否刚修复、实现候选差异、测试信心和抽查结果，自主选择追加某类推演/实现预演或进入 `EVALUATE`。
+  - 每次自主裁决必须写入 `autonomy.last_decision`。
+  - 同步收窄自动编排中“各阶段之间不等待开发者确认/同一命令内继续执行”的 blanket 表述，包括 `autonomous-orchestration` 步骤3.5 的战报收尾/同命令立即执行下一合法阶段：冷启动文档链内可自动推进，但续接命中 PRD 未确认门禁时必须停在 PRD 确认点，输出完整确认收尾并结束命令；本回合已明确确认 PRD 时，必须先/同时把可核实确认证据持久化到 `state.md` 或 `journal.md`，才允许继续 TESTCASES。
+- [ ] 步骤4: 改写轮次判定为每轮至少 1 个对应子 agent/候选，并保留“全部返回 LOGIC_CLOSED/HELD/DONE 才计入”的要求。
+- [ ] 步骤5: 在 impl 轮次判定中接入完整性闸门：
+  - 实现候选全部自报 `DONE` 后，不得立刻计入 `completed_rounds.impl`。
+  - 主 agent 必须先按 T5/T6 的完整性闸门核对覆盖矩阵、live 执行 TODO 表和 PRD/tests/plan 100% 覆盖结论。
+  - 闸门通过后才计入 impl 轮次；不通过则登记 `ANOMALY_FOUND` / `BLOCKED` 并回修正循环。
+  - 三类最低覆盖达成后，进入 `EVALUATE` 前仍必须确认 impl 候选完整性闸门已通过。
+  - 即使闸门核对基准未过期，进入 `EVALUATE` 前也必须由主 agent 独立重算当前结构化基准，并校验 impl 报告覆盖矩阵/live TODO 表的 PRD FR、PRD-AC、MUST/MUST NOT、TESTS TC、PLAN checkbox 键集合及对应正文 hash 与当前结构化核对基准一致；键集合或正文 hash 缺失/不一致时，视为完整性闸门未通过，不得进入 `EVALUATE`。
+  - 进入 `EVALUATE` 前还必须确认 impl 报告内存在主 agent 对候选 worktree 真实 diff / 改动文件清单的核对结论；若只有候选自报矩阵/TODO，或 diff 为空/缺少计划要求文件族仍标全 `done`，视为完整性闸门未通过。
+  - 若当前 `prd.md`、`tests.md` 或 `plan.md` 的结构化核对基准晚于或不同于 impl 报告中记录的“闸门核对基准”，该 impl 轮次和闸门结论视为过期；autopilot 不得计入该轮或进入 `EVALUATE`，必须先重跑完整性闸门，若文档变更影响实现路径则重新 live。不得只用 impl 报告文件 mtime、粗粒度 prose 摘要或仅标识集合判断是否过期。
+- [ ] 步骤6: 改写 Red Flags 中“state.md 里已经写了 phase，就不用看 quota”为“达到最低覆盖不等于必须停止；仍要自主裁决是否追加；impl 自报 DONE 不等于可计入轮次，必须先过完整性闸门”。
+- [ ] 步骤7: 在中文 `/sandtable-autopilot` 三份命令文件中同步上述语义：
+  - `commands/sandtable-autopilot.md`
+  - `.cursor/commands/sandtable-autopilot.md`
+  - `plugins/sandtable/commands/sandtable-autopilot.md`
+  - 步骤 3 的“初始化/刷新 `autonomy.*`”改为：新建/冷启动时初始化；续接当前 feature 时保留既有 `min_rounds`、`min_agents_per_round`、`completed_rounds` 与 `phase`，只刷新需要的 `last_decision`。
+  - 步骤 4 的“自动完成 `RECON → OBJECTIVES → TESTCASES → PLAN`”改为冷启动专用；续接已有 feature 时先检查 PRD 确认门禁，PRD 未确认时即使三文档已存在也必须停在 PRD 确认点；PRD 已确认且三文档存在时跳过文档链；续接但文档未齐备时，从最早缺失阶段补齐文档，不得整链重跑；但 `phase=OBJECTIVES` 且 PRD 未确认时必须先停在 PRD 确认点，不得仅因 `tests.md` 缺失就进入 TESTCASES。
+  - 步骤 5 的 3/3/2 列表改为三类各至少 1 轮/1 agent。
+  - 增加“实现预演自报 DONE 后先执行完整性闸门，通过后才计入 impl 完成轮次或进入 EVALUATE”。
+  - 增加“进入 EVALUATE 前必须由主 agent 独立重算结构化基准，并二次校验覆盖矩阵/live TODO 表的 PRD FR、PRD-AC、MUST/MUST NOT、TESTS TC、PLAN checkbox 键集合及正文 hash；不得只凭旧闸门结论存在就进入 EVALUATE”。
+  - 增加“进入 EVALUATE 前必须确认完整性闸门报告记录了真实 diff / 改动文件清单核对结论；缺该结论时视为闸门未通过”。
+  - 增加“当前文档结构化核对基准与 impl 报告内记录的闸门核对基准不一致时，视为闸门过期，必须重跑闸门或重新 live；不得只看 impl 报告文件 mtime或粗摘要”。
+  - 步骤 7 的“全部配额达标”改为“最低覆盖达成并完成自主裁决/复盘择优”。
+  - 同步改写步骤 7 中“各阶段之间不等待用户确认；同一命令内继续执行”这类旧条款：冷启动文档链仍可不逐阶段打扰用户；续接当前 feature 且命中 PRD 未确认门禁时，必须结束本命令并停在 PRD 确认点，输出确认/修改路径，不得同命令继续进入 TESTCASES、PLAN 或推演链；本回合已明确确认 PRD 时，必须先/同时持久化证据，才按已确认续跑进入 TESTCASES。
+- [ ] 步骤8: 将英文对应文件做等价英文改动，语义必须与中文一致，不逐字直译也可以。
+- [ ] 验证:
+  - 覆盖 TC1、TC2、TC3。
+  - 用同一个 `state.md` 分别走 `/sandtable-resume` 和 `/sandtable-autopilot` 续接：当 `completed_rounds={ mental:1, redteam:0, impl:0 }` 时，两者都应保留已完成 mental 并继续 redteam，不得重置为 0 或回到 RECON。
+  - 构造 `phase=REDTEAM`、三文档已存在、`completed_rounds={ mental:1, redteam:0, impl:0 }` 的续接场景，触发 `/sandtable-autopilot` 时不得重跑或重写 `RECON → PLAN` 文档链，必须同回合进入 redteam 调度。
+  - 构造 `phase=PLAN`、三文档已存在、`completed_rounds={ mental:0, redteam:0, impl:0 }` 的续接场景，触发 `/sandtable-autopilot` 时不得重跑或重写 `RECON → PLAN` 文档链，必须进入 mental 最低覆盖调度。
+  - 构造 `phase=PLAN`、三文档已存在、但 PRD 从未获开发者确认的续接场景，触发 `/sandtable-autopilot` 或 `/sandtable-resume` 时不得进入 mental，必须先停在 PRD 确认点。
+  - 构造 `mode=manual`、`phase=PLAN`、三文档已存在、首次触发 `/sandtable-autopilot` 的场景，确认按续接处理，不得初始化回 `RECON`。
+  - 构造 `phase=OBJECTIVES`、仅有 `prd.md`、PRD 未获确认的场景，确认 `/sandtable-autopilot` 和 `/sandtable-resume` 都必须停在 PRD 确认点，不得进入 TESTCASES。
+  - 构造 PRD 已确认（本回合确认已先/同时持久化到 `state.md` 或 `journal.md`，或历史记录中有 AskQuestion answer id / `source: askquestion:<id>`，或用户确认原话摘录 + 确认时间 + 用户消息来源）、仅有 `prd.md`，或已有 `prd.md`/`tests.md` 但缺 `plan.md` 的场景，确认 `/sandtable-autopilot` 从最早缺失阶段补齐文档，不得整链重跑或跳过缺失文档进入推演。
+  - 构造 `/sandtable-autopilot` 同条消息带“PRD 已确认，请继续写 tests.md”的场景，确认 autopilot 在写 `tests.md` 前或同时把用户原话摘录、确认时间和用户消息来源写入 `state.md` 或 `journal.md`，不得只凭本回合临时上下文续跑。
+  - 构造仅有 agent 自写 journal “PRD 已确认”、伪造“用户确认原话摘录”、或 agent 自设 `state.md prd_confirmed=true` / `confirmed_by: developer` 但无对应用户消息/AskQuestion 来源的场景，确认 `/sandtable-autopilot` 和 `/sandtable-resume` 仍必须停在 PRD 确认点。
+  - 构造历史 feature `min_rounds={ mental:3, redteam:3, impl:2 }`、`completed_rounds.mental=2` 的续接场景，确认 `/sandtable-autopilot` 不得覆盖既有 `min_rounds` / `min_agents_per_round` 为 1/1/1，不得跳过原本第 3 轮 mental。
+  - 搜索 `至少 3 轮`、`at least 3 rounds`、`至少 2 轮`、`at least 2 rounds`，确认本任务涉及的自动模式硬门槛已移除。
+  - 搜索 `min_rounds: { mental: 3, redteam: 3, impl: 2 }`，确认自动模式初始化文件不再使用 3/3/2。
+
+## 任务 T2: 状态模板与恢复语义同步最低覆盖
+
+**文件:**
+- 修改: `skills/state-and-memory/SKILL.md`
+- 修改: `plugins/sandtable/skills/state-and-memory/SKILL.md`
+- 修改: `locales/en/skills/SKILL.md`
+- 修改: `locales/en/skills/state-and-memory/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/state-and-memory/SKILL.md`
+- 修改: `templates/state.md`
+- 修改: `templates/en/state.md`
+- 修改: `commands/sandtable-resume.md`
+- 修改: `.cursor/commands/sandtable-resume.md`
+- 修改: `plugins/sandtable/commands/sandtable-resume.md`
+- 修改: `locales/en/commands/sandtable-resume.md`
+- 修改: `locales/en/.cursor/commands/sandtable-resume.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-resume.md`
+- 修改: `README.md`
+
+- [ ] 步骤1: 把中文 `state-and-memory` 示例 frontmatter 的默认值改为：
+  - `min_rounds: { mental: 1, redteam: 1, impl: 1 }`
+  - `min_agents_per_round: { mental: 1, redteam: 1, impl: 1 }`
+- [ ] 步骤2: 在 `state-and-memory` 规则中把“配额闭包”统一改为“最低覆盖 + 自主裁决”：
+  - `autonomy.min_rounds` 表示最低覆盖，不表示固定必须跑满的多轮配额。
+  - `completed_rounds` 仍只记录 autopilot 自动推进的完成轮次，手动 `rehearsals.*` 仍不得回填。
+  - 恢复时先补足最低覆盖；三类均满足后，根据 `autonomy.last_decision` 或当前风险判断继续追加还是进入 `EVALUATE`。
+- [ ] 步骤3: 显式修改恢复流程图和自动模式分支：
+  - 在任何推演/实现调度前先检查 feature 三文档齐备度，并先尊重 PRD 确认门禁：若 `prd.md` 已存在但没有可核实的开发者 PRD 确认，无论 `phase` 是否为 OBJECTIVES、三文档是否齐备，都必须停在 PRD 确认点，不得进入 TESTCASES/PLAN/MENTAL/REDTEAM/IMPL；可核实确认必须包含开发者来源并持久化到 `state.md` 或 `journal.md`：AskQuestion answer id 或 `source: askquestion:<id>` + 选项原文/确认时间，或用户确认原话摘录 + 确认时间 + 用户消息来源；仅有确认时间或“AskQuestion 答复”不算。agent 自写 journal 决策不算。若本回合消息明确确认 PRD，必须先/同时写入上述持久化证据，才可从最早缺失阶段补齐。若 `prd.md` / `tests.md` / `plan.md` 未齐备，且不处于 PRD 未确认门禁，必须从最早缺失阶段补齐，补齐后才进入最低覆盖调度；不得在缺 `tests.md` 或 `plan.md` 时进入 mental/redteam/impl。
+  - dot 图节点 `按配额闭包决定下一步` 改为 `补足最低覆盖或自主裁决下一步`。
+  - 自动模式分支最后一项不得写死“否则下一步是 EVALUATE”，而要写成“三类最低覆盖均满足后，按 `autonomous-orchestration` 自主选择追加推演/实现预演或进入 EVALUATE，并写入 `autonomy.last_decision`”。
+  - 在自动模式恢复分支中插入 `impl 完整性闸门仍有效?` 判断：若 `completed_rounds.impl` 表面达标但当前 `prd.md` / `tests.md` / `plan.md` 与 impl 报告内记录的闸门核对基准不一致，视同 impl 未达最低覆盖，恢复路径必须回到完整性闸门或 `IMPL_REHEARSAL`，不得进入 `EVALUATE`。
+  - 即使闸门核对基准未过期，进入 `EVALUATE` 前也必须由主 agent 独立重算当前结构化基准，并校验 impl 报告覆盖矩阵/live TODO 表的 PRD FR、PRD-AC、MUST/MUST NOT、TESTS TC、PLAN checkbox 键集合及正文 hash 与当前结构化核对基准一致；缺键或 hash 不一致时视同 impl 未达标，不得进入 `EVALUATE`。
+  - 恢复路径还必须确认 impl 报告内存在主 agent 对候选 worktree 真实 diff / 改动文件清单的核对结论；缺该结论、diff 为空却自报全 `done`、或 diff 缺少计划要求文件族时，视同 impl 完整性闸门无效，不得进入 `EVALUATE`。
+- [ ] 步骤3.5: 修订 `state-and-memory` 的恢复信任规则：
+  - 保留“journal 中已有决策应优先遵从”的原则，但为 PRD 确认加硬例外：journal 只有 agent 自写推进记录、`autonomy.last_decision` 或无开发者来源的“PRD 已确认”字样时，不得视为 PRD 已确认。
+  - PRD 确认记录必须能追溯到开发者输入：AskQuestion answer id 或 `source: askquestion:<id>` + 选项原文/确认时间，或用户确认原话摘录 + 确认时间 + 用户消息来源；`state.md` 中等价的 `prd_confirmed` / `confirmed_by: developer` 字段只能在同一回合真实收到开发者确认时写入，并必须引用该来源。agent 在无对应用户输入时自设确认字段、伪造用户原话、仅写“AskQuestion 答复”但无 id、或只写确认时间，均按未确认处理。
+- [ ] 步骤4: 保留 FEEDBACK/DONE 的特殊恢复分支，不改 FEEDBACK 人在环语义；英文 bundle 副本也必须同步步骤3全文：既要补齐 FEEDBACK/DONE 特殊分支，也要把 `else EVALUATE` 替换为最低覆盖后的自主裁决，不能只改 canonical 子目录文件或只补 1.5 分支。
+- [ ] 步骤5: 修改 `templates/state.md` 与 `templates/en/state.md` 的默认值为 1/1/1，并更新注释为“minimum coverage”/“最低覆盖”。
+- [ ] 步骤6: 修改六份 `/sandtable-resume` 命令，把“按未完成最低配额继续推进；优先级 mental → redteam → impl → EVALUATE”改为：
+  - 先检查 PRD 确认门禁和文档齐备度；若 `prd.md` 已存在但用户同条或当前回合没有明确确认 PRD，且 `state.md`/journal 中也没有带可追溯开发者来源的 PRD 确认记录，不得因文档缺失或齐备进入后续阶段，必须停在 PRD 确认点。若用户同条或当前回合明确确认 PRD，必须先/同时把确认记录持久化到 `state.md` 或 `journal.md`，才可视为已确认并继续。若 `prd.md` / `tests.md` / `plan.md` 未齐备，且不处于 PRD 未确认门禁，从最早缺失阶段补齐：缺 `prd.md` 回 OBJECTIVES/PRD，缺 `tests.md` 回 TESTCASES，缺 `plan.md` 回 PLAN；补齐后才进入最低覆盖调度。
+  - 先补齐最低覆盖：mental → redteam → impl。
+  - 若 impl 表面已达标但当前文档与 impl 报告内记录的闸门核对基准不一致，视同 impl 未达标；必须先重跑闸门，变更影响实现路径时重新 live，不得进入 `EVALUATE`。
+  - 若闸门核对基准一致但覆盖矩阵/live TODO 表缺少 PRD FR、PRD-AC、MUST/MUST NOT、TESTS TC、PLAN checkbox 任一键或对应正文 hash 不一致，也视同 impl 未达标；必须补审或重跑闸门，不得进入 `EVALUATE`。
+  - 三类最低覆盖已满足时，按 `autonomous-orchestration` 的自主裁决规则选择追加或进入 `EVALUATE`。
+  - 仍不得用手动 `rehearsals.*` 抵扣 `autonomy.completed_rounds`。
+- [ ] 步骤7: 修改 `README.md` 中 `/sandtable-autopilot` 的一句说明，把“按配额自动推进”改为“按最低覆盖自动推进，并在达标后自主判断是否追加或评估”。
+- [ ] 步骤8: 将英文 state skill、英文 state bundle、英文模板、英文 resume 命令做等价英文改动。
+- [ ] 验证:
+  - 覆盖 TC1、TC2、TC3、TC4。
+  - 读取 `templates/state.md` 与 `templates/en/state.md`，确认新建 feature 默认是 1/1/1。
+  - 构造 `phase=OBJECTIVES`、仅有 `prd.md`、PRD 未获确认并通过 `/sandtable-resume` 恢复的场景，确认 resume 不得进入 TESTCASES 或 mental，必须停在 PRD 确认点。
+  - 构造 `phase=PLAN`、三文档已存在但 PRD 未获确认并通过 `/sandtable-resume` 恢复的场景，确认 resume 不得进入 mental，必须停在 PRD 确认点。
+  - 构造 PRD 已确认（本回合确认已先/同时持久化到 `state.md` 或 `journal.md`，或历史记录中有 AskQuestion answer id / `source: askquestion:<id>`，或用户确认原话摘录 + 确认时间 + 用户消息来源）、仅有 `prd.md`、通过 `/sandtable-resume` 恢复的场景，确认 resume 不得进入 mental，必须先写 `tests.md`。
+  - 构造 `/sandtable-resume` 同条消息带“PRD 已确认，请继续写 tests.md”的场景，确认 resume 在写 `tests.md` 前或同时把用户原话摘录、确认时间和用户消息来源写入 `state.md` 或 `journal.md`，不得只凭本回合临时上下文续跑。
+  - 构造仅有 agent 自写 journal “PRD 已确认”、无开发者原话/AskQuestion id/用户消息来源，或仅写“依据/来源: AskQuestion 答复”但无 id 的场景，确认 resume/autopilot 仍必须停在 PRD 确认点。
+  - 构造 agent 伪造 journal “用户确认原话摘录” 或自设 `state.md prd_confirmed=true`、但没有对应用户消息/AskQuestion 来源的场景，确认 resume/autopilot 仍必须停在 PRD 确认点。
+  - 构造 impl 闸门通过后修改 `plan.md` 的场景，仅通过 `/sandtable-resume` 恢复；确认 resume 不得因 `completed_rounds.impl=1` 直接进入 `EVALUATE`。
+  - 搜索“配额闭包”与 “quota closure”，确认仍出现的位置是在解释历史/状态计数时合理使用，不能再表示固定 3/3/2 硬门槛。
+
+## 任务 T3: 调整头脑推演真实问题口径
+
+**文件:**
+- 修改: `skills/mental-rehearsal/SKILL.md`
+- 修改: `skills/mental-rehearsal/mental-rehearsal-prompt.md`
+- 修改: `plugins/sandtable/skills/mental-rehearsal/SKILL.md`
+- 修改: `plugins/sandtable/skills/mental-rehearsal/mental-rehearsal-prompt.md`
+- 修改: `locales/en/skills/mental-rehearsal/SKILL.md`
+- 修改: `locales/en/skills/mental-rehearsal/mental-rehearsal-prompt.md`
+- 修改: `locales/en/plugins/sandtable/skills/mental-rehearsal/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/mental-rehearsal/mental-rehearsal-prompt.md`
+- 修改: `commands/sandtable-mental.md`
+- 修改: `.cursor/commands/sandtable-mental.md`
+- 修改: `plugins/sandtable/commands/sandtable-mental.md`
+- 修改: `locales/en/commands/sandtable-mental.md`
+- 修改: `locales/en/.cursor/commands/sandtable-mental.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-mental.md`
+- 修改: `skills/being-truthful/SKILL.md`
+- 修改: `plugins/sandtable/skills/being-truthful/SKILL.md`
+- 修改: `locales/en/skills/being-truthful/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/being-truthful/SKILL.md`
+- 修改: `AGENTS.md`
+- 修改: `CLAUDE.md`
+- 修改: `.cursor/rules/sandtable.mdc`
+- 修改: `locales/en/AGENTS.md`
+- 修改: `locales/en/.cursor/rules/sandtable.mdc`
+- 修改: `skills/using-sandtable/SKILL.md`
+- 修改: `plugins/sandtable/skills/using-sandtable/SKILL.md`
+- 修改: `locales/en/skills/using-sandtable/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/using-sandtable/SKILL.md`
+
+- [ ] 步骤1: 在 mental skill 的“它做什么 / 不做什么”中追加口径：
+  - 目标是发现会影响 PRD/plan/code reality 闭环的真实问题。
+  - 不为制造 anomaly 构造与本需求无关、无现实触发路径、不会影响验收的偏题场景。
+- [ ] 步骤2: 改写 mental skill 的终止铁律：
+  - 保留“计划/PRD 与代码现实不符、逻辑无法闭环、意料之外影响、违反 MUST/MUST-NOT、关键事实无法确认且影响决策”即 `ANOMALY_FOUND`。
+  - 明确“与当前需求无关且不影响决策的边缘疑问”记录为残余风险或备注，不触发 anomaly。
+- [ ] 步骤3: 同步清理 mental skill 中与新口径冲突的旧文本：
+  - 删除或改写“不确定本身就是 anomaly”这类 blanket 表述。
+  - 删除或改写“计划没覆盖的情况一律是 ANOMALY”这类 blanket 表述，改为“计划没覆盖且会影响 PRD/plan/code reality 闭环、验收、实现可行性或关键决策时才是 ANOMALY；无关且不影响决策的遗漏记残余风险”。
+  - Red Flags 中“大概=没确认。要么确认，要么上报”改为“关键事实没确认且会影响链路/验收/计划决策时上报；无关且不影响决策的边缘疑问记为残余风险”。
+  - 不改无关 Red Flags，只改与本需求 FR4/TC5/TC6 直接冲突的行。
+- [ ] 步骤3.5: 在 mental skill 和 prompt 中补最小优先级说明：
+  - `being-truthful` 的“不猜测、不带关键未知继续”原则继续适用。
+  - 在 mental rehearsal 语境下，是否升级为 `ANOMALY_FOUND` 以本 skill 的真实问题口径为准：关键且影响链路/验收/决策的不确定点必须上报；无关边缘疑问不得因为全局泛化措辞被升级为 anomaly。
+  - 对 `being-truthful` 四份镜像只做最小衔接改动：不改“不猜测/先弄清关键事实”的全局硬门禁，只把“预演中暴露出的不确定正是 ANOMALY”收窄为“关键且影响 PRD/plan/code reality 闭环、验收或决策的不确定才是 ANOMALY；无关边缘疑问可记残余风险”。
+- [ ] 步骤3.6: 同步行为基线中的预演铁律：
+  - 在 `AGENTS.md`、`CLAUDE.md`、`.cursor/rules/sandtable.mdc` 及英文镜像中，把“意料之外/之前没注意到即立即上报”的 blanket 表述收窄为“与计划不符、意料之外或新发现，且会影响 PRD/plan/code reality 闭环、验收、实现可行性或关键决策时立即上报”。
+  - 同步处理这些行为基线中“核心闭环/状态机摘要”段落里的 blanket 表述，例如“异常/意外 → 核实/上报”、`unexpected fact`、`surprise` 等；红军真实攻破仍必须上报，但无关且不影响决策的边缘意外不得驱动修正循环。
+  - 同步处理 `using-sandtable` 四份镜像中由 session-start 全量注入的“推演铁律”“异常 → 修正 → 重演”与相关 Red Flags，把“意料之外/之前没注意到即上报”收窄为同一真实影响口径；保留“顺手修一下继续”仍是 Red Flag，但仅针对真实 anomaly/breach。
+  - 保留不猜测、不绕过异常、关键未知必须停下核实的原则；无关且不影响决策的边缘疑问记为残余风险，不驱动修正循环。
+- [ ] 步骤4: 在 `mental-rehearsal-prompt.md` 的工作方式和终止规则中加入同样口径：
+  - 子 agent 不得猜测。
+  - 但只有“关键事实无法确认且会影响链路/验收/计划决策”才作为 anomaly。
+  - 无关脑洞或不可执行 TC 本身仍不算 anomaly。
+  - 删除或改写 prompt 中“任何无法用代码或文档确认的不确定点”与“不确定本身就是要上报的发现”这类 blanket 终止规则，避免新旧规则并存。
+- [ ] 步骤5: 在六份 `/sandtable-mental` 命令中补一句“异常即停，但只上报影响 PRD/plan/code reality 闭环的真实问题；无关偏题场景不算 anomaly”。
+- [ ] 步骤5.5: 在六份 `/sandtable-mental` 命令中补 PRD 确认门禁：若 `prd.md` 已存在但无可核实开发者确认记录，不得派发 mental 子 agent；必须完整收尾并停在 PRD 确认点。若本回合 `/sandtable-mental` 消息同时明确确认 PRD，必须在派发 mental 子 agent 前或同时把可核实确认证据持久化到 `state.md` 或 `journal.md`。
+- [ ] 步骤6: 同步英文对应文件。
+- [ ] 验证:
+  - 覆盖 TC5、TC6、TC20。
+  - 搜索 `无法用代码或文档确认的不确定点`、`不确定本身就是 anomaly`、`计划没覆盖的情况`、`大概=没确认`，确认新文本已限定为关键且影响决策的不确定点，不再把无关边缘疑问升级为 anomaly。
+  - 搜索 `预演中暴露出的"不确定"` / `uncertainty exposed during rehearsal`，确认 `being-truthful` 四份镜像也完成最小衔接，不再与 mental 口径冲突。
+  - 搜索 `意料之外` / `意外` / `unexpected` / `surprise` / `anomaly or unexpected` / `immediately report` / `顺手修`，确认行为基线五份文件与 `using-sandtable` 四份镜像的预演铁律、核心闭环/异常修正段落都完成同样收窄，不再压过 mental 新口径。
+  - 抽查中文根源与插件镜像、英文根源与英文插件镜像语义一致。
+  - 构造三文档已存在但 PRD 未确认的场景，确认 `/sandtable-mental` 不得进入推演。
+  - 构造 `/sandtable-mental PRD 已确认，请开始推演` 的同条确认场景，确认派发 mental 前或同时把用户原话摘录、确认时间和用户消息来源写入 `state.md` 或 `journal.md`。
+
+## 任务 T4: 调整红蓝对抗真实攻破口径
+
+**文件:**
+- 修改: `skills/red-team-wargame/SKILL.md`
+- 修改: `skills/red-team-wargame/opfor-prompt.md`
+- 修改: `plugins/sandtable/skills/red-team-wargame/SKILL.md`
+- 修改: `plugins/sandtable/skills/red-team-wargame/opfor-prompt.md`
+- 修改: `locales/en/skills/red-team-wargame/SKILL.md`
+- 修改: `locales/en/skills/red-team-wargame/opfor-prompt.md`
+- 修改: `locales/en/plugins/sandtable/skills/red-team-wargame/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/red-team-wargame/opfor-prompt.md`
+- 修改: `commands/sandtable-redteam.md`
+- 修改: `.cursor/commands/sandtable-redteam.md`
+- 修改: `plugins/sandtable/commands/sandtable-redteam.md`
+- 修改: `locales/en/commands/sandtable-redteam.md`
+- 修改: `locales/en/.cursor/commands/sandtable-redteam.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-redteam.md`
+- 修改: `skills/using-sandtable/SKILL.md`
+- 修改: `plugins/sandtable/skills/using-sandtable/SKILL.md`
+- 修改: `locales/en/skills/using-sandtable/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/using-sandtable/SKILL.md`
+
+- [ ] 步骤1: 在 red-team skill 全文把“唯一使命就是击溃”“逼它往死里打”等与真实攻破口径冲突的表述改为：
+  - 红军使命是寻找真实、可复现、与 PRD/计划/实现相关的攻破场景。
+  - 红军不替方案找补，但也不能为了攻破而发明无现实触发路径的脑洞。
+  - 必须覆盖开头使命段和“进攻向量”段，不能只改开头。
+- [ ] 步骤2: 在裁决规则中保留“可复现杀招才算成功进攻”，并新增：
+  - 空泛风险、纯猜测、无输入/步骤/证据、与本需求验收无关的场景，不算 `BREACH_FOUND`。
+  - 可作为残余风险或下一轮重点，但不得驱动修正循环。
+- [ ] 步骤3: 在 `opfor-prompt.md` 中把“唯一使命是击溃”改为“尽力寻找真实可复现破口”，并在交战规则中加入“不偏题、不脑补现实不存在的攻击面”；“攻破任一即 BREACH”必须限定为真实、相关、可复现地攻破任一验收/红线才算 `BREACH_FOUND`。
+- [ ] 步骤4: 修改六份 `/sandtable-redteam` 命令的铁律，把“往死里打”改为“真实可复现地打；空泛、猜测、偏题不算攻破”。
+- [ ] 步骤5: 修改 `using-sandtable` 四份镜像中“红蓝对抗：能不能被打破？（红军唯一使命是击溃方案）”为“红军寻找真实可复现破口，验证方案是否能被打破”。
+- [ ] 步骤5.5: 在六份 `/sandtable-redteam` 命令中补 PRD 确认门禁：若 `prd.md` 已存在但无可核实开发者确认记录，不得派发红军；必须停在 PRD 确认点。若本回合 `/sandtable-redteam` 消息同时明确确认 PRD，必须在派发红军前或同时把可核实确认证据持久化到 `state.md` 或 `journal.md`。
+- [ ] 步骤6: 同步英文对应文件。
+- [ ] 验证:
+  - 覆盖 TC7、TC8、TC20。
+  - 搜索 `往死里打`、`唯一使命`、`defeat`，确认仍保留对抗性但不再鼓励偏题击溃。
+  - 搜索 `可复现` / `reproducible`，确认可复现门槛仍存在。
+  - 构造三文档已存在但 PRD 未确认的场景，确认 `/sandtable-redteam` 不得进入对抗。
+  - 构造 `/sandtable-redteam PRD 已确认，请开始对抗` 的同条确认场景，确认派发红军前或同时把用户原话摘录、确认时间和用户消息来源写入 `state.md` 或 `journal.md`。
+
+## 任务 T5: 实现预演 DONE 覆盖矩阵与完整性审查
+
+**文件:**
+- 修改: `skills/implementation-rehearsal/SKILL.md`
+- 修改: `skills/implementation-rehearsal/implementation-rehearsal-prompt.md`
+- 修改: `plugins/sandtable/skills/implementation-rehearsal/SKILL.md`
+- 修改: `plugins/sandtable/skills/implementation-rehearsal/implementation-rehearsal-prompt.md`
+- 修改: `locales/en/skills/implementation-rehearsal/SKILL.md`
+- 修改: `locales/en/skills/implementation-rehearsal/implementation-rehearsal-prompt.md`
+- 修改: `locales/en/plugins/sandtable/skills/implementation-rehearsal/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/implementation-rehearsal/implementation-rehearsal-prompt.md`
+- 修改: `skills/evaluating-rehearsals/SKILL.md`
+- 修改: `plugins/sandtable/skills/evaluating-rehearsals/SKILL.md`
+- 修改: `locales/en/skills/evaluating-rehearsals/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/evaluating-rehearsals/SKILL.md`
+
+- [ ] 步骤1: 在 implementation skill 的主 agent 编排中，在“全部 DONE”之后、“evaluating-rehearsals 打分择优”之前新增完整性闸门：
+  - 主 agent 必须核对每个候选是否 100% 覆盖 `prd.md`、`tests.md`、`plan.md`。
+  - 简单明确的候选可由主 agent 亲自检查。
+  - 复杂、高风险或改动面大的候选可派只读 mental / redteam 风格子 agent 辅助审查。
+  - 检查结论必须写入对应 `rehearsals/impl-<n>-<branch>.md`，作为该候选报告的一部分；journal 只能追加摘要，不能作为 debrief 判定的唯一来源。
+  - 主 agent 必须独立读取当前 `prd.md`、`tests.md`、`plan.md` 并重算结构化核对基准；impl 报告内嵌的基准、覆盖矩阵或 live TODO 表只能作为候选自报输入，不能作为唯一事实来源。
+  - 结构化核对基准的稳定键派生规则必须写清：`PRD-AC1...PRD-ACn` 来自 `prd.md` 独立验收标准章节的顶层 `-` bullet，按文档顺序编号；`MUST-1...MUST-n` 来自 MUST 章节顶层 `-` bullet；`MNOT-1...MNOT-n` 来自 MUST NOT 章节顶层 `-` bullet；多行 bullet 归入同一条，嵌套 bullet 归入所属顶层 bullet 正文，不单独编号。`FRx`、`TCx` 使用文档原有编号，`PLAN Tx/步骤x` 使用 `plan.md` checkbox 原文编号和标题，含小数编号。
+  - 正文 hash 必须使用同一规范：提取对应条目的规范化 UTF-8 文本，统一换行为 LF，去除行尾空白，保留条目内部顺序和缩进语义后计算 SHA-256。任一 FR/PRD-AC/MUST/MNOT/TC/PLAN checkbox 的增删、改名、正文变化或 hash 缺失都必须导致基准不同。
+  - 闸门结论必须记录主 agent 独立重算的 `prd.md`、`tests.md`、`plan.md` 结构化核对基准、核对时间、候选 worktree/分支标识、真实 diff 或改动文件清单摘要，作为后续过期判定的“闸门核对基准”。少报键、聚合键、报告内基准与主 agent 重算基准不一致时，均按 `missing` 处理。
+  - 闸门通过前，主 agent 必须对照候选 worktree 的真实 diff / 改动文件清单核查覆盖矩阵和 live TODO 表；证据不能只写“已实现”或引用同一报告内文字，必须能指向改动文件、测试结果、人工核对说明或明确的非代码文档改动依据。若 diff 为空、缺少计划要求的文件族、或无法支撑某个 `PLAN` / `PRD-AC` / `MUST` / `MNOT` / `TC` 键的完成状态，该键按 `missing` 处理。
+  - 任一漏项、部分实现、未验证验收标准、计划不一致，转为 `ANOMALY_FOUND` / `BLOCKED`，不得进入 debrief。
+- [ ] 步骤2: 在 implementation skill 的 “DONE” 状态说明、编排 dot 图与 Red Flags 中加入“DONE 只是候选自报完成，必须经过完整性闸门后才可评分”：
+  - dot 图必须从 `全部 DONE -> 完整性闸门 -> evaluating-rehearsals`，不得保留 `全部 DONE -> evaluating-rehearsals` 的直接边。
+  - Red Flags 中“子 agent 说 DONE，直接合并/评分”类文本必须同步改为“先核对覆盖矩阵、live TODO 表与完整性闸门结论”。
+- [ ] 步骤3: 在 implementation prompt 的输入上下文中把 `prd.md` / `tests.md` 从“相关片段”改为完整覆盖输入：
+  - `PRD 要点 + 验收标准` 改为要求粘贴 `prd.md` 全文，或至少粘贴完整 FR1-FRn、验收标准、MUST/MUST NOT。
+  - `待验证用例清单` 改为要求粘贴 `tests.md` 全文（TC1-TCn）。
+  - 若上下文过长，允许明确授权子 agent 在只读模式下打开本 feature 的 `prd.md` / `tests.md` / `plan.md`，但不得省略覆盖矩阵中的任何 FR/PRD-AC/MUST/MNOT/TC/PLAN 行。
+  - 禁止只给“本链路相关 TC”后仍要求全量覆盖矩阵。
+- [ ] 步骤4: 在 implementation prompt 的 `DONE` 返回格式中新增“覆盖矩阵”小节，格式固定为：
+  - `PRD 覆盖: FR1 ... FRn -> 已实现/未覆盖/不适用 + 证据`
+  - `PRD 验收标准覆盖: PRD-AC1 ... PRD-ACn -> 已满足/未覆盖/不适用 + 证据`，逐条对应 `prd.md` 的独立验收标准 bullet；不得只用 FR 行或摘要替代。
+  - `PRD 红线覆盖: MUST-1 ... MUST-n / MNOT-1 ... MNOT-n -> 已满足/违反/不适用 + 证据`，逐条对应 `prd.md` 的 MUST 与 MUST NOT；不得只用 FR、PRD-AC 或 TC 行间接替代。
+  - `TESTS 覆盖: TC1 ... TCn -> 已验证/人工核对/未覆盖 + 证据`
+  - `PLAN 覆盖: T1/步骤1 ... Tn/步骤m -> 已完成/未完成/不适用 + 证据`，必须逐项覆盖 `plan.md` 中的每个 checkbox 步骤，不得只用 T1-T8 的任务级汇总代替步骤级覆盖。
+  - `PLAN` 行键必须使用 `plan.md` checkbox 原文编号和标题，包括 `步骤2.5`、`步骤3.5`、`步骤6.5`、`步骤6.6` 这类小数编号；不得重编号、合并或折叠到相邻整数步骤。
+  - `未覆盖项: 无` 或列明具体项。
+- [ ] 步骤5: 在 implementation prompt 的 `DONE` 返回格式中新增“live 执行 TODO 表”，作为每个实现候选报告内的执行追踪，不创建独立持久文件：
+  - 表格列：`项` / `来源` / `状态` / `证据`
+  - `项` 填 `PRD FRx`、`PRD-ACx`、`MUST-x`、`MNOT-x`、`TCx` 或 `PLAN Tx/步骤x`；不得使用聚合的 `MUST/MUST NOT`、`全部红线` 之类摘要键替代逐条红线。
+  - `来源` 填 `prd.md` / `tests.md` / `plan.md` / `constraints.md`。
+  - `状态` 只能填 `done` / `not-applicable` / `blocked` / `missing`。
+  - `证据` 填改动文件、提交 SHA、测试结果或人工核对说明。
+  - `证据` 必须能被主 agent 用真实 diff / 改动文件清单复核；仅引用候选报告文本、笼统写“已完成/已修改”或用一个文件证明多个无关计划键，均不得视为充分证据。
+  - `missing` 或 `blocked` 任一存在时，子 agent 不得返回 `DONE`，必须返回 `ANOMALY_FOUND` 或 `BLOCKED`。
+  - `not-applicable` 必须引用 `prd.md` 非目标、`plan.md` 明确排除项，或当前候选经主 agent 授权的子范围；PRD FR、PRD-AC、MUST/MUST NOT、TC、PLAN 中属于本需求 scope 的项不得用 `not-applicable` 洗白。缺少依据的 `not-applicable` 按 `missing` 处理。
+  - 若覆盖矩阵与 live 执行 TODO 表结论冲突，以更细粒度的 `missing` / `blocked` 结论为准；任一来源显示未覆盖，候选不得视为 `DONE`。
+  - 覆盖矩阵与 live 执行 TODO 表必须在 PRD FR、PRD-AC、MUST/MNOT、TESTS TC 键集合上一一对应；任一表缺少另一表已有的必做键，或使用聚合键替代逐条键，均按 `missing` 处理。
+  - 覆盖矩阵与 live 执行 TODO 表必须在 PLAN 步骤粒度上一一对应；若矩阵只到任务级而 TODO 表到步骤级，以步骤级 TODO 为准并要求补齐矩阵。
+  - 覆盖矩阵和 live TODO 表的 `PLAN Tx/步骤x` 键必须完全一致；缺少任一 `plan.md` 原文 checkbox 编号时，该候选按 `missing` 处理。
+- [ ] 步骤6: 在 implementation skill 中说明该 TODO 表的定位：
+  - 它不是新计划，也不是替代 `plan.md` 的任务系统。
+  - 它是 live 阶段每个候选实现的执行记录和完整性核查输入，用于主 agent 持续检查实现是否仍覆盖 PRD/tests/plan。
+  - `state.md.tasks` 继续记录 feature 级任务状态；实现候选内部进度由报告里的 TODO 表记录。
+- [ ] 步骤7: 在 evaluating-rehearsals skill 中补前置条件：
+  - 仅当所有实现候选 `DONE` 且完整性闸门通过时才评分。
+  - 若覆盖矩阵或 live TODO 表存在 `missing` / `blocked`，回到修正循环，不评分。
+  - 若覆盖矩阵或 live TODO 表存在无依据的 `not-applicable`，按 `missing` 处理，不评分。
+  - 若当前 `plan.md`、`tests.md` 或 `prd.md` 的结构化核对基准与 impl 报告内记录的闸门核对基准不一致，既有 impl 完成轮次和闸门结论视为失效，必须重新跑完整性闸门；`prd.md` 独立验收标准章节任一 bullet 增删或正文变化也必须触发基准变化；变更影响实现路径时需重新 live。
+  - 即使闸门核对基准未过期，也必须校验覆盖矩阵/live TODO 表的 PRD FR、PRD-AC、MUST/MUST NOT、TESTS TC、PLAN checkbox 键集合及对应正文 hash 与当前结构化核对基准一致；缺键、hash 缺失或不一致时按 `missing` 处理，不评分。
+  - evaluating 前必须复核完整性闸门报告中存在主 agent 独立重算基准和真实 diff / 改动清单核对结论；若只有候选自报矩阵/TODO、没有独立基准或没有 diff 核对，不评分。
+  - 同步修改 evaluating skill 的 HARD-GATE、编排 dot 图和 Red Flags：dot 图必须显式包含 `完整性闸门通过?` 节点，不得保留 `全部 DONE -> 抽查/打分` 的直接边；Red Flags 必须拦截“缺矩阵/缺 TODO/缺闸门结论/闸门过期仍评分”。
+- [ ] 步骤8: 在 `autonomous-orchestration` 与 `/sandtable-autopilot` 中引用本完整性闸门，确保 autopilot 路径与手动 `/sandtable-live` 路径一致；具体落点在 T1 步骤5/7，不在 T5 重复定义。
+- [ ] 步骤9: 同步英文对应文件。
+- [ ] 验证:
+  - 覆盖 TC9、TC10、TC11。
+  - 搜索 `覆盖矩阵` / `coverage matrix`，确认 prompt、skill、evaluating skill 均有对应要求。
+  - 搜索 `live 执行 TODO 表` / `live execution TODO table`，确认 prompt、skill、evaluating skill 均有对应要求，且没有要求创建独立 TODO 文件。
+  - 抽查一个 `plan.md` 中有多步骤的任务，确认覆盖矩阵和 TODO 表逐项列到 `PLAN Tx/步骤x`，而不是只写 `T1`/`T2` 汇总。
+  - 抽查包含小数编号的步骤，确认覆盖矩阵和 TODO 表必须保留原文键，例如 `T1/步骤2.5`、`T3/步骤3.5`、`T6/步骤2.5`、`T7/步骤6.5`、`T7/步骤6.6`。
+  - 构造 close loop 未实现但标记 `not-applicable` 的候选，确认闸门将其按 `missing` 处理，不允许进入 debrief。
+  - 构造仅修改 `prd.md` 独立验收标准章节、FR/MUST/TC/PLAN 标识不变的场景，确认结构化核对基准发生变化，旧 impl 报告不得进入 debrief。
+  - 构造闸门核对基准一致但覆盖矩阵/live TODO 表缺 `MUST-2` 或 `MNOT-1` 的场景，确认候选不得进入 `EVALUATE`/复盘/评分。
+  - 构造 `PRD-AC` / `MUST` / `MNOT` 少报但报告内基准、覆盖矩阵、TODO 表彼此自洽的场景，确认主 agent 独立重算基准后判定缺键，不得进入 `EVALUATE`/复盘/评分。
+  - 构造覆盖矩阵和 TODO 表全 `done`、但候选 worktree diff 为空或缺少 T6/T7/T8 要求镜像文件的场景，确认完整性闸门失败，不得进入 `EVALUATE`/复盘/评分。
+  - 确认没有把“必须派子 agent”写成硬要求；必须保留“主 agent 可亲自或按需派只读子 agent”。
+
+## 任务 T6: live / rehearse / debrief 命令接入完整性闸门
+
+**文件:**
+- 修改: `commands/sandtable-live.md`
+- 修改: `.cursor/commands/sandtable-live.md`
+- 修改: `plugins/sandtable/commands/sandtable-live.md`
+- 修改: `locales/en/commands/sandtable-live.md`
+- 修改: `locales/en/.cursor/commands/sandtable-live.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-live.md`
+- 修改: `commands/sandtable-rehearse.md`
+- 修改: `.cursor/commands/sandtable-rehearse.md`
+- 修改: `plugins/sandtable/commands/sandtable-rehearse.md`
+- 修改: `locales/en/commands/sandtable-rehearse.md`
+- 修改: `locales/en/.cursor/commands/sandtable-rehearse.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-rehearse.md`
+- 修改: `commands/sandtable-debrief.md`
+- 修改: `.cursor/commands/sandtable-debrief.md`
+- 修改: `plugins/sandtable/commands/sandtable-debrief.md`
+- 修改: `locales/en/commands/sandtable-debrief.md`
+- 修改: `locales/en/.cursor/commands/sandtable-debrief.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-debrief.md`
+
+- [ ] 步骤1: 在六份 `/sandtable-live` 命令中把“全部 DONE → 写报告、更新 state、提示 redteam/debrief”改为：
+  - 开始 live 前先检查 PRD 确认门禁；若 `prd.md` 已存在但无可核实开发者确认记录，不得开启实现预演，必须停在 PRD 确认点。若本回合 `/sandtable-live` 消息同时明确确认 PRD，必须在开启实现预演前或同时把可核实确认证据持久化到 `state.md` 或 `journal.md`。
+  - 全部自报 `DONE` 后，主 agent 先执行完整性闸门。
+  - 每个 `DONE` 报告必须包含覆盖矩阵和 live 执行 TODO 表；缺任一项不得视为完整 `DONE`。
+  - 可亲自核查，或按复杂度派只读 mental/redteam 风格子 agent 辅助。
+  - 闸门结论必须基于主 agent 独立重算的 `prd.md`、`tests.md`、`plan.md` 结构化核对基准；不得只采信候选报告内嵌基准或自报覆盖矩阵。
+  - 闸门结论必须记录本次核对所依据的结构化核对基准、核对时间、候选 worktree/分支、真实 diff 或改动文件清单摘要；后续不得只用 impl 报告文件自身 mtime 或粗粒度 prose 摘要判断是否过期。
+  - 闸门通过前必须核对真实 diff / 改动文件清单是否支撑覆盖矩阵和 live TODO 表。若矩阵全绿但 diff 为空、缺少 T6/T7/T8 等计划要求的文件族、或任一键缺少可复核证据，不得通过完整性闸门。
+  - 完整性通过后才更新 `impl.last=done` 并提示 `/sandtable-redteam` 或 `/sandtable-debrief`。
+  - 完整性不通过则登记 `ANOMALY_FOUND` / `BLOCKED` 并修正重演。
+- [ ] 步骤2: 在六份 `/sandtable-rehearse` 命令中把实现预演步骤改为：
+  - 进入任何 mental/redteam/impl 预演前先检查 PRD 确认门禁；若 `prd.md` 已存在但无可核实开发者确认记录，不得进入推演，必须停在 PRD 确认点。若本回合 `/sandtable-rehearse` 消息同时明确确认 PRD，必须在进入任何推演前或同时把可核实确认证据持久化到 `state.md` 或 `journal.md`。
+  - 全部候选 `DONE` 后先过完整性闸门。
+  - 通过后才进入复盘择优。
+  - rehearse 内的首次完整性闸门与 `/sandtable-live` 同标准：主 agent 独立重算结构化基准，并核对候选 worktree 真实 diff / 改动文件清单；候选自报基准、矩阵、TODO 表不得单独作为通过依据。
+  - 若当前 `prd.md`、`tests.md` 或 `plan.md` 的结构化核对基准与 impl 报告内记录的闸门核对基准不一致，视为闸门过期；不得复用旧结论进入复盘，必须先重跑完整性闸门，变更影响实现路径时重新 live。不得只用 impl 报告文件 mtime 或粗粒度 prose 摘要判断是否过期。
+  - 即使闸门核对基准未过期，进入复盘择优前也必须校验覆盖矩阵/live TODO 表的 PRD FR、PRD-AC、MUST/MUST NOT、TESTS TC、PLAN checkbox 键集合及对应正文 hash 与当前结构化核对基准一致；缺键、hash 缺失或不一致时不得进入复盘，必须补审或重跑闸门。
+- [ ] 步骤2.5: 确认 `/sandtable-autopilot` 不绕过本闸门；该接入由 T1 负责，本任务验证时必须把 autopilot 路径纳入检查。
+- [ ] 步骤3: 在六份 `/sandtable-debrief` 命令中加前置检查：
+  - 评分前先检查 PRD 确认门禁；若 `prd.md` 已存在但无可核实开发者确认记录，不得评分，必须停在 PRD 确认点。若本回合 `/sandtable-debrief` 消息同时明确确认 PRD，必须在评分前或同时把可核实确认证据持久化到 `state.md` 或 `journal.md`。
+  - 若实现预演报告缺少覆盖矩阵、live 执行 TODO 表或完整性闸门结论，不得评分；先回 `/sandtable-live` 或由主 agent 补做完整性核查。
+  - 若完整性闸门结论没有记录主 agent 独立重算的结构化基准，或没有记录候选 worktree 真实 diff / 改动文件清单核对结论，不得评分；先补做完整性核查。
+  - 主 agent 补做核查时必须重读真实 diff、`prd.md`、`tests.md`、`plan.md`，逐项补齐覆盖矩阵和 live TODO 表，并把补审结论写回对应 `rehearsals/impl-<n>-<branch>.md` 后才可评分；补审结论必须记录所核对的三文档结构化核对基准，以及补审时间。
+  - 补审结论视为该 impl 报告内最新的完整性闸门结论续记；补审通过时，必须同步刷新报告内“闸门核对基准”为补审时核对的三文档状态，后续 autopilot/resume/rehearse/debrief 过期判定均读取最新核对基准。
+  - 若 `plan.md`、`tests.md` 或 `prd.md` 的当前结构化核对基准不同于 impl 报告中记录的“闸门核对基准”，视为报告过期，不得评分；不能因为补审写回同一个 impl 报告刷新了文件 mtime 或粗摘要未变化就判定不过期。
+  - 即使报告未判定过期，debrief 前也必须校验 impl 报告覆盖矩阵/live TODO 表的 PRD FR、PRD 独立验收标准 `PRD-AC`、MUST/MUST NOT、TESTS TC、PLAN checkbox 键集合及对应正文 hash 与当前三文档结构化基准一致；键集合或正文 hash 缺失/不一致时，必须补审或重跑闸门，不得评分。
+  - 补审只能证明旧实现仍覆盖最新文档；若文档变更影响实现路径、文件范围、命令入口或验收行为，必须重新 live，不得只靠补审把旧候选送入评分。
+- [ ] 步骤4: 同步英文对应文件。
+- [ ] 验证:
+  - 覆盖 TC9、TC10、TC11。
+  - 搜索 `完整性` / `completeness`，确认 live、rehearse、debrief 三类命令都接入。
+  - 搜索 `sandtable-autopilot` 与 `完整性闸门` / `completeness gate`，确认 autopilot 路径不会在 impl 自报 `DONE` 后直接进入 `EVALUATE`。
+  - 构造 impl 闸门通过后修改 `plan.md` 的场景，分别走 `/sandtable-autopilot`、`/sandtable-rehearse`、`/sandtable-debrief`，确认三条路径都判定旧 impl 报告/闸门结论过期。
+  - 构造 debrief 补审写回同一 `rehearsals/impl-*.md` 的场景，确认过期判定基于报告内记录的核对基准，而不是报告文件 mtime；若文档变更影响实现路径，必须重新 live。
+  - 构造 debrief 补审证明旧实现仍覆盖最新文档的场景，确认补审通过后报告内最新闸门核对基准已刷新；后续 `/sandtable-resume` 和 `/sandtable-autopilot` 不得继续用旧基准误判过期。
+  - 构造 `plan.md` 新增一个 checkbox 但粗摘要不变的场景，确认结构化核对基准发生变化；旧 impl 报告缺该 checkbox 键时必须判定过期或缺项，不得进入 debrief。
+  - 构造 `prd.md`/`tests.md`/`plan.md` 在同一 FR/TC/checkbox 标识下修改正文但标识集合不变的场景，确认结构化核对基准发生变化；旧 impl 报告不得仅凭标识集合一致进入 debrief。
+  - 构造仅修改 `prd.md` 独立验收标准章节 bullet、FR/MUST/TC/PLAN 标识不变的场景，确认结构化核对基准发生变化；旧 impl 报告缺 `PRD-AC` 键或 hash 不一致时不得进入 debrief。
+  - 构造闸门核对基准一致但 impl 报告覆盖矩阵/live TODO 表缺 `PRD-AC6`、`MUST-2` 或 `MNOT-1` 的场景，分别走 `/sandtable-autopilot`、`/sandtable-resume`、`/sandtable-rehearse`、`/sandtable-debrief`，确认四条路径都不得进入 `EVALUATE`/复盘/评分。
+  - 构造 impl 报告内少报 `PRD-AC` / `MUST` / `MNOT` 且自报基准、矩阵、TODO 表彼此自洽的场景，分别走 `/sandtable-autopilot`、`/sandtable-resume`、`/sandtable-rehearse`、`/sandtable-debrief`，确认四条路径都必须独立重算基准并判定缺键。
+  - 构造 impl 报告矩阵/TODO 全 `done`，但没有真实 diff / 改动文件清单核对结论，或 diff 缺少 T6/T7/T8 要求文件族的场景，确认四条路径都不得进入 `EVALUATE`/复盘/评分。
+  - 构造 impl 报告内 `PRD-AC` / `MUST` / `MNOT` 少报但基准、矩阵、TODO 表彼此自洽的场景，分别走 `/sandtable-live`、`/sandtable-rehearse`、`/sandtable-debrief`，确认主 agent 独立重算后判定缺键，不得进入 `EVALUATE`/复盘/评分。
+  - 构造覆盖矩阵和 TODO 表全 `done`、但候选 worktree diff 为空或缺少 T6/T7/T8 要求镜像文件的场景，分别走 `/sandtable-live`、`/sandtable-rehearse`、`/sandtable-debrief`，确认完整性闸门失败，不得进入 `EVALUATE`/复盘/评分。
+  - 搜索 `TODO 表` / `TODO table`，确认 live、rehearse、debrief 三类命令对实现报告内 TODO 表的要求一致。
+  - 搜索 `全部 DONE → 进入复盘` 旧语义，确认不再绕过完整性闸门。
+  - 构造三文档已存在但 PRD 未确认的场景，确认 `/sandtable-live`、`/sandtable-rehearse`、`/sandtable-debrief` 均不得进入实现/推演/评分。
+  - 构造 `/sandtable-live`、`/sandtable-rehearse`、`/sandtable-debrief` 同条消息带“PRD 已确认”的场景，确认进入实现/推演/评分前或同时把用户原话摘录、确认时间和用户消息来源写入 `state.md` 或 `journal.md`。
+
+## 任务 T7: close loop 已选择路径直接执行
+
+**文件:**
+- 修改: `skills/closing-the-loop/SKILL.md`
+- 修改: `plugins/sandtable/skills/closing-the-loop/SKILL.md`
+- 修改: `locales/en/skills/closing-the-loop/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/closing-the-loop/SKILL.md`
+- 修改: `skills/using-sandtable/SKILL.md`
+- 修改: `plugins/sandtable/skills/using-sandtable/SKILL.md`
+- 修改: `locales/en/skills/using-sandtable/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/using-sandtable/SKILL.md`
+- 修改: `commands/sandtable-start.md`
+- 修改: `.cursor/commands/sandtable-start.md`
+- 修改: `plugins/sandtable/commands/sandtable-start.md`
+- 修改: `locales/en/commands/sandtable-start.md`
+- 修改: `locales/en/.cursor/commands/sandtable-start.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-start.md`
+- 修改: `commands/sandtable-objectives.md`
+- 修改: `.cursor/commands/sandtable-objectives.md`
+- 修改: `plugins/sandtable/commands/sandtable-objectives.md`
+- 修改: `locales/en/commands/sandtable-objectives.md`
+- 修改: `locales/en/.cursor/commands/sandtable-objectives.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-objectives.md`
+- 修改: `commands/sandtable-refine.md`
+- 修改: `.cursor/commands/sandtable-refine.md`
+- 修改: `plugins/sandtable/commands/sandtable-refine.md`
+- 修改: `locales/en/commands/sandtable-refine.md`
+- 修改: `locales/en/.cursor/commands/sandtable-refine.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-refine.md`
+- 修改: `commands/sandtable-plan.md`
+- 修改: `.cursor/commands/sandtable-plan.md`
+- 修改: `plugins/sandtable/commands/sandtable-plan.md`
+- 修改: `locales/en/commands/sandtable-plan.md`
+- 修改: `locales/en/.cursor/commands/sandtable-plan.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-plan.md`
+- 修改: `commands/sandtable-resume.md`
+- 修改: `.cursor/commands/sandtable-resume.md`
+- 修改: `plugins/sandtable/commands/sandtable-resume.md`
+- 修改: `locales/en/commands/sandtable-resume.md`
+- 修改: `locales/en/.cursor/commands/sandtable-resume.md`
+- 修改: `locales/en/plugins/sandtable/commands/sandtable-resume.md`
+- 修改: `skills/writing-prd/SKILL.md`
+- 修改: `plugins/sandtable/skills/writing-prd/SKILL.md`
+- 修改: `locales/en/skills/writing-prd/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/writing-prd/SKILL.md`
+- 修改: `skills/writing-tests/SKILL.md`
+- 修改: `plugins/sandtable/skills/writing-tests/SKILL.md`
+- 修改: `locales/en/skills/writing-tests/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/writing-tests/SKILL.md`
+- 修改: `skills/writing-plan/SKILL.md`
+- 修改: `plugins/sandtable/skills/writing-plan/SKILL.md`
+- 修改: `locales/en/skills/writing-plan/SKILL.md`
+- 修改: `locales/en/plugins/sandtable/skills/writing-plan/SKILL.md`
+
+- [ ] 步骤1: 在 closing-the-loop 硬门禁中新增一条“已选择路径优先”：
+  - 该规则必须排在 `blocked=true` / 真实阻塞判定之后；若存在真实阻塞，先写 `questions.md`、设置 `blocked=true` 并提问，不得执行选择。
+  - 该规则也必须排在 PRD 未确认门禁之后；若 `prd.md` 已存在但无可核实开发者确认记录，即使用户选择 `/sandtable-rehearse`、`/sandtable-mental`、`/sandtable-live` 或“继续推演”，也必须先停在 PRD 确认点，除非该选择本身就是对 PRD 的明确确认。
+  - 同步修订 `autonomy.mode=autopilot && blocked=false` 的“不得 AskQuestion、必须同命令续跑”硬门禁：若续接当前 feature 命中 PRD 未确认门禁，必须走 PRD 确认完整收尾并结束命令，不得因 autopilot 模式跳过确认或同命令继续。
+  - 若用户已经通过 AskQuestion 选择下一步，或自然语言明确表达“确认并继续 / 按 X 继续 / 就选 X”，且没有真实阻塞，agent 必须在同一回合执行该选择对应动作。
+  - 若该选择本身构成 PRD 确认，执行后续动作前或同时必须先把可核实 PRD 确认证据写入 `state.md` 或 `journal.md`：AskQuestion 选择写 answer id 或 `source: askquestion:<id>` + 选项原文/确认时间；自然语言确认写用户原话摘录 + 确认时间 + 用户消息来源。不得只依赖本回合临时上下文直接进入 TESTCASES/PLAN/推演。
+  - 同步修订现有 `autonomy.mode=manual 且 ≥2 条合理下一步 → 必须 AskQuestion` 的硬门禁：若用户本回合已经通过 AskQuestion 或自然语言明确选择路径，不得再次 AskQuestion；必须先执行选择，再按“已选择且已执行”收尾。
+  - 执行后再输出状态收尾。
+  - 不得仅输出复制命令要求用户重复输入同一选择。
+- [ ] 步骤2: 在完整收尾 profile 表中区分：
+  - `未选择路径`: 完整收尾可含推荐、复制模板、其他路径。
+  - `已选择路径且已执行`: 收尾只报告执行结果、当前 phase、下一建议；复制模板只能指向下一阶段，不得重复当前已执行选择。
+- [ ] 步骤3: 在 phase → 默认下一步表的 OBJECTIVES/TESTCASES/PLAN 行补一句：
+  - 用户确认后应直接执行对应阶段动作；不要把确认语转换成“请复制以下命令”。
+- [ ] 步骤4: 在 Red Flags 中新增：
+  - “用户已经选了 A，我再给 A 的复制命令” → 应直接执行 A。
+- [ ] 步骤5: 在 using-sandtable 四份镜像的回合收尾段落中补充“手动多分支用 AskQuestion；用户选定后直接执行；未选或真实命令边界才给模板停下；同回合已通过 AskQuestion 或自然语言明确确认继续时，不得把命令边界解释为禁止续跑；autopilot 非阻塞同命令续跑也必须为 PRD 未确认门禁让路，命中该门禁时完整收尾并停在 PRD 确认点”。
+- [ ] 步骤6: 在 `/sandtable-start` 与 `/sandtable-objectives` 六份命令中补充“确认消息续跑”的入口语义：
+  - PRD 未确认时仍必须停在确认点。
+  - 同步改写 `/sandtable-start` 中“本命令在此结束；不得在本命令内继续步骤5–6”这类硬禁令：PRD 未获确认时仍结束并等待确认；若用户已在同一回合通过 AskQuestion 或自然语言明确确认 PRD 并要求继续，允许在同一命令回合内直接进入 TESTCASES，但必须先按步骤1落盘可核实 PRD 确认证据，不得让旧命令边界压过步骤1的“已选择路径优先”。
+  - 收到开发者确认 PRD 并要求继续的下一条消息时，agent 应先记录自然语言确认三元组，再直接加载 `writing-tests` 写 `tests.md`，而不是只输出复制命令。
+  - 收到“先修改 PRD”的反馈时，按 `/sandtable-refine` 处理。
+- [ ] 步骤6.5: 在 `/sandtable-refine` 六份命令中补充确认续跑语义：
+  - 若用户反馈是“修改 PRD”，按 refine 迭代修改并在完成后给出结果。
+  - 若用户反馈是“修改 tests/测试/plan/计划”，必须先满足 PRD 确认门禁；PRD 未确认时不得加载 `writing-tests` 或 `writing-plan`，必须停在 PRD 确认点。PRD 已确认后，才按 refine 迭代修改并在完成后给出结果。
+  - 若用户反馈是“PRD 已确认/认可，继续写 tests.md”且无阻塞，不得再次停在复制命令或摘要确认；必须先记录自然语言确认三元组，再直接加载 `writing-tests` 进入 TESTCASES。
+  - 若用户反馈是“tests 已确认，继续 plan”或“plan 已确认，继续推演”，必须先满足 PRD 确认门禁；若无可核实 PRD 确认记录，不得进入 PLAN/推演，必须停在 PRD 确认点。PRD 已确认时，才按当前 `state.phase` 直接执行对应下一步。
+  - 同步改写 refine 命令中“把修改点摘要给我，等我确认或继续提反馈”和“不得越权执行本命令未列出的下一阶段”两类条款：修改反馈完成后才等待确认；用户已明确确认的阶段续跑是本命令允许的内联后续，不得再次等待或让旧越权禁令覆盖本步骤。
+- [ ] 步骤6.6: 在 `/sandtable-resume` 六份命令中补充手动模式确认续跑语义：
+  - resume 复原 `state.md` 后，若用户同条或下一条消息已明确确认当前阶段产物并要求继续，且 `blocked=false`，按 `state.phase` 直接加载对应 skill。
+  - 当 `phase=OBJECTIVES` 且 `prd.md` 已存在，用户同条或下一条消息明确“PRD 已确认/认可，请继续写 tests.md”时，必须先记录自然语言确认三元组，再把续跑目标视为 TESTCASES，并直接加载 `writing-tests` 写 `tests.md`；不得按 `phase=OBJECTIVES` 重新加载 `writing-prd`，也不得只输出复制命令。
+  - 例：`phase=OBJECTIVES`、`prd.md` 已写完且用户说“PRD 已确认，请继续写 tests.md”时，先落盘证据再加载 `writing-tests`；`phase=TESTCASES` 且 tests 已确认时，直接进入 PLAN；不得因 resume 命令边界只输出模板。
+  - 真阻塞仍优先；若缺少必要确认或当前 phase 不明确，才停下提问。
+  - 同步改写 resume 命令中“manual 时等我确认”和“不得越权执行本命令未列出的下一阶段”条款：缺少确认时继续等待；已经确认并要求继续时，阶段续跑就是本命令允许的内联后续。
+- [ ] 步骤6.7: 在 `/sandtable-plan` 六份命令与 `writing-tests` / `writing-plan` 四份 skill 中补 PRD 确认门禁：
+  - `/sandtable-plan` 开始前必须检查 PRD 确认门禁；若 `prd.md` 已存在但无可核实开发者确认记录，不得读取 tests 或写 plan，必须停在 PRD 确认点。
+  - `/sandtable-plan` 若由本回合 AskQuestion 或自然语言 PRD 确认触发，必须在写 `plan.md` 前或同时先落盘对应证据；不得只凭本回合临时上下文写 `plan.md`。
+  - `writing-tests` 与 `writing-plan` 的 HARD-GATE 必须从“基于已确认 PRD/tests”改为“先验证 PRD 有可核实开发者确认记录；没有则不得写 `tests.md`/`plan.md`”。
+  - `writing-tests` / `writing-plan` 若由本回合 AskQuestion 或自然语言 PRD 确认触发，必须在写 `tests.md` / `plan.md` 前或同时先落盘对应证据；不得只凭调用方说“本回合已确认”就跳过持久化记录。
+  - 禁止通过 `/sandtable-plan` 为满足 `writing-plan` 前置而顺手生成 `tests.md`；缺 `tests.md` 但 PRD 已确认时，回 TESTCASES，PRD 未确认时停在 PRD 确认点。
+- [ ] 步骤7: 在 `writing-prd` 四份 skill 中强化“完成并经开发者确认后”的执行语义：
+  - 开发者确认消息本身就是进入 TESTCASES 的授权。
+  - 收到开发者确认时，必须在 `state.md` 或 `journal.md` 记录可核实 PRD 确认证据：AskQuestion answer id 或 `source: askquestion:<id>` + 选项原文/确认时间，或来自当前/历史真实用户消息的确认原话摘录 + 确认时间 + 用户消息来源；等价的 `prd_confirmed` / `confirmed_by: developer` 字段也只能在同一回合收到真实确认时写入。agent 自己的推进判断、伪造原话、仅写“AskQuestion 答复”但无 id 或无来源确认不得写成开发者确认。
+  - 若该确认消息还要求继续，agent 应直接加载 `writing-tests`，而非再次请求复制命令。
+  - 真实阻塞仍优先于继续执行。
+- [ ] 步骤8: 同步英文对应文件。
+- [ ] 验证:
+  - 覆盖 TC12、TC13、TC14、TC15。
+  - 用本 feature 的历史场景核对：用户选择“认可 PRD，下一步进入 TESTCASES”后，应写 `tests.md`，而不是仅输出复制命令。
+  - 构造 `/sandtable-start` 写完 PRD 后同回合 AskQuestion 选择“认可 PRD，下一步进入 TESTCASES”的场景，确认 `/sandtable-start` 的“本命令在此结束/不得继续步骤5–6”已加例外，agent 必须先落盘 AskQuestion answer id 或 `source: askquestion:<id>` + 选项原文/确认时间，再直接写 `tests.md`。
+  - 构造 `/sandtable-refine PRD 已确认，请继续写 tests.md` 和 `/sandtable-resume` 复原 `phase=OBJECTIVES` 后自然语言确认“PRD 已确认，请继续写 tests.md”两个入口，确认二者都直接写 `tests.md`，不输出重复复制命令、不重新进入 `writing-prd`，并在 `state.md` 或 `journal.md` 记录用户原话摘录、确认时间和用户消息来源。
+  - 构造 PRD 确认后续接场景，确认 `state.md` 或 `journal.md` 中存在带开发者来源的可核实确认记录；仅有 agent 自写 “PRD 已确认”、伪造“用户确认原话摘录”、仅写“AskQuestion 答复”但无 id、只有确认时间或自设 `state.md prd_confirmed=true` / `confirmed_by: developer` 时不得视为已确认。
+  - 构造三文档已存在但 PRD 未确认时，手动选择 `/sandtable-rehearse`、`/sandtable-mental`、`/sandtable-live` 或通过 `/sandtable-refine` 说“plan 已确认，继续推演”的场景，确认均不得进入推演/实现，必须停在 PRD 确认点。
+  - 构造 PRD 未确认时直接调用 `/sandtable-plan`，或通过 `/sandtable-refine` 要求修改 tests/plan 的场景，确认不得写 `tests.md` / `plan.md`，必须停在 PRD 确认点。
+  - 构造 `/sandtable-plan PRD 已确认，请写 plan.md` 的同条确认场景，确认写 `plan.md` 前或同时把用户原话摘录、确认时间和用户消息来源写入 `state.md` 或 `journal.md`。
+  - 搜索 refine/resume 命令里的 `不得越权执行` / `must not execute` / `等我确认` / `wait for confirmation`，确认这些旧条款已为“已确认续跑”加例外，不再压过步骤6.5/6.6。
+  - 搜索 `必须调用 AskQuestion` / `must invoke AskQuestion` / `multiple valid branches`，确认 closing-the-loop 的手动多分支硬门禁已为“本回合已明确选择路径”加例外，不再压过 TC12/TC13。
+  - 搜索 `autopilot` / `同命令续跑` / `same command` / `without waiting`，确认 closing-the-loop、autonomous-orchestration、using-sandtable 中的 autopilot 同命令续跑硬门禁已为 PRD 未确认门禁加例外。
+  - 确认 `/sandtable-start` 写完 PRD 未获确认时仍停在 PRD 确认点。
+  - 构造 `blocked=true` 且用户同时说“继续”的场景，确认阻塞优先，不执行选择。
+
+## 任务 T8: 镜像一致性与范围验证
+
+**文件:**
+- 验证: 本计划所有文件地图列出的中文根源、插件镜像、Cursor 命令镜像、英文 locale 与模板源路径。
+- 修改: 仅当前任务发现遗漏时，补齐对应镜像文件。
+
+- [ ] 步骤1: 对照 `INSTALL.md` 语言资产映射逐项核对：
+  - 中文根源：`skills/`、`commands/`、`.cursor/commands/`、`plugins/sandtable/skills/`、`plugins/sandtable/commands/`、`templates/`
+  - 英文 locale：`locales/en/skills/`、`locales/en/commands/`、`locales/en/.cursor/commands/`、`locales/en/plugins/sandtable/skills/`、`locales/en/plugins/sandtable/commands/`、`templates/en/`
+  - 行为基线：`AGENTS.md`、`CLAUDE.md`、`.cursor/rules/sandtable.mdc`、`locales/en/AGENTS.md`、`locales/en/.cursor/rules/sandtable.mdc`
+  - 逐项核对时以本计划所有任务文件列表为准，不只看顶部文件地图；任何任务内列出的 command/skill 镜像都必须进入最终同步检查。
+- [ ] 步骤2: 搜索并核对关键短语：
+  - 旧硬门槛：`mental: 3, redteam: 3, impl: 2`、`至少 3 轮`、`至少 2 轮`、`at least 3 rounds`、`at least 2 rounds`
+  - 新语义：`最低覆盖`、`自主裁决`、`coverage matrix`、`completeness gate`
+  - 红蓝旧偏激口径：`往死里打`、`唯一使命`、`defeat the design`
+  - 预演旧 blanket 铁律：`意料之外`、`意外`、`unexpected`、`surprise`、`anomaly or unexpected`、`immediately report`、`顺手修`
+- [ ] 步骤3: 核对 `tests.md` 20 条用例覆盖：
+  - T1/T2 覆盖 TC1-T4。
+  - T3 覆盖 TC5-T6。
+  - T4 覆盖 TC7-T8。
+  - T5/T6 覆盖 TC9-T11。
+  - T7 覆盖 TC12-T15。
+  - T8 覆盖 TC16-T20。
+- [ ] 步骤4: 范围审查：
+  - 不改安装脚手架、FEEDBACK/bugfix 语义。
+  - 不新增依赖。
+  - 不批量迁移历史 feature 的 `state.md`。
+  - 不重写无关 Red Flags 或硬门禁文本。
+- [ ] 步骤5: 运行最终诊断：
+  - `ReadLints` 检查本轮修改的 markdown 文件。
+  - 如有测试脚本或文档校验命令可用，再按现有项目约定运行；没有则记录未运行原因。
+- [ ] 验证:
+  - 覆盖 TC16、TC17、TC18、TC19、TC20。
+  - 镜像文件语义一致，不出现只改根目录或只改中文的漂移。
+
+## 自查清单
+
+- [ ] PRD FR1-FR9 均有任务覆盖。
+- [ ] TC1-TC20 均在任务验证中被引用。
+- [ ] 没有引入脚本、依赖或运行时代码。
+- [ ] 没有要求迁移历史 feature 状态。
+- [ ] 没有把 live 完整性检查写成“必须派子 agent”；保留主 agent 亲自检查或按需派子 agent 的裁量。
+- [ ] live TODO 表只作为实现候选报告内的执行追踪和完整性核查输入，不新增独立持久文件、不替代 `plan.md` / `state.md`。
+- [ ] 没有把 close loop 已选择路径继续写成“只输出复制命令”。
+- [ ] 中文根源、插件镜像、Cursor 命令镜像、英文 locale、模板源路径都有同步步骤。

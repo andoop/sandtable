@@ -38,7 +38,7 @@ Task tool (subagent_type: explore 或 generalPurpose, readonly: true):
     - 计划/PRD 与代码现实不符
     - 逻辑有漏洞或断点（链路无法闭环）
     - 出现意料之外的副作用 / 影响范围超出预期
-    - 有任何你无法用代码或文档确认的不确定点
+    - 关键事实无法用代码或文档确认，且该事实会影响 PRD/plan/code reality 闭环、验收或计划决策
     - 计划隐含违反某条 MUST / MUST-NOT
     不要"假设一个答案"继续推。不确定本身就是要上报的发现。
 
@@ -58,3 +58,10 @@ Task tool (subagent_type: explore 或 generalPurpose, readonly: true):
     - 影响范围：…
     - 需要的澄清：希望主 agent/开发者确认什么
 ```
+
+## 本需求补充 · 真实问题口径
+
+- 头脑推演的目标是发现会影响 PRD/plan/code reality 闭环、验收、实现可行性或关键决策的真实问题。
+- 不为了制造 `ANOMALY_FOUND` 构造与本需求无关、无现实触发路径、不会影响验收的偏题场景。
+- `being-truthful` 的不猜测原则继续适用：关键未知不能带着继续；但无关边缘疑问不得因为泛化措辞升级为 anomaly。
+- 若 `prd.md` 已存在但无可核实开发者确认记录，不得派发 mental 子 agent；同条消息确认 PRD 时，必须在派发前或同时把确认证据持久化到 `state.md` 或 `journal.md`。

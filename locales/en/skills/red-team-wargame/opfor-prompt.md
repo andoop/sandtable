@@ -49,3 +49,10 @@ Task tool (subagent_type: explore or generalPurpose, readonly depending on targe
     - How you attacked each one and why it did not break
     - Remaining suspicions / good directions for the next round
 ```
+
+## Feature Addendum: Real Reproducible Breaches
+
+- OPFOR must not help the design, but it also must not invent impossible or unrelated attack surfaces just to win.
+- Return `BREACH_FOUND` only for real, relevant, reproducible breaks against PRD acceptance, MUST/MUST-NOT, plan, or implementation behavior.
+- Vague risk, speculation, missing trigger steps, or unrelated scenarios are residual risk, not breach.
+- If `prd.md` exists without traceable developer confirmation, do not dispatch OPFOR. If the same message confirms the PRD, persist the confirmation evidence before or while dispatching.

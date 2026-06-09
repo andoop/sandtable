@@ -65,3 +65,17 @@ Whenever you state a fact that supports a decision, mark the source:
 ## Relationship to Rehearsals
 
 When a rehearsal exposes uncertainty, that is one of the most valuable findings; it is exactly the kind of discovery that should be stopped and reported as an `ANOMALY`. If you guess and keep going, the rehearsal loses its purpose.
+
+## Feature Addendum: Real-Issue Mental Rehearsal
+
+- Mental rehearsal is for real issues that affect PRD/plan/code-reality closure, acceptance, implementation feasibility, or key decisions.
+- Do not manufacture `ANOMALY_FOUND` from unrelated edge cases, impossible triggers, or scenarios that cannot affect acceptance.
+- The truthfulness rule still applies: do not continue with key unknowns. Irrelevant side questions become residual risk, not anomaly.
+- If `prd.md` exists without traceable developer confirmation, do not dispatch mental subagents. If the same message confirms the PRD, persist the confirmation evidence to `state.md` or `journal.md` before or while dispatching.
+
+## Feature Addendum: Real Reproducible Breaches
+
+- OPFOR must not help the design, but it also must not invent impossible or unrelated attack surfaces just to win.
+- Return `BREACH_FOUND` only for real, relevant, reproducible breaks against PRD acceptance, MUST/MUST-NOT, plan, or implementation behavior.
+- Vague risk, speculation, missing trigger steps, or unrelated scenarios are residual risk, not breach.
+- If `prd.md` exists without traceable developer confirmation, do not dispatch OPFOR. If the same message confirms the PRD, persist the confirmation evidence before or while dispatching.

@@ -57,8 +57,8 @@ rehearsals:
   impl:    { runs: 0, last: none }     # 报告汇总：none|done|anomaly|blocked
 autonomy:
   mode: manual                         # manual|autopilot；是否处于自动模式的唯一权威开关
-  min_rounds: { mental: 3, redteam: 3, impl: 2 }
-  min_agents_per_round: { mental: 3, redteam: 3, impl: 2 }
+  min_rounds: { mental: 1, redteam: 1, impl: 1 } # minimum coverage / 最低覆盖
+  min_agents_per_round: { mental: 1, redteam: 1, impl: 1 } # minimum coverage / 最低覆盖
   completed_rounds: { mental: 0, redteam: 0, impl: 0 }
   last_decision: none                  # 最近一次自动推进 / 回退重演 / 阻塞裁决
 selected_impl: none
@@ -76,7 +76,7 @@ selected_impl: none
 - `blocked: true` 时，主流程暂停，必须先解决 `questions.md` 里的阻塞问题。
 - `autonomy.mode` 是自动模式的唯一权威开关；不要再额外发明 `enabled` 一类并列字段。
 - 自动模式运行时，`autonomy.*` 是恢复与续跑的权威；不要只看 `rehearsals.runs` 的汇总数字。
-- `phase` 在 autopilot 下是记录位；恢复与续跑时，先判断 `autonomy.completed_rounds` 是否满足 `autonomy.min_rounds` 的配额闭包，再决定下一步阶段。
+- `phase` 在 autopilot 下是记录位；恢复与续跑时，先判断 `autonomy.completed_rounds` 是否满足 `autonomy.min_rounds` 的最低覆盖与自主裁决，再决定下一步阶段。
 - 手动 `/sandtable-mental`、`/sandtable-redteam`、`/sandtable-live`、`/sandtable-rehearse` 仍会更新 `rehearsals.*.runs` / `rehearsals.*.last` 与报告文件，但这些手动记录不能抵扣或回填 `autonomy.completed_rounds`。
 - 状态回退（异常→修正）时，把 `phase` 改回最早尚未重新验证的阶段，并在 `journal.md` 记录原因；若是 autopilot，还要同步刷新 `autonomy.last_decision`。
 - 遇到老需求目录缺少 `autonomy` 块时，显式按 `manual` 处理，并按 `phase` 恢复；不要用 `rehearsals.*` 反推 autopilot 配额进度。
@@ -107,7 +107,7 @@ digraph resume {
   "读 questions.md, 先解阻塞" [shape=box];
   "读 journal.md 近期条目重建上下文" [shape=box];
   "autopilot?" [shape=diamond];
-  "按配额闭包决定下一步" [shape=box];
+  "按最低覆盖与自主裁决决定下一步" [shape=box];
   "按 phase 指向的阶段继续" [shape=doublecircle];
 
   "读 project.md + constraints.md" -> "列出 features/ 找到目标需求" -> "读 state.md 取 phase/tasks/autonomy" -> "blocked?";
@@ -115,9 +115,9 @@ digraph resume {
   "blocked?" -> "读 journal.md 近期条目重建上下文" [label="否"];
   "读 questions.md, 先解阻塞" -> "读 journal.md 近期条目重建上下文";
   "读 journal.md 近期条目重建上下文" -> "autopilot?";
-  "autopilot?" -> "按配额闭包决定下一步" [label="是"];
+  "autopilot?" -> "按最低覆盖与自主裁决决定下一步" [label="是"];
   "autopilot?" -> "按 phase 指向的阶段继续" [label="否"];
-  "按配额闭包决定下一步" -> "按 phase 指向的阶段继续";
+  "按最低覆盖与自主裁决决定下一步" -> "按 phase 指向的阶段继续";
 }
 ```
 
@@ -125,7 +125,7 @@ digraph resume {
 
 自动模式续跑时用这条明确分支，不要写成含糊回退简写：
 1. 若 `blocked=true`：先解 `questions.md`。
-1.5 **若 `phase` ∈ {`DONE`, `FEEDBACK`}（落地后）**：autopilot 配额闭包**不适用**，一律**按 `phase` 恢复**；`FEEDBACK` 是人在环阶段，autopilot 不驱动，**不得**因三类配额已达标而被误路由回 `EVALUATE`（由 `/sandtable-bug`、`/sandtable-bugfix` 手动推进）。
+1.5 **若 `phase` ∈ {`DONE`, `FEEDBACK`}（落地后）**：autopilot 最低覆盖与自主裁决**不适用**，一律**按 `phase` 恢复**；`FEEDBACK` 是人在环阶段，autopilot 不驱动，**不得**因三类配额已达标而被误路由回 `EVALUATE`（由 `/sandtable-bug`、`/sandtable-bugfix` 手动推进）。
 2. 若 `autonomy.mode=autopilot` 且 `blocked=false`（且未命中 1.5）：
    - 若 `completed_rounds.mental < min_rounds.mental`，下一步是 `MENTAL_REHEARSAL`；
    - 否则若 `completed_rounds.redteam < min_rounds.redteam`，下一步是 `REDTEAM`；
@@ -141,3 +141,12 @@ digraph resume {
 | "journal 太啰嗦，跳过" | 没有 journal，下一个 AI 等于从零开始。 |
 | "直接改 journal 旧条目修正一下" | 历史只增不改，修正用新条目。 |
 | "blocked 了我先往下做别的" | blocked=主流程停。先解 questions.md。 |
+
+## 本需求补充 · 最低覆盖、自主裁决与续接门禁
+
+- `autonomy.min_rounds` 和 `autonomy.min_agents_per_round` 表示最低覆盖，默认 `{ mental: 1, redteam: 1, impl: 1 }`；历史 feature 已写入 3/3/2 时不得强制迁移或覆盖。
+- 冷启动才初始化 `phase=RECON` 并自动补齐 `RECON -> OBJECTIVES -> TESTCASES -> PLAN`。已有 `state.md` 或任一 feature 文档时按续接处理，保留既有 `min_rounds`、`min_agents_per_round`、`completed_rounds` 与 `phase`。
+- 续接进入 TESTCASES/PLAN/MENTAL/REDTEAM/IMPL 前必须先检查 PRD 确认门禁：确认必须可追溯到开发者输入，并在继续前或同时持久化到 `state.md` 或 `journal.md`。AskQuestion 需有 answer id 或 `source: askquestion:<id>`；自然语言确认需记录用户原话摘录、确认时间和用户消息来源。agent 自写推进日志、`autonomy.last_decision`、`phase>=TESTCASES`、仅写“AskQuestion 答复”或无来源的 `prd_confirmed` 不算确认。
+- 文档未齐备时从最早缺失阶段补齐；但 `prd.md` 已存在且未确认时必须停在 PRD 确认点，不得因缺 `tests.md` 或 `plan.md` 继续。
+- 推演链先补足 mental -> redteam -> impl 最低覆盖。最低覆盖达成后，主 agent 必须依据风险、改动面、历史教训、异常是否刚修复、实现候选差异、测试信心和抽查结果，自主追加或进入 `EVALUATE`，并记录 `autonomy.last_decision`；非真实阻塞不得询问用户是否继续。
+- impl 自报 `DONE` 不能直接计入轮次或进入 `EVALUATE`；必须先通过完整性闸门，并在进入 `EVALUATE` 前二次校验当前 PRD/tests/plan 结构化基准、覆盖矩阵、live TODO 表、真实 diff / 改动文件清单。

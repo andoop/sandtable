@@ -52,8 +52,8 @@ rehearsals:
   impl:    { runs: 0, last: none }     # 报告汇总：none|done|anomaly|blocked
 autonomy:
   mode: manual                         # manual|autopilot；是否处于自动模式的唯一权威开关
-  min_rounds: { mental: 3, redteam: 3, impl: 2 }
-  min_agents_per_round: { mental: 3, redteam: 3, impl: 2 }
+  min_rounds: { mental: 1, redteam: 1, impl: 1 } # minimum coverage / 最低覆盖
+  min_agents_per_round: { mental: 1, redteam: 1, impl: 1 } # minimum coverage / 最低覆盖
   completed_rounds: { mental: 0, redteam: 0, impl: 0 }
   last_decision: none                  # 最近一次自动推进 / 回退重演 / 阻塞裁决
 selected_impl: none
@@ -135,3 +135,12 @@ digraph resume {
 | "journal 太啰嗦，跳过" | 没有 journal，下一个 AI 等于从零开始。 |
 | "直接改 journal 旧条目修正一下" | 历史只增不改，修正用新条目。 |
 | "blocked 了我先往下做别的" | blocked=主流程停。先解 questions.md。 |
+
+## Feature Addendum: Minimum Coverage, Autonomous Judgment, Resume Gate
+
+- `autonomy.min_rounds` and `autonomy.min_agents_per_round` mean minimum coverage, defaulting to `{ mental: 1, redteam: 1, impl: 1 }`. Do not migrate or overwrite historical features that already recorded 3/3/2.
+- Only a cold start initializes `phase=RECON` and runs the full `RECON -> OBJECTIVES -> TESTCASES -> PLAN` document chain. If `state.md` or any feature artifact already exists, resume in place and preserve existing `min_rounds`, `min_agents_per_round`, `completed_rounds`, and `phase`.
+- Before resuming into TESTCASES/PLAN/MENTAL/REDTEAM/IMPL, enforce the PRD confirmation gate. Confirmation must be traceable to developer input and persisted to `state.md` or `journal.md` before or while continuing. AskQuestion confirmation needs an answer id or `source: askquestion:<id>`; natural-language confirmation needs the quoted user text, confirmation time, and user-message source. Agent-authored progress logs, `autonomy.last_decision`, `phase>=TESTCASES`, vague “AskQuestion answer”, or source-less `prd_confirmed` fields do not count.
+- If documents are incomplete, resume from the earliest missing artifact. If `prd.md` exists but is not confirmed, stop at PRD confirmation instead of moving to tests or plan.
+- Rehearsal scheduling first fills mental -> redteam -> impl minimum coverage. Once minimum coverage is met, the main agent decides autonomously whether to add more rehearsal or enter `EVALUATE`, based on risk, change surface, lessons hit, recently fixed anomalies, implementation divergence, test confidence, and spot checks. Do not ask the user whether to continue unless truly blocked.
+- Implementation `DONE` is not enough to count the impl round or enter `EVALUATE`; the completeness gate must pass, and EVALUATE must re-check the current PRD/tests/plan structured baseline, coverage matrix, live TODO table, and real diff / changed file list.

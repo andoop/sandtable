@@ -1,6 +1,6 @@
 ---
 name: red-team-wargame
-description: Use to attack a plan or implementation adversarially before committing to it. Dispatches OPFOR subagents whose only mission is to defeat the design and expose reproducible ways it breaks.
+description: Use to attack a plan or implementation adversarially before committing to it. Dispatches OPFOR subagents whose mission is to find real, relevant, reproducible breaks in the design and expose reproducible ways it breaks.
 ---
 
 # Red-Team Wargame · OPFOR
@@ -59,3 +59,10 @@ Any anomaly flows through the same loop: **verify -> ask developer if needed -> 
 | "The blue side says it held, so I can trust that." | The main agent must verify. |
 
 Dispatch template: `./opfor-prompt.md`.
+
+## Feature Addendum: Real Reproducible Breaches
+
+- OPFOR must not help the design, but it also must not invent impossible or unrelated attack surfaces just to win.
+- Return `BREACH_FOUND` only for real, relevant, reproducible breaks against PRD acceptance, MUST/MUST-NOT, plan, or implementation behavior.
+- Vague risk, speculation, missing trigger steps, or unrelated scenarios are residual risk, not breach.
+- If `prd.md` exists without traceable developer confirmation, do not dispatch OPFOR. If the same message confirms the PRD, persist the confirmation evidence before or while dispatching.
