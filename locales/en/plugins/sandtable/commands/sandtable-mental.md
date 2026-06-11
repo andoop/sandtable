@@ -14,9 +14,14 @@ Iron law: read-only only; no code changes; stop immediately on anomalies; do not
 
 8. When done, load `skills/closing-the-loop/SKILL.md`, read `state.md`, and output the close block (skip for in-command chain steps; use status bulletin for in-chain switches). Do not run unlisted next phases except `/sandtable-autopilot` and `/sandtable-rehearse`.
 
-## Feature Addendum: Real-Issue Mental Rehearsal
+## Issue Grading and Restraint (P0–P3)
 
-- Mental rehearsal is for real issues that affect PRD/plan/code-reality closure, acceptance, implementation feasibility, or key decisions.
-- Do not manufacture `ANOMALY_FOUND` from unrelated edge cases, impossible triggers, or scenarios that cannot affect acceptance.
-- The truthfulness rule still applies: do not continue with key unknowns. Irrelevant side questions become residual risk, not anomaly.
+- Grade by the `using-sandtable` P0–P3 rubric (trigger probability × functional impact × recoverability × user perception).
+- Only **P0/P1** (core damage · redline violation · hard to self-recover, or unlikely but severe) return `ANOMALY_FOUND` and drive the loop; **P2/P3** (edge, retryable/auto-recoverable, basically no perception) are residual risk listed with `LOGIC_CLOSED` for me to decide.
+- Many P0/P1 in one round → suspect the design itself, go back to PLAN/OBJECTIVES, don't patch one by one.
+- Explain to me in plain language: what was found, what grade, real user impact, recommendation.
+- Do not fabricate impossible-trigger or unrelated scenarios for logical perfection (`being-truthful` no-guessing unchanged: do not continue with key unknowns).
+
+## PRD Confirmation Gate
+
 - If `prd.md` exists without traceable developer confirmation, do not dispatch mental subagents. If the same message confirms the PRD, persist the confirmation evidence to `state.md` or `journal.md` before or while dispatching.

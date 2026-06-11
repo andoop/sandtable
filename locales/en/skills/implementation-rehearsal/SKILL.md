@@ -57,7 +57,7 @@ Point each subagent at its own worktree. Clean up unselected worktrees / branche
 
 Dispatch template: `./implementation-rehearsal-prompt.md`. After all implementations are `DONE` and the completeness gate passes, load `evaluating-rehearsals`.
 
-## Feature Addendum: Implementation Completeness Gate
+## Implementation Completeness Gate
 
 `DONE` is only the candidate's self-report. Do not enter `evaluating-rehearsals`, debrief, or EVALUATE until the completeness gate passes. After all candidates report `DONE`, the main agent must run the gate itself for simple candidates or may dispatch read-only mental/redteam-style reviewers for complex or high-risk candidates.
 

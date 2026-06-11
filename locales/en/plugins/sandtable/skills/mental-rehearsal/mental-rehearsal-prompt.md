@@ -36,34 +36,37 @@ Task tool (subagent_type: explore or generalPurpose, readonly: true):
     6. Check every TC one by one. If the Given -> When -> Then logic can be reasoned through, do it. If not executable, use it as a reference. Only a contradiction between reality and the plan / code counts as ANOMALY.
 
     ## Stop Rule (Most Important)
-    The moment you find any of the following, stop immediately and return ANOMALY_FOUND:
+    The moment you find any of the following AND it grades as P0/P1 (core damage · redline violation · hard to self-recover, or unlikely but severe), stop immediately and return ANOMALY_FOUND:
     - the plan / PRD diverges from code reality
     - the logic chain does not close
     - there is unexpected side effect or blast radius
-    - there is any uncertainty you cannot resolve from code or docs
+    - a key fact cannot be resolved from code or docs and it affects PRD/plan/code-reality closure, acceptance, or a plan decision
     - the plan implicitly violates a MUST / MUST-NOT
-    Do not assume an answer and keep going. Uncertainty itself is the report.
+    Findings that grade as P2/P3 (edge, retryable/auto-recoverable, basically no perception) do not stop the walk and are not reported as anomaly; list them as residual risk with LOGIC_CLOSED.
+    Do not assume an answer and keep going: a key unknown itself is the report.
 
     ## Return Format (choose one)
     LOGIC_CLOSED
     - End-to-end logic chain: step 1 ... (file:line) -> step 2 ... (file:line) -> ... -> closure point
     - Boundary / error paths checked: ...
     - Red-line check: conclusions for each MUST / MUST-NOT
-    - Residual risks (if any, but not enough for anomaly): ...
+    - Residual risks (P2/P3, if any, not enough to drive the loop): each with grade + real user impact
 
     or
 
-    ANOMALY_FOUND
+    ANOMALY_FOUND (P0/P1 only)
     - Deviation / problem: what exactly is wrong
     - Location: where in plan.md and/or which file:line
     - Why it is a problem: ...
     - Blast radius: ...
+    - Grade: P0 or P1, with trigger probability / functional impact / recoverability / user perception
     - Clarification needed: what the main agent / developer should resolve
 ```
 
-## Feature Addendum: Real-Issue Mental Rehearsal
+## Grading (mandatory)
 
-- Mental rehearsal is for real issues that affect PRD/plan/code-reality closure, acceptance, implementation feasibility, or key decisions.
-- Do not manufacture `ANOMALY_FOUND` from unrelated edge cases, impossible triggers, or scenarios that cannot affect acceptance.
-- The truthfulness rule still applies: do not continue with key unknowns. Irrelevant side questions become residual risk, not anomaly.
-- If `prd.md` exists without traceable developer confirmation, do not dispatch mental subagents. If the same message confirms the PRD, persist the confirmation evidence to `state.md` or `journal.md` before or while dispatching.
+Grade by the `using-sandtable` **P0–P3** rubric (trigger probability × functional impact × recoverability × user perception):
+
+- Only **P0/P1** (always/likely + core damage · redline · hard to self-recover, or unlikely but severe) return `ANOMALY_FOUND`.
+- **P2/P3** (edge, retryable/auto-recoverable, basically no perception) are listed as residual risk with `LOGIC_CLOSED`; they do not drive the loop.
+- Do not invent impossible-trigger or unrelated scenarios to fabricate an anomaly; but a key unknown that affects closure/acceptance/decision must still be reported.

@@ -75,7 +75,7 @@ description: Use when the developer wants Sandtable to advance from intake throu
 | "手动跑过一次 mental，可以顺手抵掉 autopilot 的一轮" | 不行。手动 `rehearsals.*` 不能回填 `autonomy.completed_rounds`。 |
 | "state.md 里已经写了 phase，就不用看 minimum coverage" | 不行。autopilot 恢复与续跑先看最低覆盖与自主裁决，再看 `phase`。 |
 
-## 本需求补充 · 最低覆盖、自主裁决与续接门禁
+## 最低覆盖、自主裁决与续接门禁
 
 - `autonomy.min_rounds` 和 `autonomy.min_agents_per_round` 表示最低覆盖，默认 `{ mental: 1, redteam: 1, impl: 1 }`；历史 feature 已写入 3/3/2 时不得强制迁移或覆盖。
 - 冷启动才初始化 `phase=RECON` 并自动补齐 `RECON -> OBJECTIVES -> TESTCASES -> PLAN`。已有 `state.md` 或任一 feature 文档时按续接处理，保留既有 `min_rounds`、`min_agents_per_round`、`completed_rounds` 与 `phase`。

@@ -16,7 +16,7 @@ description: 从需求到复盘全流程无人值守推进
 6. 任一 `ANOMALY_FOUND` / `BREACH_FOUND` / `BLOCKED`：先亲自核实，写回 `prd.md` / `tests.md` / `plan.md` / `state.md` / `journal.md`，然后按最早尚未重新验证的阶段重演；只有真正阻塞才写 `questions.md` 并向我提问。
 7. 各阶段之间不等待用户确认；阶段切换时更新 state、输出**战报收尾** profile，并在同一命令内继续执行。最低覆盖达成并完成自主裁决并完成复盘择优后，加载 `closing-the-loop` 输出**完整收尾**（含可复制模版）。`blocked=true` 时输出**完整收尾**并可用 AskQuestion（FR5 优先于 autopilot 静默纪律）。
 
-## 本需求补充 · 最低覆盖、自主裁决与续接门禁
+## 最低覆盖、自主裁决与续接门禁
 
 - `autonomy.min_rounds` 和 `autonomy.min_agents_per_round` 表示最低覆盖，默认 `{ mental: 1, redteam: 1, impl: 1 }`；历史 feature 已写入 3/3/2 时不得强制迁移或覆盖。
 - 冷启动才初始化 `phase=RECON` 并自动补齐 `RECON -> OBJECTIVES -> TESTCASES -> PLAN`。已有 `state.md` 或任一 feature 文档时按续接处理，保留既有 `min_rounds`、`min_agents_per_round`、`completed_rounds` 与 `phase`。

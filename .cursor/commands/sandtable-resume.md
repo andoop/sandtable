@@ -17,7 +17,7 @@ description: 换人/换 AI/异常退出后，按持久化状态与当前模式�
 
 8. 完成后加载 `skills/closing-the-loop/SKILL.md`，读 `state.md`，输出收尾（本命令已列出的链内后续步骤除外；链内切换用战报 profile）。缺少明确选择或确认时不得越权执行**本命令未列出**的下一阶段（`/sandtable-autopilot`、`/sandtable-rehearse` 除外）；本回合用户已明确选择/确认且必要证据已先/同时落盘的内联后续，属于本命令允许的链内后续。
 
-## 本需求补充 · 最低覆盖、自主裁决与续接门禁
+## 最低覆盖、自主裁决与续接门禁
 
 - `autonomy.min_rounds` 和 `autonomy.min_agents_per_round` 表示最低覆盖，默认 `{ mental: 1, redteam: 1, impl: 1 }`；历史 feature 已写入 3/3/2 时不得强制迁移或覆盖。
 - 冷启动才初始化 `phase=RECON` 并自动补齐 `RECON -> OBJECTIVES -> TESTCASES -> PLAN`。已有 `state.md` 或任一 feature 文档时按续接处理，保留既有 `min_rounds`、`min_agents_per_round`、`completed_rounds` 与 `phase`。
@@ -26,7 +26,7 @@ description: 换人/换 AI/异常退出后，按持久化状态与当前模式�
 - 推演链先补足 mental -> redteam -> impl 最低覆盖。最低覆盖达成后，主 agent 必须依据风险、改动面、历史教训、异常是否刚修复、实现候选差异、测试信心和抽查结果，自主追加或进入 `EVALUATE`，并记录 `autonomy.last_decision`；非真实阻塞不得询问用户是否继续。
 - impl 自报 `DONE` 不能直接计入轮次或进入 `EVALUATE`；必须先通过完整性闸门，并在进入 `EVALUATE` 前二次校验当前 PRD/tests/plan 结构化基准、覆盖矩阵、live TODO 表、真实 diff / 改动文件清单。
 
-## 本需求补充 · 已选择路径直接执行与 PRD 确认证据
+## PRD 确认门禁与已选择路径直接执行
 
 - 优先级：真实阻塞 (`blocked=true`、缺产品意图/权限/登录/外部资源/关键事实) 最高，必须写 `questions.md`、设置 `blocked=true` 并提问；其次是 PRD 未确认门禁；之后才执行用户选择。
 - 若用户已经通过 AskQuestion 选择下一步，或自然语言明确表达“确认并继续 / 按 X 继续 / 就选 X”，且没有真实阻塞，agent 必须在同一回合执行该选择对应动作。不得再次 AskQuestion，也不得只输出同一动作的复制命令要求用户重复输入。

@@ -66,16 +66,6 @@ Whenever you state a fact that supports a decision, mark the source:
 
 When a rehearsal exposes uncertainty, that is one of the most valuable findings; it is exactly the kind of discovery that should be stopped and reported as an `ANOMALY`. If you guess and keep going, the rehearsal loses its purpose.
 
-## Feature Addendum: Real-Issue Mental Rehearsal
+## Relationship to Rehearsal Grading
 
-- Mental rehearsal is for real issues that affect PRD/plan/code-reality closure, acceptance, implementation feasibility, or key decisions.
-- Do not manufacture `ANOMALY_FOUND` from unrelated edge cases, impossible triggers, or scenarios that cannot affect acceptance.
-- The truthfulness rule still applies: do not continue with key unknowns. Irrelevant side questions become residual risk, not anomaly.
-- If `prd.md` exists without traceable developer confirmation, do not dispatch mental subagents. If the same message confirms the PRD, persist the confirmation evidence to `state.md` or `journal.md` before or while dispatching.
-
-## Feature Addendum: Real Reproducible Breaches
-
-- OPFOR must not help the design, but it also must not invent impossible or unrelated attack surfaces just to win.
-- Return `BREACH_FOUND` only for real, relevant, reproducible breaks against PRD acceptance, MUST/MUST-NOT, plan, or implementation behavior.
-- Vague risk, speculation, missing trigger steps, or unrelated scenarios are residual risk, not breach.
-- If `prd.md` exists without traceable developer confirmation, do not dispatch OPFOR. If the same message confirms the PRD, persist the confirmation evidence before or while dispatching.
+A "key unknown" exposed during rehearsal is the most valuable finding—if it affects PRD/plan/code-reality closure, acceptance, or a decision, report it per the `using-sandtable` P0–P3 grading (P0/P1 drive the fix loop). But **no-guessing ≠ escalating every irrelevant edge question into an anomaly**: unrelated, impossible-trigger, acceptance-irrelevant questions are residual risk (P2/P3) and do not drive the loop. Hold both ends—never proceed with a key assumption, and never fabricate pseudo-issues for "logical perfection".

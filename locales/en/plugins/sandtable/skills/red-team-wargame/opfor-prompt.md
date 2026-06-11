@@ -36,23 +36,25 @@ Task tool (subagent_type: explore or generalPurpose, readonly depending on targe
     5. For executable or objectively checkable TCs, try to make the Then fail. For non-executable TCs, attack by proving the plan / implementation violates the intent. Breaking any one of them is a BREACH.
 
     ## Return Format
-    BREACH_FOUND
+    BREACH_FOUND  (at least one break, graded P0/P1)
     - List of strikes, each with:
       - Attack vector:
       - Reproduction: input / scenario / steps
       - Consequence: wrong result / crash / broken red line / broken feature
       - Evidence: file:line
-      - Severity: critical / major / moderate
+      - Grade: P0/P1 (state trigger probability / functional impact / recoverability / user perception)
 
-    HELD
+    HELD  (no break, or only P2/P3)
     - Which vectors you attacked
     - How you attacked each one and why it did not break
+    - Residual risk (P2/P3, if any): each with grade + real user impact (does not drive the loop)
     - Remaining suspicions / good directions for the next round
 ```
 
-## Feature Addendum: Real Reproducible Breaches
+## Grading (mandatory)
 
-- OPFOR must not help the design, but it also must not invent impossible or unrelated attack surfaces just to win.
-- Return `BREACH_FOUND` only for real, relevant, reproducible breaks against PRD acceptance, MUST/MUST-NOT, plan, or implementation behavior.
-- Vague risk, speculation, missing trigger steps, or unrelated scenarios are residual risk, not breach.
-- If `prd.md` exists without traceable developer confirmation, do not dispatch OPFOR. If the same message confirms the PRD, persist the confirmation evidence before or while dispatching.
+Grade by the `using-sandtable` **P0–P3** rubric (trigger probability × functional impact × recoverability × user perception):
+
+- Only **P0/P1** (always/likely + core damage · redline · hard to self-recover, or unlikely but severe) return `BREACH_FOUND` and drive the loop.
+- **P2/P3** (edge, retryable/auto-recoverable, basically no perception) are listed as residual risk with `HELD` for the developer to decide; they do not drive the loop.
+- Do not help the design, but also do not invent impossible-trigger or unrelated attack surfaces; attack only real, relevant, reproducible breaks that affect acceptance / redlines / closure.

@@ -69,7 +69,7 @@ Give the developer a brief comparison: total score per rehearsal, key difference
 | "The most feature-rich option is the best." | Over-implementation and scope creep should be penalized. Minimalism matters. |
 | "If they tie, I’ll just pick one." | Prefer the simpler and smaller change. |
 
-## Feature Addendum: Implementation Completeness Gate
+## Implementation Completeness Gate
 
 `DONE` is only the candidate's self-report. Do not enter `evaluating-rehearsals`, debrief, or EVALUATE until the completeness gate passes. After all candidates report `DONE`, the main agent must run the gate itself for simple candidates or may dispatch read-only mental/redteam-style reviewers for complex or high-risk candidates.
 

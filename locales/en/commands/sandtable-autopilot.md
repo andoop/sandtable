@@ -16,7 +16,7 @@ Execute:
 6. On any `ANOMALY_FOUND` / `BREACH_FOUND` / `BLOCKED`: verify it personally first, write the result back into `prd.md` / `tests.md` / `plan.md` / `state.md` / `journal.md`, then rehearse again from the earliest stage that has not been re-validated; only write `questions.md` and ask me if the issue is truly blocked.
 7. Do not wait between phases; on phase switch update state and output **status bulletin** close, then continue in the same command. After all minimum coverage and debrief, load `closing-the-loop` for **full close** (with copy-paste templates). If `blocked=true`, use **full close** and AskQuestion (FR5 overrides autopilot silence).
 
-## Feature Addendum: Minimum Coverage, Autonomous Judgment, Resume Gate
+## Minimum Coverage, Autonomous Judgment, Resume Gate
 
 - `autonomy.min_rounds` and `autonomy.min_agents_per_round` mean minimum coverage, defaulting to `{ mental: 1, redteam: 1, impl: 1 }`. Do not migrate or overwrite historical features that already recorded 3/3/2.
 - Only a cold start initializes `phase=RECON` and runs the full `RECON -> OBJECTIVES -> TESTCASES -> PLAN` document chain. If `state.md` or any feature artifact already exists, resume in place and preserve existing `min_rounds`, `min_agents_per_round`, `completed_rounds`, and `phase`.

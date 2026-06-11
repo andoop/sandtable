@@ -69,7 +69,7 @@ description: Use after the PRD is confirmed and before writing the change plan, 
 
 完成并经开发者确认后，更新 `state.md`（phase=PLAN），加载 `writing-plan`。tests.md 随后作为三类推演的逐条突破点被注入各预演 prompt。
 
-## 本需求补充 · 已选择路径直接执行与 PRD 确认证据
+## PRD 确认门禁与已选择路径直接执行
 
 - 优先级：真实阻塞 (`blocked=true`、缺产品意图/权限/登录/外部资源/关键事实) 最高，必须写 `questions.md`、设置 `blocked=true` 并提问；其次是 PRD 未确认门禁；之后才执行用户选择。
 - 若用户已经通过 AskQuestion 选择下一步，或自然语言明确表达“确认并继续 / 按 X 继续 / 就选 X”，且没有真实阻塞，agent 必须在同一回合执行该选择对应动作。不得再次 AskQuestion，也不得只输出同一动作的复制命令要求用户重复输入。

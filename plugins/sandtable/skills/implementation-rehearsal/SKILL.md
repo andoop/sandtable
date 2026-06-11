@@ -73,7 +73,7 @@ git worktree add ../<repo>-rehearsal-2 -b sandtable/rehearse/<feature>-2
 
 子 agent 派发模板见 `./implementation-rehearsal-prompt.md`。全部 DONE 且完整性闸门通过后才加载 `evaluating-rehearsals`。
 
-## 本需求补充 · 实现预演完整性闸门
+## 实现预演完整性闸门
 
 `DONE` 只是候选自报完成，不得直接进入 `evaluating-rehearsals` / debrief / EVALUATE。全部候选自报 `DONE` 后，主 agent 必须先执行完整性闸门，简单候选可亲自检查，复杂或高风险候选可按需派只读 mental/redteam 风格子 agent 辅助。
 
