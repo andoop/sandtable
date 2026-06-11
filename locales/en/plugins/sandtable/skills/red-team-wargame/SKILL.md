@@ -36,9 +36,12 @@ Red-team silence is not proof of safety. Record what was attacked and why it hel
 
 ## Adjudication Rules
 
-- A red-team strike must be **reproducible**: concrete inputs / scenario / steps plus expected failure and supporting `file:line`.
-- The main agent verifies every claimed strike personally.
-- Each round writes `rehearsals/redteam-<n>.md`, appends to `journal.md`, and increments `rehearsals.redteam`.
+- A red-team strike must be **reproducible**: concrete inputs / scenario / steps plus expected failure and supporting `file:line`. Vague risk, speculation, impossible triggers, or unrelated scenarios do not count as `BREACH_FOUND`.
+- Grade each strike by the `using-sandtable` **P0–P3** rubric (trigger probability × functional impact × recoverability × user perception). **Only P0/P1 become `BREACH_FOUND` driving the fix loop** (a MUST/MUST-NOT violation is P0/P1 by definition); P2/P3 (edge, retryable/auto-recoverable, basically no perception) are **residual risk** listed with `HELD` for the developer to decide.
+- The main agent verifies every claimed strike personally; trust neither red nor blue.
+- Red-team silence is not proof of safety; record what was attacked and why it held.
+- **Many P0/P1 in one round → suspect the design itself**, go back to PLAN/OBJECTIVES instead of plugging holes one by one.
+- Each round writes `rehearsals/redteam-<n>.md`, appends to `journal.md`, and increments `rehearsals.redteam`. Explain to the developer in plain language: what was attacked, how many broke, at what grades, the real user impact, and the recommendation.
 
 ## Relationship to the Three Rehearsals
 
@@ -55,14 +58,12 @@ Any anomaly flows through the same loop: **verify -> ask developer if needed -> 
 |------|------|
 | "The red team didn’t find anything major, so we’re good enough." | Change attack vectors and run another round, especially against red-line infiltration or hidden coupling. |
 | "The red team says there may be risk, but they did not reproduce it." | That does not count as a breach. |
-| "The breach is small; I’ll note it and fix it later." | Small breaches often expose larger holes. Register it as an anomaly now. |
+| "The breach is small; I’ll note it and fix it later." | Grade P0–P3: P0/P1 drive the loop; P2/P3 are residual risk for the developer—don't force-polish. |
 | "The blue side says it held, so I can trust that." | The main agent must verify. |
+| "A whole pile of breaches, plug each one." | Many P0/P1 → suspect the design, go back to PLAN/OBJECTIVES, don't patch one by one. |
 
 Dispatch template: `./opfor-prompt.md`.
 
-## Feature Addendum: Real Reproducible Breaches
+## PRD Confirmation Gate
 
-- OPFOR must not help the design, but it also must not invent impossible or unrelated attack surfaces just to win.
-- Return `BREACH_FOUND` only for real, relevant, reproducible breaks against PRD acceptance, MUST/MUST-NOT, plan, or implementation behavior.
-- Vague risk, speculation, missing trigger steps, or unrelated scenarios are residual risk, not breach.
-- If `prd.md` exists without traceable developer confirmation, do not dispatch OPFOR. If the same message confirms the PRD, persist the confirmation evidence before or while dispatching.
+- If `prd.md` exists without traceable developer confirmation, do not dispatch OPFOR. If the same message confirms the PRD, persist the confirmation evidence to `state.md` or `journal.md` before or while dispatching.

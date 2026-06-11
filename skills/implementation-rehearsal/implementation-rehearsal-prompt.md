@@ -66,7 +66,7 @@ Task tool (subagent_type: generalPurpose):
     - 卡在哪、试过什么、需要哪种帮助（更多上下文 / 拆小 / 计划有错）
 ```
 
-## 本需求补充 · 实现预演完整性闸门
+## 实现预演完整性闸门
 
 `DONE` 只是候选自报完成，不得直接进入 `evaluating-rehearsals` / debrief / EVALUATE。全部候选自报 `DONE` 后，主 agent 必须先执行完整性闸门，简单候选可亲自检查，复杂或高风险候选可按需派只读 mental/redteam 风格子 agent 辅助。
 

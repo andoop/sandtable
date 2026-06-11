@@ -52,16 +52,16 @@
 
 `/sandtable-start`（受领任务·前五步）、`/sandtable-autopilot`（自动推进·从需求到复盘无人值守执行）、`/sandtable-recon`（战场侦察）、`/sandtable-objectives`（指挥官意图·目标红线）、`/sandtable-plan`（作战计划）、`/sandtable-refine`（调整部署·迭代完善）、`/sandtable-mental`（头脑预演）、`/sandtable-redteam`（红蓝对抗）、`/sandtable-live`（实现预演）、`/sandtable-debrief`（战损复盘·择优）、`/sandtable-rehearse`（联合预演·只跑推演与复盘）、`/sandtable-bug`（受理验收反馈）、`/sandtable-bugfix`（证据驱动根因修障）、`/sandtable-status`（战报）、`/sandtable-resume`（接防·重获记忆）。
 
-## 本需求补充 · 真实问题口径
+## 问题分级与克制（P0–P3）
 
-- 头脑推演的目标是发现会影响 PRD/plan/code reality 闭环、验收、实现可行性或关键决策的真实问题。
-- 不为了制造 `ANOMALY_FOUND` 构造与本需求无关、无现实触发路径、不会影响验收的偏题场景。
-- `being-truthful` 的不猜测原则继续适用：关键未知不能带着继续；但无关边缘疑问不得因为泛化措辞升级为 anomaly。
-- 若 `prd.md` 已存在但无可核实开发者确认记录，不得派发 mental 子 agent；同条消息确认 PRD 时，必须在派发前或同时把确认证据持久化到 `state.md` 或 `journal.md`。
+推演发现的问题必须**站在用户使用角度分级**，不为"逻辑完美"凑数。判级看四维：触发概率（必现/大概率/小概率/仅理论）× 功能影响（核心不可用·数据损坏·违反红线 / 重要受损 / 瑕疵）× 可恢复性（无法绕过 / 重试可救 / 自动救回）× 用户感知（明显/轻微/无感）。
 
-## 本需求补充 · 真实可复现攻破口径
+- **P0/P1**（必现或大概率且核心受损·违反 MUST·MUST-NOT·难自救，或小概率但后果严重）→ 作为 `ANOMALY_FOUND`/`BREACH_FOUND` 驱动修正循环。
+- **P2/P3**（边缘场景、可重试/可自动救回、用户基本无感）→ 记为残余风险，向开发者说明，由其拍板，不自动拉起重演。
+- **一轮冒出大量 P0/P1 → 先怀疑方案本身**，回 PLAN/OBJECTIVES 重审，别逐条打补丁。
+- 每轮结论用人话向开发者解释：发现什么、定几级、对用户的真实影响、建议怎么办。
+- 不是每个需求都跑满三类推演：先判风险再定强度，trivial 改动可免推演（journal 记理由）；autopilot 保留其最低覆盖底线。详见 `using-sandtable`。
 
-- 红军不替方案找补，但也不能为了击溃而发明无现实触发路径的脑洞。
-- 只有真实、相关、可复现地攻破 PRD 验收、MUST/MUST-NOT、计划或实现路径时，才返回 `BREACH_FOUND`。
-- 空泛风险、纯猜测、无输入/步骤/证据、与本需求无关的场景可记录为残余风险或下一轮重点，但不得驱动修正循环。
-- 若 `prd.md` 已存在但无可核实开发者确认记录，不得派发红军；同条消息确认 PRD 时，必须在派发前或同时持久化确认证据。
+## PRD 确认门禁
+
+- 若 `prd.md` 已存在但无可核实开发者确认记录，不得派发 mental/红军子 agent；同条消息确认 PRD 时，必须在派发前或同时把确认证据持久化到 `state.md` 或 `journal.md`。

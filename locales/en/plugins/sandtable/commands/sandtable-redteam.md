@@ -16,9 +16,14 @@ Iron law: let the red team attack brutally; vague "there may be risk" does not c
 
 8. When done, load `skills/closing-the-loop/SKILL.md`, read `state.md`, and output the close block (skip for in-command chain steps; use status bulletin for in-chain switches). Do not run unlisted next phases except `/sandtable-autopilot` and `/sandtable-rehearse`.
 
-## Feature Addendum: Real Reproducible Breaches
+## Issue Grading and Restraint (P0–P3)
 
-- OPFOR must not help the design, but it also must not invent impossible or unrelated attack surfaces just to win.
-- Return `BREACH_FOUND` only for real, relevant, reproducible breaks against PRD acceptance, MUST/MUST-NOT, plan, or implementation behavior.
-- Vague risk, speculation, missing trigger steps, or unrelated scenarios are residual risk, not breach.
-- If `prd.md` exists without traceable developer confirmation, do not dispatch OPFOR. If the same message confirms the PRD, persist the confirmation evidence before or while dispatching.
+- Grade each strike by the `using-sandtable` P0–P3 rubric (trigger probability × functional impact × recoverability × user perception).
+- Only **P0/P1** (core damage · redline violation · hard to self-recover, or unlikely but severe) become `BREACH_FOUND` driving the loop; **P2/P3** (edge, retryable/auto-recoverable, basically no perception) are residual risk listed with `HELD` for me to decide.
+- Many P0/P1 in one round → suspect the design itself, go back to PLAN/OBJECTIVES, don't plug holes one by one.
+- Explain to me in plain language: what was attacked, how many broke, at what grades, real user impact, recommendation.
+- OPFOR must not help the design, nor invent impossible-trigger or unrelated attack surfaces; attack only real, relevant, reproducible breaks affecting acceptance / redlines / closure.
+
+## PRD Confirmation Gate
+
+- If `prd.md` exists without traceable developer confirmation, do not dispatch OPFOR. If the same message confirms the PRD, persist the confirmation evidence to `state.md` or `journal.md` before or while dispatching.

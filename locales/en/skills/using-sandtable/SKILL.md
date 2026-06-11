@@ -120,21 +120,44 @@ Only when this turn is a **Sandtable work step** (positive trigger in `closing-t
 
 Sandtable absorbs Karpathy’s four principles (no guessing, minimalism, surgical changes, goal-driven work) and the subagent orchestration ideas from superpowers, then adds **three kinds of rehearsal (mental / red-team / implementation) + a persistent state machine + an anomaly-driven fix loop**. If a project already has superpowers installed, you may still reuse its `test-driven-development`, `requesting-code-review`, and `finishing-a-development-branch` skills during `INTEGRATE` / `VERIFY`.
 
-## Feature Addendum: Real-Issue Mental Rehearsal
+## Issue Grading and Restraint (P0–P3, shared rehearsal verdict)
 
-- Mental rehearsal is for real issues that affect PRD/plan/code-reality closure, acceptance, implementation feasibility, or key decisions.
-- Do not manufacture `ANOMALY_FOUND` from unrelated edge cases, impossible triggers, or scenarios that cannot affect acceptance.
-- The truthfulness rule still applies: do not continue with key unknowns. Irrelevant side questions become residual risk, not anomaly.
-- If `prd.md` exists without traceable developer confirmation, do not dispatch mental subagents. If the same message confirms the PRD, persist the confirmation evidence to `state.md` or `journal.md` before or while dispatching.
+Issues found by rehearsal (mental / red-team) must be **graded from the user's point of view**, not piled up for the sake of "logical perfection". Grade first, then decide whether it drives the fix loop.
 
-## Feature Addendum: Real Reproducible Breaches
+Grade along four axes:
 
-- OPFOR must not help the design, but it also must not invent impossible or unrelated attack surfaces just to win.
-- Return `BREACH_FOUND` only for real, relevant, reproducible breaks against PRD acceptance, MUST/MUST-NOT, plan, or implementation behavior.
-- Vague risk, speculation, missing trigger steps, or unrelated scenarios are residual risk, not breach.
-- If `prd.md` exists without traceable developer confirmation, do not dispatch OPFOR. If the same message confirms the PRD, persist the confirmation evidence before or while dispatching.
+- **Trigger probability**: always / likely / unlikely / only theoretical
+- **Functional impact**: core unusable · data loss · redline violation / important feature degraded / cosmetic
+- **Recoverability**: user cannot work around / user retry recovers / system auto-recovers
+- **User perception**: obvious / minor / basically none
 
-## Feature Addendum: Execute Already-Selected Paths and Persist PRD Evidence
+| Level | Typical combination | Handling |
+|------|---------|------|
+| **P0** | Always/likely + core unusable / data loss / MUST·MUST-NOT violation, obvious to user and unrecoverable | Must drive the fix loop as `ANOMALY_FOUND`/`BREACH_FOUND`; blocks integration |
+| **P1** | Likely degrades an important feature, or unlikely but severe (data/security/money), perceived and hard to self-recover | Fix in the loop; deferring needs explicit developer consent |
+| **P2** | Edge/unlikely, degraded but retryable or auto-recoverable, minor perception | Record as **residual risk**, explain to developer, who decides whether to fix this round |
+| **P3** | Only theoretical / pure cosmetic, no/negligible perception | Log for the record, does not drive the loop |
+
+**Verdict iron law: only P0/P1 drive the fix loop; P2/P3 are residual risk for the developer to decide—do not auto-trigger reruns, do not polish endlessly for "logical perfection".** The truthfulness lens still holds: report only real, relevant, reproducible issues that affect acceptance / redlines / closure; do not manufacture `ANOMALY_FOUND`/`BREACH_FOUND` from impossible triggers or unrelated scenarios (`being-truthful`'s no-guessing rule is unchanged: do not continue with key unknowns).
+
+**Restraint and reflection**: if one rehearsal round surfaces **many P0/P1**, first suspect the **design itself** (too complex, boundaries not converged, requirement misread) and go back to PLAN/OBJECTIVES, instead of patching one by one. A pile of issues is usually a design signal, not a patch list.
+
+**Explain to the developer**: each round's conclusion in plain language—what was found, what grade, why it is (or is not) a real issue, the real user impact, and the recommendation. No jargon dumps, no perfection-for-its-own-sake pseudo-issues.
+
+## Rehearsal Intensity by Risk (don't crack a nut with a sledgehammer)
+
+Not every change runs all three rehearsals. Judge complexity/risk first, then set intensity—a simple flow can be short, but **the judgment itself cannot be skipped**.
+
+| Task profile | Suggested intensity |
+|---------|---------|
+| Copy/constant/single line, no branching, change verifiable at a glance | May skip rehearsal; surgical change + verify; journal one line "low-risk, rehearsal skipped" + reason |
+| Single module, clear logic, contained blast radius | At least 1 **mental rehearsal**; add red-team as needed |
+| Cross-module / concurrency-timing / touches data or interfaces / unclear blast radius | Mental + red-team, implementation rehearsal if needed |
+| High risk (redline-related / data migration / security / irreversible) | All three, possibly multiple rounds |
+
+Any choice to "skip / do one / combine" must state the reason in the journal. **Autopilot keeps its minimum-coverage floor** (see `autonomous-orchestration`); intensity scaling mainly serves manual flow. Trivial changes should use the lightweight manual path or `/sandtable-bugfix`, not the full autopilot run.
+
+## PRD Confirmation Gate and Executing Already-Selected Paths
 
 - Priority: real blockers (`blocked=true`, missing product intent, permission, login, external resource, or key fact) come first and require `questions.md`, `blocked=true`, and a question; the PRD confirmation gate comes next; only then execute the user's selected path.
 - If the user already selected the next step via AskQuestion or clearly wrote “confirm and continue / continue with X / choose X”, and there is no real blocker, the agent must execute that step in the same turn. Do not ask again and do not merely print the same copy-paste command.

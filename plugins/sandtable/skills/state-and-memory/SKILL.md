@@ -142,7 +142,7 @@ digraph resume {
 | "直接改 journal 旧条目修正一下" | 历史只增不改，修正用新条目。 |
 | "blocked 了我先往下做别的" | blocked=主流程停。先解 questions.md。 |
 
-## 本需求补充 · 最低覆盖、自主裁决与续接门禁
+## 最低覆盖、自主裁决与续接门禁
 
 - `autonomy.min_rounds` 和 `autonomy.min_agents_per_round` 表示最低覆盖，默认 `{ mental: 1, redteam: 1, impl: 1 }`；历史 feature 已写入 3/3/2 时不得强制迁移或覆盖。
 - 冷启动才初始化 `phase=RECON` 并自动补齐 `RECON -> OBJECTIVES -> TESTCASES -> PLAN`。已有 `state.md` 或任一 feature 文档时按续接处理，保留既有 `min_rounds`、`min_agents_per_round`、`completed_rounds` 与 `phase`。

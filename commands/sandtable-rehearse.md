@@ -21,7 +21,7 @@ description: 依次执行 Sandtable 推演与复盘：头脑预演→红蓝对�
 
 两条铁律：异常即停上报、推演在隔离子 agent 中并行进行。不轻信子 agent 结论，抽查其引用与 diff。
 
-## 本需求补充 · 实现预演完整性闸门
+## 实现预演完整性闸门
 
 `DONE` 只是候选自报完成，不得直接进入 `evaluating-rehearsals` / debrief / EVALUATE。全部候选自报 `DONE` 后，主 agent 必须先执行完整性闸门，简单候选可亲自检查，复杂或高风险候选可按需派只读 mental/redteam 风格子 agent 辅助。
 

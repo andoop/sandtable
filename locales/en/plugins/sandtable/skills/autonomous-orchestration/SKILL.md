@@ -74,7 +74,7 @@ After each autonomous action, write all of:
 | "I ran mental manually once, so that can count for autopilot." | No. Manual runs do not backfill `autonomy.completed_rounds`. |
 | "The phase in state.md is enough; I do not need to check minimum coverage." | Wrong. In autopilot, resume and continuation are driven by minimum coverage plus autonomous judgment first. |
 
-## Feature Addendum: Minimum Coverage, Autonomous Judgment, Resume Gate
+## Minimum Coverage, Autonomous Judgment, Resume Gate
 
 - `autonomy.min_rounds` and `autonomy.min_agents_per_round` mean minimum coverage, defaulting to `{ mental: 1, redteam: 1, impl: 1 }`. Do not migrate or overwrite historical features that already recorded 3/3/2.
 - Only a cold start initializes `phase=RECON` and runs the full `RECON -> OBJECTIVES -> TESTCASES -> PLAN` document chain. If `state.md` or any feature artifact already exists, resume in place and preserve existing `min_rounds`, `min_agents_per_round`, `completed_rounds`, and `phase`.

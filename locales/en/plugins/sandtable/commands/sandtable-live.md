@@ -14,7 +14,7 @@ Iron law: every rehearsal must stay in its own worktree; stop immediately on ano
 
 8. When done, load `skills/closing-the-loop/SKILL.md`, read `state.md`, and output the close block (skip for in-command chain steps; use status bulletin for in-chain switches). Do not run unlisted next phases except `/sandtable-autopilot` and `/sandtable-rehearse`.
 
-## Feature Addendum: Implementation Completeness Gate
+## Implementation Completeness Gate
 
 `DONE` is only the candidate's self-report. Do not enter `evaluating-rehearsals`, debrief, or EVALUATE until the completeness gate passes. After all candidates report `DONE`, the main agent must run the gate itself for simple candidates or may dispatch read-only mental/redteam-style reviewers for complex or high-risk candidates.
 

@@ -69,7 +69,7 @@ digraph eval {
 | "功能最全的就是最好的" | 越界/过度实现要扣分，极简优先。 |
 | "并列就随便选一个" | 取更简单、改动更小者。 |
 
-## 本需求补充 · 实现预演完整性闸门
+## 实现预演完整性闸门
 
 `DONE` 只是候选自报完成，不得直接进入 `evaluating-rehearsals` / debrief / EVALUATE。全部候选自报 `DONE` 后，主 agent 必须先执行完整性闸门，简单候选可亲自检查，复杂或高风险候选可按需派只读 mental/redteam 风格子 agent 辅助。
 

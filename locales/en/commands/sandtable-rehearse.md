@@ -21,7 +21,7 @@ Execute:
 
 Two iron laws: stop and report on anomalies immediately, and run rehearsals in isolated subagents. Do not trust subagent conclusions without spot-checking their citations and diffs.
 
-## Feature Addendum: Implementation Completeness Gate
+## Implementation Completeness Gate
 
 `DONE` is only the candidate's self-report. Do not enter `evaluating-rehearsals`, debrief, or EVALUATE until the completeness gate passes. After all candidates report `DONE`, the main agent must run the gate itself for simple candidates or may dispatch read-only mental/redteam-style reviewers for complex or high-risk candidates.
 

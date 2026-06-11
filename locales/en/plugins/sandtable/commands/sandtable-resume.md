@@ -17,7 +17,7 @@ Go back to `being-truthful` only when you detect contradiction or missing inform
 
 8. When done, load `skills/closing-the-loop/SKILL.md`, read `state.md`, and output the close block (skip for in-command chain steps; use status bulletin for in-chain switches). Do not run unlisted next phases except `/sandtable-autopilot` and `/sandtable-rehearse`.
 
-## Feature Addendum: Minimum Coverage, Autonomous Judgment, Resume Gate
+## Minimum Coverage, Autonomous Judgment, Resume Gate
 
 - `autonomy.min_rounds` and `autonomy.min_agents_per_round` mean minimum coverage, defaulting to `{ mental: 1, redteam: 1, impl: 1 }`. Do not migrate or overwrite historical features that already recorded 3/3/2.
 - Only a cold start initializes `phase=RECON` and runs the full `RECON -> OBJECTIVES -> TESTCASES -> PLAN` document chain. If `state.md` or any feature artifact already exists, resume in place and preserve existing `min_rounds`, `min_agents_per_round`, `completed_rounds`, and `phase`.
@@ -26,7 +26,7 @@ Go back to `being-truthful` only when you detect contradiction or missing inform
 - Rehearsal scheduling first fills mental -> redteam -> impl minimum coverage. Once minimum coverage is met, the main agent decides autonomously whether to add more rehearsal or enter `EVALUATE`, based on risk, change surface, lessons hit, recently fixed anomalies, implementation divergence, test confidence, and spot checks. Do not ask the user whether to continue unless truly blocked.
 - Implementation `DONE` is not enough to count the impl round or enter `EVALUATE`; the completeness gate must pass, and EVALUATE must re-check the current PRD/tests/plan structured baseline, coverage matrix, live TODO table, and real diff / changed file list.
 
-## Feature Addendum: Execute Already-Selected Paths and Persist PRD Evidence
+## PRD Confirmation Gate and Executing Already-Selected Paths
 
 - Priority: real blockers (`blocked=true`, missing product intent, permission, login, external resource, or key fact) come first and require `questions.md`, `blocked=true`, and a question; the PRD confirmation gate comes next; only then execute the user's selected path.
 - If the user already selected the next step via AskQuestion or clearly wrote “confirm and continue / continue with X / choose X”, and there is no real blocker, the agent must execute that step in the same turn. Do not ask again and do not merely print the same copy-paste command.

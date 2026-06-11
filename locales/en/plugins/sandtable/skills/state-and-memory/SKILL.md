@@ -133,7 +133,7 @@ Autopilot continuation must follow this exact branch:
 | "I’ll edit an old journal entry to fix it." | History is append-only. Fixes are new entries. |
 | "We’re blocked, but I’ll keep doing other parts." | `blocked=true` means the main flow stops. Resolve `questions.md` first. |
 
-## Feature Addendum: Minimum Coverage, Autonomous Judgment, Resume Gate
+## Minimum Coverage, Autonomous Judgment, Resume Gate
 
 - `autonomy.min_rounds` and `autonomy.min_agents_per_round` mean minimum coverage, defaulting to `{ mental: 1, redteam: 1, impl: 1 }`. Do not migrate or overwrite historical features that already recorded 3/3/2.
 - Only a cold start initializes `phase=RECON` and runs the full `RECON -> OBJECTIVES -> TESTCASES -> PLAN` document chain. If `state.md` or any feature artifact already exists, resume in place and preserve existing `min_rounds`, `min_agents_per_round`, `completed_rounds`, and `phase`.

@@ -52,16 +52,16 @@ Load `closing-the-loop` only when a **Sandtable work step** ends. **Do not** clo
 
 `/sandtable-start` (first five steps), `/sandtable-autopilot` (advance from raw request through debrief unattended), `/sandtable-recon` (reconnaissance), `/sandtable-objectives` (goals and red lines), `/sandtable-plan` (plan), `/sandtable-refine` (iterate and revise), `/sandtable-mental` (mental rehearsal), `/sandtable-redteam` (red-team attack), `/sandtable-live` (implementation rehearsal), `/sandtable-debrief` (score and choose), `/sandtable-rehearse` (run rehearsals plus debrief only), `/sandtable-bug` (intake acceptance feedback), `/sandtable-bugfix` (evidence-driven root-cause fix), `/sandtable-status` (status report), `/sandtable-resume` (resume from disk state).
 
-## Feature Addendum: Real-Issue Mental Rehearsal
+## Issue Grading and Restraint (P0–P3)
 
-- Mental rehearsal is for real issues that affect PRD/plan/code-reality closure, acceptance, implementation feasibility, or key decisions.
-- Do not manufacture `ANOMALY_FOUND` from unrelated edge cases, impossible triggers, or scenarios that cannot affect acceptance.
-- The truthfulness rule still applies: do not continue with key unknowns. Irrelevant side questions become residual risk, not anomaly.
-- If `prd.md` exists without traceable developer confirmation, do not dispatch mental subagents. If the same message confirms the PRD, persist the confirmation evidence to `state.md` or `journal.md` before or while dispatching.
+Issues found by rehearsal must be **graded from the user's point of view**, not piled up for "logical perfection". Grade on four axes: trigger probability (always/likely/unlikely/theoretical) × functional impact (core unusable · data loss · redline / important degraded / cosmetic) × recoverability (no workaround / retry recovers / auto-recovers) × user perception (obvious/minor/none).
 
-## Feature Addendum: Real Reproducible Breaches
+- **P0/P1** (always/likely + core damage · MUST·MUST-NOT violation · hard to self-recover, or unlikely but severe) → drive the fix loop as `ANOMALY_FOUND`/`BREACH_FOUND`.
+- **P2/P3** (edge cases, retryable/auto-recoverable, basically no perception) → residual risk, explain to the developer who decides; do not auto-rerun.
+- **Many P0/P1 in one round → suspect the design itself**, go back to PLAN/OBJECTIVES, don't patch one by one.
+- Explain each round in plain language to the developer: what was found, what grade, real user impact, recommendation.
+- Not every change runs all three rehearsals: judge risk first, then intensity; trivial changes may skip rehearsal (journal the reason); autopilot keeps its minimum-coverage floor. See `using-sandtable`.
 
-- OPFOR must not help the design, but it also must not invent impossible or unrelated attack surfaces just to win.
-- Return `BREACH_FOUND` only for real, relevant, reproducible breaks against PRD acceptance, MUST/MUST-NOT, plan, or implementation behavior.
-- Vague risk, speculation, missing trigger steps, or unrelated scenarios are residual risk, not breach.
-- If `prd.md` exists without traceable developer confirmation, do not dispatch OPFOR. If the same message confirms the PRD, persist the confirmation evidence before or while dispatching.
+## PRD Confirmation Gate
+
+- If `prd.md` exists without traceable developer confirmation, do not dispatch mental/OPFOR subagents. If the same message confirms the PRD, persist the confirmation evidence to `state.md` or `journal.md` before or while dispatching.

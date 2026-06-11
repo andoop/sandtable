@@ -3,72 +3,70 @@ description: Sandtable 沙盘推演驱动开发方法论。当用户要新增/�
 alwaysApply: true
 ---
 
-# Sandtable · 沙盘推演驱动开发（行为基线）
+# Sandtable · 沙盘推演驱动开发 — Agent 行为基线
 
-本项目使用 Sandtable 方法论。任何"构建/修改功能、写需求、做计划"的任务，必须按以下基线执行；遇到决策点时，按需读取 `skills/<name>/SKILL.md` 加载对应技能的完整内容再执行。
+> 本文件适用于任何 coding agent（Cursor / Claude Code / Codex / Gemini 等）。
+> Cursor 用户：等价内容已放在 `.cursor/rules/sandtable.mdc`（`alwaysApply: true`）。
+> Claude Code：`CLAUDE.md` 软链接到本文件。
 
-## 四条不可违背的底线（实事求是）
+## 你是谁、要做什么
 
-1. **不猜测、不捏造**：不清楚的事不靠想象补全。通过①读代码 ②读文档 ③问开发者 三种途径弄清，并把结论写回 PRD/计划/状态。
-2. **先思考再动手**：显式列出假设；有多种解释就全部摆出而不是默默选一个；有更简单的方案要说出来。
-3. **外科手术式改动**：只改必须改的；不顺手"优化"无关代码；不做兜底逻辑、不节外生枝；每一行改动都能追溯到需求。
-4. **目标驱动**：把任务转成可验证的成功标准，循环到验证通过为止。
+你在用 Sandtable 方法论工作。目标：把一句简单描述或一份粗糙需求，做成开发者**真正想要**的功能——逻辑闭环、产品闭环、细节完美。手段是一个循环：**制定计划 → 预演 → 发现问题 → 修正计划 → 再预演**，直到所有预演顺利，再择优落地。
 
-> 违反规则的字面，就是违反规则的精神。"这个太简单不需要走流程"是最危险的合理化。
+## 四条不可违背的底线
 
-## 核心闭环（一场战役）
+1. **不猜测、不捏造，实事求是。** 不清楚的，通过读代码、读文档、问开发者弄清楚，并写回 PRD/计划/状态。绝不用想象填补空白。
+2. **先思考再动手。** 显式列假设；多解都摆出来；有更简单方案就说；不清楚就停下来问。
+3. **外科手术式改动。** 只动必须动的；不做兜底、不加未要求的"灵活性"、不节外生枝；每行改动可追溯到需求。
+4. **目标驱动。** 任务转成可验证的成功标准，循环到通过。
 
-```
-INTAKE → RECON → OBJECTIVES → 测试用例 → PLAN → 头脑预演 → 红蓝对抗 → 实现预演 → 复盘择优 → INTEGRATE → VERIFY → DONE → FEEDBACK（落地后闭环·可重入）
-        ↑______ 任一推演发现异常/被攻破/意外 → 亲自核实 → 问开发者 → 修正目标/计划 → 重演 ______↑
-```
+**违反字面就是违反精神。** "太简单不用走流程"是最危险的合理化——所有需求都走流程，简单的流程可以很短。
 
-- **落地后闭环（FEEDBACK）**：DONE 后用户验收反馈进入；每条逃逸的 bug=一处推演盲区，缺陷类经 bugfix 根因（必靠日志100%）→修复→回归用例→教训，教训累积进全局 `lessons.md` 反哺未来 RECON/红军/PRD。FEEDBACK 人在环，autopilot 不驱动。
+## 核心闭环（状态机）
 
-- **三类推演三位一体**（"推演"是统称）：头脑预演（问逻辑通不通）、红蓝对抗（红军 OPFOR 专攻找破绽，问能不能被打破）、实现预演（隔离 worktree 真改代码，问做出来对不对）。
-- 推演必须在**隔离的子 agent** 中进行，可并行多个；返回信号 `LOGIC_CLOSED`/`HELD`/`DONE` 或 `ANOMALY_FOUND`/`BREACH_FOUND`/`BLOCKED`。
-- **只要任一推演发现与计划不符、意料之外、或被红军攻破，立即终止并上报**；主 agent 亲自核实，给方案或向开发者求助，修正后重演，直到全线顺利，再复盘择优落地。
+`INTAKE → RECON → OBJECTIVES → TESTCASES → PLAN → MENTAL_REHEARSAL → REDTEAM → IMPL_REHEARSAL → EVALUATE → INTEGRATE → VERIFY → DONE → FEEDBACK`
 
-## Slash 命令（每个=一个战术动作）
+任一预演发现会影响闭环、验收、实现可行性或关键决策的异常/意外 → 主 agent 亲自核实 → 给方案或问开发者 → 修正 PRD/计划 → 重演。循环往复，逐步加固逻辑，直至完美。
 
-`/sandtable-start` 受领任务·前五步 · `/sandtable-autopilot` 自动推进·从需求到复盘无人值守执行 · `/sandtable-recon` 侦察 · `/sandtable-objectives` 目标红线 · `/sandtable-plan` 计划 · `/sandtable-refine` 迭代完善 · `/sandtable-mental` 头脑预演 · `/sandtable-redteam` 红蓝对抗 · `/sandtable-live` 实现预演 · `/sandtable-debrief` 复盘择优 · `/sandtable-rehearse` 联合预演·只跑推演与复盘 · `/sandtable-bug` 受理验收反馈 · `/sandtable-bugfix` 证据驱动根因修障 · `/sandtable-status` 战报 · `/sandtable-resume` 接防续接
+**落地后闭环（FEEDBACK，可重入）**：DONE 后用户验收反馈进入；缺陷类经 bugfix 根因（必靠日志100%确认）→修复→回归用例→教训，教训累积进全局 `lessons.md` 反哺未来推演。FEEDBACK 人在环，autopilot 不驱动（其范围止于 EVALUATE/DONE）。
 
-## 状态与记忆（换人/换AI可续）
+## 预演的两条铁律
 
-所有过程持久化到目标项目的 `docs/sandtable/`：全局 `project.md`（目标）、`constraints.md`（红线 MUST/MUST-NOT）、`lessons.md`（全局教训台账·跨 feature 累积），每个需求一个目录含 `prd.md` `tests.md`（测试用例）`plan.md` `state.md`（状态机）`journal.md`（追加式记忆）`questions.md`（阻塞问题）`feedback.md`（验收反馈台账）。异常退出后用 `/sandtable-resume` 从这些文件恢复。
+1. **任一预演只要发现与计划不符、意料之外、之前没注意到的事，立即终止并上报。** 不要"顺手修一下继续跑"。
+2. **预演在隔离子 agent 中进行，可并行多个。** 实现预演必须各自在独立 git worktree/分支，避免互相污染。
 
-## 技能索引（按需加载完整内容）
+## 优先级
 
-- `using-sandtable` — 方法总览、状态机与触发规则
-- `being-truthful` — 实事求是 / 不猜测的硬门禁
-- `state-and-memory` — 状态机与持久化记忆机制
-- `gathering-intel` — 战场侦察：主动收集情报、列未知、提问
-- `writing-prd` — 写目标、PRD、红线（MUST/MUST-NOT）
-- `writing-tests` — 写黑盒测试用例（检验 AI 理解的闸门）
-- `writing-plan` — 写细到可执行的改动计划
-- `autonomous-orchestration` — 自动推进：从需求到复盘无人值守执行
-- `mental-rehearsal` — 头脑预演（隐喻：图上作业 / 只读逻辑推演）
-- `red-team-wargame` — 红蓝对抗 OPFOR（专攻找破绽）
-- `implementation-rehearsal` — 实现预演（隐喻：实兵演习 / 真改代码）
-- `evaluating-rehearsals` — 战损复盘：评分与择优
-- `closing-the-loop` — 回合收尾：战况、可复制模版、AskQuestion 纪律
-- `triaging-feedback` — 验收反馈分诊：生命周期、用户确认关闭、三件套、教训沉淀
-- `bugfix-with-evidence` — bugfix 模式：日志100%锁根因、自动收集、调查分队、禁表面/临时修复
+用户的显式指令 > Sandtable 方法论 > 默认行为。若用户说"跳过流程/直接改"，照做，但提醒可能的风险。
+
+## 三类推演（"推演"是统称）
+
+- **头脑预演（`mental-rehearsal`，隐喻：图上作业）**：只读推演逻辑闭环。
+- **红蓝对抗（`red-team-wargame`）**：红军 OPFOR 子 agent 专攻找破绽，每记可复现杀招=一个 anomaly。
+- **实现预演（`implementation-rehearsal`，隐喻：实兵演习）**：隔离 worktree 真改代码、完整实现。
+
+## 技能索引
+
+需要时读取对应 `skills/<name>/SKILL.md` 的完整内容：`using-sandtable`、`being-truthful`、`state-and-memory`、`gathering-intel`、`writing-prd`、`writing-tests`、`writing-plan`、`autonomous-orchestration`、`mental-rehearsal`、`red-team-wargame`、`implementation-rehearsal`、`evaluating-rehearsals`、`closing-the-loop`、`triaging-feedback`、`bugfix-with-evidence`。
 
 ## 回合收尾（FR8）
 
 仅 **Sandtable 工作步**结束且需确认/选下一步时加载 `closing-the-loop`。**禁止**对非 Sandtable 任务（如修 typo）输出收尾，即使本回合读过 `docs/sandtable/`。
 
-## 本需求补充 · 真实问题口径
+## Slash 命令（每个=一个战术动作，可单独触发/反复迭代）
 
-- 头脑推演的目标是发现会影响 PRD/plan/code reality 闭环、验收、实现可行性或关键决策的真实问题。
-- 不为了制造 `ANOMALY_FOUND` 构造与本需求无关、无现实触发路径、不会影响验收的偏题场景。
-- `being-truthful` 的不猜测原则继续适用：关键未知不能带着继续；但无关边缘疑问不得因为泛化措辞升级为 anomaly。
-- 若 `prd.md` 已存在但无可核实开发者确认记录，不得派发 mental 子 agent；同条消息确认 PRD 时，必须在派发前或同时把确认证据持久化到 `state.md` 或 `journal.md`。
+`/sandtable-start`（受领任务·前五步）、`/sandtable-autopilot`（自动推进·从需求到复盘无人值守执行）、`/sandtable-recon`（战场侦察）、`/sandtable-objectives`（指挥官意图·目标红线）、`/sandtable-plan`（作战计划）、`/sandtable-refine`（调整部署·迭代完善）、`/sandtable-mental`（头脑预演）、`/sandtable-redteam`（红蓝对抗）、`/sandtable-live`（实现预演）、`/sandtable-debrief`（战损复盘·择优）、`/sandtable-rehearse`（联合预演·只跑推演与复盘）、`/sandtable-bug`（受理验收反馈）、`/sandtable-bugfix`（证据驱动根因修障）、`/sandtable-status`（战报）、`/sandtable-resume`（接防·重获记忆）。
 
-## 本需求补充 · 真实可复现攻破口径
+## 问题分级与克制（P0–P3）
 
-- 红军不替方案找补，但也不能为了击溃而发明无现实触发路径的脑洞。
-- 只有真实、相关、可复现地攻破 PRD 验收、MUST/MUST-NOT、计划或实现路径时，才返回 `BREACH_FOUND`。
-- 空泛风险、纯猜测、无输入/步骤/证据、与本需求无关的场景可记录为残余风险或下一轮重点，但不得驱动修正循环。
-- 若 `prd.md` 已存在但无可核实开发者确认记录，不得派发红军；同条消息确认 PRD 时，必须在派发前或同时持久化确认证据。
+推演发现的问题必须**站在用户使用角度分级**，不为"逻辑完美"凑数。判级看四维：触发概率（必现/大概率/小概率/仅理论）× 功能影响（核心不可用·数据损坏·违反红线 / 重要受损 / 瑕疵）× 可恢复性（无法绕过 / 重试可救 / 自动救回）× 用户感知（明显/轻微/无感）。
+
+- **P0/P1**（必现或大概率且核心受损·违反 MUST·MUST-NOT·难自救，或小概率但后果严重）→ 作为 `ANOMALY_FOUND`/`BREACH_FOUND` 驱动修正循环。
+- **P2/P3**（边缘场景、可重试/可自动救回、用户基本无感）→ 记为残余风险，向开发者说明，由其拍板，不自动拉起重演。
+- **一轮冒出大量 P0/P1 → 先怀疑方案本身**，回 PLAN/OBJECTIVES 重审，别逐条打补丁。
+- 每轮结论用人话向开发者解释：发现什么、定几级、对用户的真实影响、建议怎么办。
+- 不是每个需求都跑满三类推演：先判风险再定强度，trivial 改动可免推演（journal 记理由）；autopilot 保留其最低覆盖底线。详见 `using-sandtable`。
+
+## PRD 确认门禁
+
+- 若 `prd.md` 已存在但无可核实开发者确认记录，不得派发 mental/红军子 agent；同条消息确认 PRD 时，必须在派发前或同时把确认证据持久化到 `state.md` 或 `journal.md`。
