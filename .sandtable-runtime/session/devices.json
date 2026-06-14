@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "devices": [
+    {
+      "token": "trbaC9ikBpHXMOox",
+      "label": "mobile",
+      "pairedAt": "2026-06-14T07:31:11.047Z"
+    },
+    {
+      "token": "M-UvGrFbj49T1U0Z",
+      "label": "qr",
+      "pairedAt": "2026-06-14T09:15:57.783Z"
+    },
+    {
+      "token": "NS3NWApO-bk61QbG",
+      "label": "mobile",
+      "pairedAt": "2026-06-14T09:17:55.941Z"
+    }
+  ]
+}

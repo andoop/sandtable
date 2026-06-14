@@ -116,6 +116,16 @@ Only when this turn is a **Sandtable work step** (positive trigger in `closing-t
 | "I already know this workflow; I don’t need to read the skill." | Skills evolve. Read the current version on demand. |
 | "Adding a fallback or extra flexibility would be safer." | Do not add unrequested fallback logic or side quests. Keep changes surgical. |
 
+## Mobile Review Companion (Optional)
+
+If a project explicitly enables the Sandtable mobile review runtime, the main agent should sync the current feature state after each phase action and keep the agent pipeline in working state until a computer-side stop, stop mailbox event, or explicit developer stop request arrives.
+
+- When MCP is available, prefer the Sandtable MCP handler for phase, document summary, pending confirmation, and blocked-state sync.
+- Without MCP, write `.sandtable-runtime/mailbox/inbox/` messages according to `docs/mobile-review-companion/protocol.md`.
+- Before ending a phase action, the main agent must renew `.sandtable-runtime/session/continuation.json` and hand mailbox waiting to one or more cheap/free waiting workers.
+- Waiting workers may only wait, deduplicate, renew leases, notify, relay, or stop. Unless explicitly assigned, they must not edit PRD/tests/plan or make product decisions for the main agent.
+- If the runtime is not explicitly enabled, do not start the server, do not write mailbox messages, and do not change the default Sandtable flow.
+
 ## Relationship to Existing Methodologies
 
 Sandtable absorbs Karpathy’s four principles (no guessing, minimalism, surgical changes, goal-driven work) and the subagent orchestration ideas from superpowers, then adds **three kinds of rehearsal (mental / red-team / implementation) + a persistent state machine + an anomaly-driven fix loop**. If a project already has superpowers installed, you may still reuse its `test-driven-development`, `requesting-code-review`, and `finishing-a-development-branch` skills during `INTEGRATE` / `VERIFY`.

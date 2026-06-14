@@ -1,0 +1,13 @@
+{
+  "id": "20260614T073111050Z-mobile-1-X-nMgr",
+  "feature": "2026-06-13-mobile-on-demand-sync",
+  "sessionId": "sess_lOuzQMt00pj8",
+  "source": "mobile",
+  "type": "mobile_paired",
+  "createdAt": "2026-06-14T07:31:11.050Z",
+  "payload": {
+    "code": "6656",
+    "publicUrl": "http://192.168.5.198:8765",
+    "sessionId": "sess_lOuzQMt00pj8"
+  }
+}

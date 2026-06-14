@@ -1,0 +1,18 @@
+{
+  "id": "20260614T080345438Z-mobile-EoeFBw0s",
+  "feature": "2026-06-13-mobile-on-demand-sync",
+  "sessionId": "sess_lOuzQMt00pj8",
+  "agent": {
+    "id": "custom-NCTtLbBi",
+    "kind": "custom",
+    "name": "Sandtable agent"
+  },
+  "source": "mobile",
+  "type": "chat_message",
+  "createdAt": "2026-06-14T08:03:45.438Z",
+  "payload": {
+    "text": "那手机端可以同时处理多仓库所服务端吗",
+    "target": "conversation",
+    "kind": "chat"
+  }
+}

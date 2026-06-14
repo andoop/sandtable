@@ -1,0 +1,18 @@
+{
+  "id": "20260614T074806682Z-mobile-59qhXIKF",
+  "feature": "2026-06-13-mobile-on-demand-sync",
+  "sessionId": "sess_lOuzQMt00pj8",
+  "agent": {
+    "id": "custom-NCTtLbBi",
+    "kind": "custom",
+    "name": "Sandtable agent"
+  },
+  "source": "mobile",
+  "type": "chat_message",
+  "createdAt": "2026-06-14T07:48:06.682Z",
+  "payload": {
+    "text": "你有结合最新代码去看吗",
+    "target": "conversation",
+    "kind": "chat"
+  }
+}

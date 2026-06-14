@@ -1,0 +1,24 @@
+{
+  "version": 1,
+  "sessions": [
+    {
+      "id": "sess_lOuzQMt00pj8",
+      "title": "2026-06-13-mobile-on-demand-sync",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "workspace": "/Users/andoop/Documents/projects/sss/sandtable",
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "status": "active",
+      "phase": "VERIFY",
+      "blocked": false,
+      "paired": true,
+      "createdAt": "2026-06-14T04:38:48.964Z",
+      "updatedAt": "2026-06-14T09:30:43.092Z",
+      "lastActivityAt": "2026-06-14T09:30:43.092Z",
+      "summary": "收到，确实有这个问题 🛠 根因是消息高度不一时 ListView 估算的底部不准。我改成 reverse 列表(最新消息天然置底,进入即在底),马上修。"
+    }
+  ]
+}

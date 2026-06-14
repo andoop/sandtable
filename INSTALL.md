@@ -45,6 +45,7 @@ English official prompt:
 - `AGENTS.md` 仍是受保护文件、绝不覆盖；但在本次 locale-pack 安装规则下，它同时属于语言相关资产，所以只要 `AGENTS.md` 已存在，就视为 locale-pack 冲突，停止复制该语言包并如实报告，而不是继续追加。
 - 外科手术式：只安装本说明列出的文件；不要顺手安装其它仓库文件。
 - 诚实报告（硬性）：只要跳过的是核心项（`skills/`、`templates/`、`commands/`、`plugins/sandtable/commands`、`plugins/sandtable/skills`、`AGENTS.md`、`.cursor/rules/sandtable.mdc`、`plugins/sandtable/.codex-plugin/plugin.json`、`.agents/plugins/marketplace.json`、`hooks/run-hook.cmd`、`hooks/session-start` 之一），最终都必须报告“安装不完整”。存在性检查只是辅助，跳过清单才是权威。
+- Mobile Review Companion 是可选 runtime；本安装流程不安装 Node、Flutter、Dart 或 runtime 依赖。需要手机审阅时，安装方法论资产后再按 `docs/mobile-review-companion/runtime.md` 显式启用。
 
 ### 2. 取得 Sandtable 源
 

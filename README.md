@@ -105,6 +105,12 @@ English：
 - `/sandtable-resume`: 按 `state.md` 与 `journal.md` 恢复现场继续。
 - `/sandtable-status`: 查看阶段、任务、推演结果和未决问题。
 
+## Mobile Review Companion（可选）
+
+Sandtable 现在包含一个可选 mobile review runtime：本机/局域网 server、MCP 风格 handler、文件信箱 fallback、长驻 waiting worker 队列，以及 Android/iOS Flutter App。它用于在手机上查看 PRD/tests/plan/state/journal/questions，并提交确认或回答。
+
+默认 Sandtable 方法论安装仍不安装 Node、Flutter、Dart 或 runtime 依赖。启用移动端审阅时，按 [`docs/mobile-review-companion/runtime.md`](docs/mobile-review-companion/runtime.md) 单独启动。
+
 ## Sandtable vs Superpowers
 [Superpowers](https://github.com/obra/superpowers) 是一套优秀的、被广泛使用的 agent 方法论，Sandtable 与它同源同宗：都不让 agent“看见需求就开写”，都用自动触发的 skill、都在隔离 worktree 里干活、都把设计落盘。
 

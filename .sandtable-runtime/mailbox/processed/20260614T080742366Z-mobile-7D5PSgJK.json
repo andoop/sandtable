@@ -1,0 +1,18 @@
+{
+  "id": "20260614T080742366Z-mobile-7D5PSgJK",
+  "feature": "2026-06-13-mobile-on-demand-sync",
+  "sessionId": "sess_lOuzQMt00pj8",
+  "agent": {
+    "id": "custom-NCTtLbBi",
+    "kind": "custom",
+    "name": "Sandtable agent"
+  },
+  "source": "mobile",
+  "type": "chat_message",
+  "createdAt": "2026-06-14T08:07:42.366Z",
+  "payload": {
+    "text": "当前子agent 轮训原理 耗token吗",
+    "target": "conversation",
+    "kind": "chat"
+  }
+}

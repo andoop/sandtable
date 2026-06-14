@@ -1,0 +1,18 @@
+{
+  "id": "20260614T080103484Z-mobile-NbHcDcUE",
+  "feature": "2026-06-13-mobile-on-demand-sync",
+  "sessionId": "sess_lOuzQMt00pj8",
+  "agent": {
+    "id": "custom-NCTtLbBi",
+    "kind": "custom",
+    "name": "Sandtable agent"
+  },
+  "source": "mobile",
+  "type": "chat_message",
+  "createdAt": "2026-06-14T08:01:03.484Z",
+  "payload": {
+    "text": "不同的agent 客户端 用的都是同一份服务器实例吗",
+    "target": "conversation",
+    "kind": "chat"
+  }
+}

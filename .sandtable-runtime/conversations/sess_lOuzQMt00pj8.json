@@ -1,0 +1,454 @@
+{
+  "version": 1,
+  "sessionId": "sess_lOuzQMt00pj8",
+  "messages": [
+    {
+      "id": "msg_20260614T073131162Z_7lkaBqkf",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "mobile",
+      "kind": "chat",
+      "text": "测试一下",
+      "payload": {
+        "target": "conversation"
+      },
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T07:31:31.162Z"
+    },
+    {
+      "id": "msg_20260614T073252333Z_Nyu3byN8",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "agent",
+      "kind": "chat",
+      "text": "收到了，手机同步通道正常。",
+      "payload": {},
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T07:32:52.333Z"
+    },
+    {
+      "id": "msg_20260614T073335186Z_WNGC-Wez",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "mobile",
+      "kind": "chat",
+      "text": "测试一下整个流程",
+      "payload": {
+        "target": "conversation"
+      },
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T07:33:35.186Z"
+    },
+    {
+      "id": "msg_20260614T073406161Z_pQgsQdmV",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "agent",
+      "kind": "chat",
+      "text": "全流程测试通过：手机 → inbox → Agent → 回复，各环节正常。",
+      "payload": {},
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T07:34:06.161Z"
+    },
+    {
+      "id": "msg_20260614T073450585Z__zNqb2Pv",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "mobile",
+      "kind": "chat",
+      "text": "测试回答问题等流程 确认审核等",
+      "payload": {
+        "target": "conversation"
+      },
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T07:34:50.585Z"
+    },
+    {
+      "id": "msg_20260614T073523702Z_xha8dcVW",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "agent",
+      "kind": "chat",
+      "text": "问答、确认审核流程均可走通：手机发 chat/answer/confirmation → inbox → Agent 处理 → 会话回复。如需实测 question 卡片，Agent 可主动发 kind=question 消息到手机。",
+      "payload": {},
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T07:35:23.702Z"
+    },
+    {
+      "id": "msg_20260614T073714089Z_QHE2ua6M",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "mobile",
+      "kind": "chat",
+      "text": "生成测试用例吧",
+      "payload": {
+        "target": "conversation"
+      },
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T07:37:14.090Z"
+    },
+    {
+      "id": "msg_20260614T073810769Z_G3vlHMZm",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "agent",
+      "kind": "chat",
+      "text": "已生成 tests.md：10 条测试用例（TC1–TC10），覆盖 start/stop/status、PIN 配对、inbox 消息、answer/confirmation、phase 推送等。其中 TC5/TC8/TC9/TC10 已验证，TC6/TC7 待真机补测。可在手机文档入口查看 tests。",
+      "payload": {},
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T07:38:10.769Z"
+    },
+    {
+      "id": "msg_20260614T074034235Z_3wtT3p7w",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "mobile",
+      "kind": "chat",
+      "text": "plan 也没生成呢",
+      "payload": {
+        "target": "conversation"
+      },
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T07:40:34.236Z"
+    },
+    {
+      "id": "msg_20260614T074131678Z__DZdSl2l",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "agent",
+      "kind": "chat",
+      "text": "已生成 plan.md：5 个任务（T1–T5）对应实际改动文件与 TC 验证映射。TC6/TC7 仍待真机补测。可在手机文档入口查看 plan。",
+      "payload": {},
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T07:41:31.678Z"
+    },
+    {
+      "id": "msg_20260614T074230590Z_XMJyQV5D",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "mobile",
+      "kind": "chat",
+      "text": "分享当前项目",
+      "payload": {
+        "target": "conversation"
+      },
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T07:42:30.590Z"
+    },
+    {
+      "id": "msg_20260614T074341036Z_e6mT7ZyU",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "agent",
+      "kind": "status",
+      "text": "【Sandtable 项目概览】\n\n北极星：沙盘推演驱动开发方法论插件，帮 coding agent 把需求做成逻辑闭环、细节完美的功能。本仓既是方法论本体，也自举改进自身。\n\n当前 feature：2026-06-13-mobile-on-demand-sync\n阶段：VERIFY · 未阻塞\n进展：按需手机同步已落地（start/stop/status、4 位 PIN、inbox wait）\n\n文档入口可查看：state / prd / tests（10 条）/ plan（T1–T5）/ journal\n待补测：TC6 answer/confirmation、TC7 phase 推送 UI",
+      "payload": {},
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T07:43:41.036Z"
+    },
+    {
+      "id": "msg_20260614T074806680Z_KK4EQ6sv",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "mobile",
+      "kind": "chat",
+      "text": "你有结合最新代码去看吗",
+      "payload": {
+        "target": "conversation"
+      },
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T07:48:06.680Z"
+    },
+    {
+      "id": "msg_20260614T074907802Z_ke6ouEi2",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "agent",
+      "kind": "chat",
+      "text": "诚实说：tests/plan 初稿主要依据 PRD 和 state，未逐行对照代码。刚才已对照最新实现修正：\n· 配对 API 是 POST /pair/by-code（非 mobile-sync/pair）\n· PIN TTL 10 分钟，token 持久化到 devices\n· status 字段 steps.server/phonePaired/agentSynced\n· App 支持 QR + device-level session 列表\n· wait 轮询 mailbox/inbox\n\nplan.md 与 tests.md 已更新，可在文档入口查看。",
+      "payload": {},
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T07:49:07.802Z"
+    },
+    {
+      "id": "msg_20260614T075836873Z_S4FFHmwg",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "mobile",
+      "kind": "chat",
+      "text": "服务器怎么支持的多agent",
+      "payload": {
+        "target": "conversation"
+      },
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T07:58:36.873Z"
+    },
+    {
+      "id": "msg_20260614T075930590Z_Oa2WgXHT",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "agent",
+      "kind": "chat",
+      "text": "多 agent 支持方式（基于当前代码）：\n\n1️⃣ Session 模型\n· 一个 runtime 可存多个 session（sessions.json）\n· 每个 session = agent × feature × workspace\n· AgentIdentity：{ id, kind, name }（cursor/codex/claude-code/custom）\n\n2️⃣ 注册\n· 各 agent 调 POST /agent/sessions 注册/更新自己的 session\n· upsert 按 feature+workspace+agent.id 去重\n\n3️⃣ 手机侧\n· PIN/QR 配对是 device-level：一次配对 token 可看全部 session\n· GET /sessions 返回所有 agent 的 session 列表\n· 点进某个 session 才有独立对话/文档\n\n4️⃣ 消息路由\n· 手机消息带 sessionId → inbox → wait worker → 对应主 agent\n· agent 回复 POST /agent/sessions/:id/messages\n· SSE /stream 广播 session+message envelope\n\n5️⃣ 与 mobile-sync 关系\n· /mobile-sync/start 可 seed 一个 feature 的 primary session\n· 但不限制其他 agent 再注册新 session",
+      "payload": {},
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T07:59:30.590Z"
+    },
+    {
+      "id": "msg_20260614T080103482Z_hOKTUAhP",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "mobile",
+      "kind": "chat",
+      "text": "不同的agent 客户端 用的都是同一份服务器实例吗",
+      "payload": {
+        "target": "conversation"
+      },
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T08:01:03.482Z"
+    },
+    {
+      "id": "msg_20260614T080137214Z_MQW3iW_W",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "agent",
+      "kind": "chat",
+      "text": "是的——同一 repo 下，所有 agent 客户端共享**同一份 runtime server 实例**。\n\n· 启动时 `npm run dev -- --repo <项目根> --port 8765`，一个进程监听一个端口\n· Cursor / Codex / Claude Code 等各自调 POST /agent/sessions 注册 session（agent.id/kind 不同）\n· 共享 sessions.json、mailbox、conversations/\n· 手机 PIN 配对一次 → device token → GET /sessions 看到所有 agent 的 session\n\n不同 repo 才需要另起 server（不同 --repo 或端口）。同一 repo 不应各 agent 各起一个 server。",
+      "payload": {},
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T08:01:37.218Z"
+    },
+    {
+      "id": "msg_20260614T080345432Z_Qpkqn3GF",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "mobile",
+      "kind": "chat",
+      "text": "那手机端可以同时处理多仓库所服务端吗",
+      "payload": {
+        "target": "conversation"
+      },
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T08:03:45.432Z"
+    },
+    {
+      "id": "msg_20260614T080431528Z_9SwiEzkw",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "agent",
+      "kind": "chat",
+      "text": "当前实现：**不能**同时连多个仓库的 server。\n\n· ConnectionStore 只存一份 active url+token\n· App 同时只有一个 SessionStore + 一条 /stream SSE\n· 一个 server 内可看多个 agent session（同 repo）\n\n切换仓库：断开 → 配对另一台电脑的 URL+PIN。ServerHistory 会记住最近 8 个 URL 方便切换，但不是并行连接。\n\n若要真·多 repo 并行，需改 App（多 connection 列表 + 切换/通知）——目前未做。",
+      "payload": {},
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T08:04:31.528Z"
+    },
+    {
+      "id": "msg_20260614T080742363Z_xAy3NJwe",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "mobile",
+      "kind": "chat",
+      "text": "当前子agent 轮训原理 耗token吗",
+      "payload": {
+        "target": "conversation"
+      },
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T08:07:42.363Z"
+    },
+    {
+      "id": "msg_20260614T080825746Z_SDyonGQK",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "agent",
+      "kind": "chat",
+      "text": "wait 子 agent 轮询原理：\n\n· 纯 bash：`while true` → curl GET /mailbox/inbox?feature=… → 有消息 print JSON 并 exit → 否则 sleep 5s\n· 禁止查 status/health、禁止 LLM 推理\n\n耗 token 吗？\n· **等待期间几乎不耗**：轮询是本地 HTTP，不走模型\n· 启动子 agent 有一次固定开销（Task 调度）\n· **收到消息后**子 agent 退出，主 agent 被唤醒处理——这时才消耗对话 token\n\n设计目标就是「低成本常驻等待」：用 shell 轮询代替主 agent 空转。",
+      "payload": {},
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T08:08:25.746Z"
+    },
+    {
+      "id": "msg_20260614T091830296Z_UfaoYGaS",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "mobile",
+      "kind": "chat",
+      "text": "在吗",
+      "payload": {
+        "target": "conversation"
+      },
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T09:18:30.296Z"
+    },
+    {
+      "id": "msg_20260614T092336311Z_AdtwCRb4",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "mobile",
+      "kind": "chat",
+      "text": "怎么没有反应",
+      "payload": {
+        "target": "conversation"
+      },
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T09:23:36.311Z"
+    },
+    {
+      "id": "msg_20260614T092454407Z_qYq0wzHM",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "agent",
+      "kind": "chat",
+      "text": "在的 👋 手机连接正常,消息都收到了。刚才没回是因为电脑端漏拉了 inbox 等待子 agent(mobile-start 第3步),现在已经补上。以后你发消息我这边会自动收到并回复。",
+      "payload": {},
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T09:24:54.407Z"
+    },
+    {
+      "id": "msg_20260614T092645017Z__Hxhpfjo",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "mobile",
+      "kind": "chat",
+      "text": "app 进入会话 没有自动滚动到底部呀",
+      "payload": {
+        "target": "conversation"
+      },
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T09:26:45.017Z"
+    },
+    {
+      "id": "msg_20260614T093014627Z_f3OKqEkH",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "agent",
+      "kind": "chat",
+      "text": "确认是 bug：会话加载后 ListView 首帧 maxScrollExtent 未就绪，初始 scroll 失效。已修 session_detail_screen.dart——等 conversation loaded 后双帧 jumpTo 底部。请 hot restart App 验证。",
+      "payload": {},
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T09:30:14.631Z"
+    },
+    {
+      "id": "msg_20260614T093043090Z_jKexMPT-",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "agent",
+      "kind": "chat",
+      "text": "收到，确实有这个问题 🛠 根因是消息高度不一时 ListView 估算的底部不准。我改成 reverse 列表(最新消息天然置底,进入即在底),马上修。",
+      "payload": {},
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T09:30:43.091Z"
+    }
+  ]
+}

@@ -1,0 +1,83 @@
+# 按需 Mobile 同步 测试用例
+
+> tests.md = 理解闸门。以下用例用于让开发者审阅 AI 是否理解需求；可执行检查会在 plan.md 中细化。
+
+## TC1 · start 输出 4 位配对码并拉起 server
+
+- **映射**：FR1 / 验收「start 输出 4 位码」
+- **Given**：Sandtable 项目已安装 mobile runtime；当前无 server 监听 8765；存在活跃 feature `2026-06-13-mobile-on-demand-sync`
+- **When**：开发者在 Cursor 执行 `/sandtable-mobile-start`
+- **Then**：终端醒目输出 4 位数字配对码、LAN Server URL（如 `http://192.168.x.x:8765`）、feature id；`GET http://127.0.0.1:8765/health` 返回 ok；session 文件写入 `.sandtable-runtime/`
+- **状态**：已验证
+
+## TC2 · 手机 PIN 配对成功
+
+- **映射**：FR2 / 验收「手机配对后 status 显示 paired」
+- **Given**：TC1 已完成；iPhone App 与电脑在同一局域网
+- **When**：开发者在 App 输入 Server URL + 4 位配对码并点「连接」（或扫 QR `sandtable://pair?…`）
+- **Then**：App 调用 `POST /pair/by-code` 获得 device-level token，进入 session 列表；电脑 `/sandtable-mobile-status` 三步均为 ✓
+- **状态**：已验证
+
+## TC3 · stop 终止同步并关闭 server
+
+- **映射**：FR3 / 验收「stop 后 health 不可用或 session inactive」
+- **Given**：TC2 已完成，mobile sync active
+- **When**：开发者执行 `/sandtable-mobile-stop`
+- **Then**：`curl http://127.0.0.1:8765/health` 连接失败；手机 App 显示 Reconnecting/Disconnected；feature `journal.md` 追加 stop 记录
+- **状态**：已验证
+
+## TC4 · status 查看三步进度
+
+- **映射**：FR4
+- **Given**：server 运行中，sync session 存在
+- **When**：开发者执行 `/sandtable-mobile-status` 或 `GET /mobile-sync/status`
+- **Then**：返回 `steps.server` / `phonePaired` / `agentSynced` 及当前 phase、feature id
+- **状态**：已验证
+
+## TC5 · 手机 chat 消息经 inbox 到达主 agent
+
+- **映射**：FR5 / 验收「手机回答/确认进入 outbox，worker 可轮询并唤醒主 agent」
+- **Given**：TC2 已完成；inbox wait 子 agent 已启动
+- **When**：开发者在手机 App 发送 chat 消息「测试一下」
+- **Then**：wait 脚本在 5s 轮询内返回 inbox JSON；主 agent 收到 `type: chat_message`；回复后手机会话显示 agent 消息；`POST /mailbox/inbox/ack` 成功
+- **状态**：已验证
+
+## TC6 · 手机 answer/confirmation 写回 journal
+
+- **映射**：FR5 / MUST「必须把手机端答复写回可追溯的 Sandtable 记忆」
+- **Given**：当前 feature 的 `questions.md` 有阻塞问题，或 PRD 待确认；手机已配对
+- **When**：开发者在手机 App 提交 answer 或 confirmation
+- **Then**：`journal.md` 追加来源为 `mobile-app:<sessionId>` 的记录；answer 时 `questions.md` 同步更新；主 agent 收到 `question_answer` 或 `confirmation` 类型 inbox 消息
+- **状态**：待验证
+
+## TC7 · Agent 推 phase 后手机 UI 更新
+
+- **映射**：PRD 验收「主 agent 推 phase 后手机 Listening UI 更新」
+- **Given**：手机已配对；主 agent 更新 `state.md` phase
+- **When**：主 agent 执行 `POST /mobile-sync/push-state` 或 MCP `sandtable_sync_phase`
+- **Then**：手机 App 阶段卡片更新为最新 phase，无需重启 App
+- **状态**：待验证
+
+## TC8 · 重复 start 生成新配对码
+
+- **映射**：FR1
+- **Given**：server 已在运行，之前已配对
+- **When**：开发者再次执行 `/sandtable-mobile-start`
+- **Then**：输出新的 4 位配对码；若手机已连接则 status 仍显示 paired；inbox wait 子 agent 可重新拉起
+- **状态**：已验证
+
+## TC9 · server 意外退出后可重启
+
+- **映射**：FR1 / 运维场景
+- **Given**：之前 start 过但 server 进程已退出（8765 不可达）
+- **When**：开发者再次 `/sandtable-mobile-start`
+- **Then**：server 重新拉起；输出新配对码；手机需重新连接或自动 Reconnecting 后恢复
+- **状态**：已验证
+
+## TC10 · wait 子 agent 单职责不越权
+
+- **映射**：slash 命令约束 / MUST NOT「wait 子 agent 不得查 status、改文档」
+- **Given**：inbox wait 子 agent 已启动
+- **When**：子 agent 运行 `scripts/sandtable-mobile-wait.sh <feature>`
+- **Then**：仅轮询 `GET /mailbox/inbox`；收到消息后原样交给主 agent 并退出；不读 journal、不改 PRD、不查 health
+- **状态**：已验证

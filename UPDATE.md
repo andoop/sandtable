@@ -35,6 +35,7 @@ English official update prompt:
 - **外科手术式**：只更新下面列出的资产；不碰 `docs/sandtable/`、不碰清单外文件（如 `scripts/test-sandtable-init.sh`）。
 - **零依赖**：只用 POSIX sh/bash + coreutils；JSON 不依赖 jq/python/node。
 - **诚实报告**：任一核心资产同步失败/源缺失，报"更新不完整"。
+- Mobile Review Companion runtime 不随方法论资产更新自动安装或升级；更新流程不修改 `.sandtable-runtime/`、`runtime/server/node_modules`、Flutter build outputs 或 `docs/sandtable/` 战役记忆。
 
 ### 2. 取得最新源
 

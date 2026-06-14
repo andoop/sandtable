@@ -116,6 +116,16 @@ digraph sandtable {
 | "我记得这套流程，不用读 skill" | skill 会演进，按需读当前版本。 |
 | "加个兜底/灵活性更稳" | 不做未要求的兜底，不节外生枝（外科手术式改动）。 |
 
+## Mobile Review Companion（可选）
+
+若当前项目显式启用了 Sandtable mobile review runtime，主 agent 在完成阶段性动作后应同步当前 feature 状态，并保持 agent 流水线处于工作态，直到收到电脑端 stop、stop mailbox event 或开发者明确停止请求。
+
+- 支持 MCP 时，优先调用 Sandtable MCP handler 同步 phase、文档摘要、待确认事项和阻塞状态。
+- 不支持 MCP 时，按 `docs/mobile-review-companion/protocol.md` 写入 `.sandtable-runtime/mailbox/inbox/`。
+- 主 agent 阶段性动作结束前必须刷新 `.sandtable-runtime/session/continuation.json`，并把等待信箱职责交给一个或一组低成本/免费 waiting workers。
+- waiting workers 只能等待、去重、续租、通知、接力或停止；除非被明确分配职责，不得自行修改 PRD/tests/plan 或替主 agent 做产品裁决。
+- 未显式启用 runtime 时，不启动 server、不写 mailbox、不改变 Sandtable 默认流程。
+
 ## 与既有方法论的关系
 
 Sandtable 吸收了 Karpathy 的四原则（不猜测、极简、外科手术式、目标驱动）与 superpowers 的子 agent 编排思想，新增了**三类推演（头脑预演/红蓝对抗/实现预演）+ 持久状态机 + 异常驱动的修正循环**。若项目已装 superpowers，可在 INTEGRATE/VERIFY 阶段复用其 `test-driven-development`、`requesting-code-review`、`finishing-a-development-branch`。
