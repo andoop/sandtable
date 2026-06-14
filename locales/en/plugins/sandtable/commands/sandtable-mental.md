@@ -16,7 +16,7 @@ Iron law: read-only only; no code changes; stop immediately on anomalies; do not
 
 ## Issue Grading and Restraint (P0–P3)
 
-- Grade by the `using-sandtable` P0–P3 rubric (trigger probability × functional impact × recoverability × user perception).
+- Grade by the `skills/_shared/issue-grading.md` P0–P3 rubric (trigger probability × functional impact × recoverability × user perception).
 - Only **P0/P1** (core damage · redline violation · hard to self-recover, or unlikely but severe) return `ANOMALY_FOUND` and drive the loop; **P2/P3** (edge, retryable/auto-recoverable, basically no perception) are residual risk listed with `LOGIC_CLOSED` for me to decide.
 - Many P0/P1 in one round → suspect the design itself, go back to PLAN/OBJECTIVES, don't patch one by one.
 - Explain to me in plain language: what was found, what grade, real user impact, recommendation.
@@ -24,4 +24,4 @@ Iron law: read-only only; no code changes; stop immediately on anomalies; do not
 
 ## PRD Confirmation Gate
 
-- If `prd.md` exists without traceable developer confirmation, do not dispatch mental subagents. If the same message confirms the PRD, persist the confirmation evidence to `state.md` or `journal.md` before or while dispatching.
+Full rules in `skills/_shared/prd-gate.md`. In particular: if `prd.md` exists without traceable developer confirmation, do not dispatch mental subagents. If the same message confirms the PRD, persist the confirmation evidence to `state.md` or `journal.md` before or while dispatching.

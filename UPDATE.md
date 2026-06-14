@@ -32,7 +32,7 @@ English official update prompt:
 - **最高红线：绝不读写/覆盖/删除 `docs/sandtable/` 下任何内容**（用户的战役记忆，含 `project.md`/`constraints.md`/`lessons.md`/`features/**`）。更新只动方法论资产。
 - **覆盖前先备份**：覆盖任一已存在资产前，先把原文件/目录备份到 `./.sandtable-backup/<时间戳>/`（镜像相对路径），再写最新版本。
 - **同步到最新**：方法论资产"覆盖已存在 + 补齐新增文件"，不像安装那样跳过。`AGENTS.md` 在更新中**可覆盖**（先备份）；`CLAUDE.md` 软链不动。方法论资产含 `/sandtable-mobile-*` 命令（三处 harness）、`scripts/sandtable-mobile-*.sh`、`docs/mobile-review-companion/` 文档与 `runtime/server/` server 源码，更新时一并覆盖到最新。
-- **外科手术式**：只更新下面列出的资产；不碰 `docs/sandtable/`、不碰清单外文件（如 `scripts/test-sandtable-init.sh`、`scripts/mobile-listening-e2e.sh`）。
+- **外科手术式**：只更新下面列出的资产；不碰 `docs/sandtable/`、不碰清单外文件（如 `scripts/test-sandtable-init.sh`、`scripts/mobile-listening-e2e.sh`、`scripts/sandtable-sync.sh`）。
 - **零依赖**：只用 POSIX sh/bash + coreutils；JSON 不依赖 jq/python/node。
 - **诚实报告**：任一核心资产同步失败/源缺失，报"更新不完整"。
 - 可选 Mobile Review Companion 的 `runtime/server/` **源码**随方法论更新覆盖（排除并**绝不删除/改动** `node_modules/`、`dist/`、`.vite/` 等用户依赖与构建产物）；`apps/`（Flutter App）不随更新升级，需用户单独 `git pull` 仓库源。更新流程也**不修改** `.sandtable-runtime/` 或 `docs/sandtable/` 战役记忆。

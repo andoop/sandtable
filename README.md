@@ -74,7 +74,7 @@ Sandtable 让 agent 用三种推演逐层逼出破口，全程落盘可续：
 2. 按 AI 的安装结果完成最后接线；若它提示重载窗口、重开工作区或启用本地插件以使规则生效，就照做。
 3. 按工具选择命令入口：
    - Cursor：通过 `.cursor/commands` 提供 slash 命令，使用 `/sandtable-start` 开始。
-   - Codex：通过 `plugins/sandtable` 与 `.agents/plugins/marketplace.json` 提供本地 Sandtable plugin；先用 `codex plugin marketplace add "$PWD"` 和 `codex plugin add sandtable --marketplace sandtable-local` 注册/启用后，优先尝试 `/sandtable:sandtable-start`。Codex 当前版本是否在 `/` 菜单展示本地插件命令取决于客户端能力；不把 Cursor 的裸 slash 自动提示当作 Codex 保证。
+   - Codex：通过 `plugins/sandtable` 与 `.agents/plugins/marketplace.json` 提供本地 Sandtable plugin（先用 `codex plugin marketplace add "$PWD"` 和 `codex plugin add sandtable --marketplace sandtable-local` 注册/启用）。Codex 插件暴露的是 **skills**（用 `$技能名` 触发，不是斜杠命令）：用 `$using-sandtable` 作为总入口驱动整个流程，移动端用 `$mobile-companion`。`/sandtable-*` 斜杠命令是 Cursor/Claude/Kiro 的入口，别当作 Codex 的保证。
    - Claude Code / Kiro / 通用 agent：没有专属 slash 接线时，把 `/sandtable-start` 作为普通消息发给 AI，让它按 `AGENTS.md` 与 `commands/sandtable-start.md` 执行。
 
 手工安装、不同 AI 工具（Cursor / Claude Code / Codex / Kiro 等）的差异、以及本地试用路径，都写在 `INSTALL.md`，README 不再展开。`.cursor/commands` 只服务 Cursor；Codex 的命令入口来自 Sandtable Codex plugin，不承诺自动发现 Cursor 命令。
@@ -146,7 +146,7 @@ sandtable/
   .cursor/rules/sandtable.mdc
   .cursor/commands/*.md
   commands/*.md                      # 含 sandtable-mobile-*（可选移动端命令）
-  scripts/                           # sandtable-init.sh + sandtable-mobile-*.sh
+  scripts/                           # sandtable-init.sh + sandtable-mobile-*.sh；sandtable-sync.sh 为仓库维护工具（不安装到用户项目）
   locales/en/**                      # 英文 locale pack（与根目录中文资产镜像）
   .claude-plugin/                    # Claude Code 插件 / marketplace 清单（仓库侧分发，不复制进用户项目）
   .cursor-plugin/plugin.json         # Cursor 插件清单（仓库侧分发）
@@ -162,6 +162,8 @@ sandtable/
     red-team-wargame/
     implementation-rehearsal/
     state-and-memory/
+    mobile-companion/
+    _shared/                         # 跨命令/skill 复用的方法论片段（单一真源）
     ... more skills
   templates/
   docs/mobile-review-companion/      # 可选 runtime 的协议/启动/验证文档

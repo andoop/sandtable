@@ -18,7 +18,7 @@ Iron law: let the red team attack brutally; vague "there may be risk" does not c
 
 ## Issue Grading and Restraint (P0–P3)
 
-- Grade each strike by the `using-sandtable` P0–P3 rubric (trigger probability × functional impact × recoverability × user perception).
+- Grade each strike by the `skills/_shared/issue-grading.md` P0–P3 rubric (trigger probability × functional impact × recoverability × user perception).
 - Only **P0/P1** (core damage · redline violation · hard to self-recover, or unlikely but severe) become `BREACH_FOUND` driving the loop; **P2/P3** (edge, retryable/auto-recoverable, basically no perception) are residual risk listed with `HELD` for me to decide.
 - Many P0/P1 in one round → suspect the design itself, go back to PLAN/OBJECTIVES, don't plug holes one by one.
 - Explain to me in plain language: what was attacked, how many broke, at what grades, real user impact, recommendation.
@@ -26,4 +26,4 @@ Iron law: let the red team attack brutally; vague "there may be risk" does not c
 
 ## PRD Confirmation Gate
 
-- If `prd.md` exists without traceable developer confirmation, do not dispatch OPFOR. If the same message confirms the PRD, persist the confirmation evidence to `state.md` or `journal.md` before or while dispatching.
+Full rules in `skills/_shared/prd-gate.md`. In particular: if `prd.md` exists without traceable developer confirmation, do not dispatch OPFOR. If the same message confirms the PRD, persist the confirmation evidence to `state.md` or `journal.md` before or while dispatching.

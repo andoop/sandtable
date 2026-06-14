@@ -232,7 +232,7 @@ codex plugin marketplace add "$PWD"
 codex plugin add sandtable --marketplace sandtable-local
 ```
 
-Codex 插件命令使用插件命名空间；安装后优先尝试 `/sandtable:sandtable-start`。若当前 Codex 客户端的 `/` 菜单不展示本地插件命令，不得谎报“slash 提示已生效”；如实报告为客户端 autocomplete 限制，并说明插件仍已在本机注册/启用。
+Codex 插件暴露的是 **skills**（用 `$技能名` 触发，**不**通过插件提供 `/` 斜杠命令）：引导用户用 `$using-sandtable` 作为总入口驱动流程、`$mobile-companion` 用移动端。不得谎报"Codex 已支持 `/sandtable` 斜杠命令"；`/sandtable-*` 是 Cursor/Claude/Kiro 的入口。插件仍在本机注册/启用以提供 skills。
 
 - Kiro / 通用 agent：步骤 5.1 的 `AGENTS.md` 即为行为基线；没有专属 slash 接线时，把 `/sandtable-start` 作为普通消息发给 AI 执行。
 
@@ -264,7 +264,7 @@ else
 fi
 ```
 
-不要复制 `scripts/mobile-listening-e2e.sh` 与 `scripts/test-sandtable-init.sh`（仓库内部测试脚本，绝不安装到用户项目）。不要复制 `apps/`（Flutter App，需用户单独 clone），也不要复制 `runtime/server/node_modules`、`dist`、`.vite`。`docs/mobile-review-companion/` 是只读参考文档，与用户的 `docs/sandtable/` 战役记忆互不相干。
+不要复制 `scripts/mobile-listening-e2e.sh`、`scripts/test-sandtable-init.sh` 与 `scripts/sandtable-sync.sh`（仓库内部测试/维护脚本，绝不安装到用户项目）。不要复制 `apps/`（Flutter App，需用户单独 clone），也不要复制 `runtime/server/node_modules`、`dist`、`.vite`。`docs/mobile-review-companion/` 是只读参考文档，与用户的 `docs/sandtable/` 战役记忆互不相干。
 
 ### 6. 初始化运行时工作区（可选，推荐）
 
@@ -305,7 +305,7 @@ done
 
 Codex 还必须人工或由 AI 读取 `./.agents/plugins/marketplace.json`，确认 `plugins` 数组里存在 `name` 为 `sandtable` 的条目，且 `source.path` 为 `./plugins/sandtable`、`policy.authentication` 为 `ON_INSTALL`、`category` 为 `Developer Tools`；若不符合，报告 `Codex 不完整`。这项 JSON 结构检查不要依赖 `jq`、Python、Node 或其它非 POSIX/coreutils 工具。
 
-Cursor 提示用户重载窗口后 `alwaysApply` 规则生效。Codex 提示用户按 Codex 本地插件流程启用 Sandtable Local，并优先尝试 `/sandtable:sandtable-start`。最后按工具入口开始第一场战役。
+Cursor 提示用户重载窗口后 `alwaysApply` 规则生效。Codex 提示用户按本地插件流程启用 Sandtable Local，并用 `$using-sandtable`（skills，`$` 触发）作为入口。最后按工具入口开始第一场战役。
 
 ### 7. 清理
 

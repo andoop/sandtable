@@ -116,7 +116,18 @@ digraph sandtable {
 | "我记得这套流程，不用读 skill" | skill 会演进，按需读当前版本。 |
 | "加个兜底/灵活性更稳" | 不做未要求的兜底，不节外生枝（外科手术式改动）。 |
 
+## 在不同工具里触发
+
+同一套能力，触发方式按工具不同：
+
+- **Cursor / Claude Code / Kiro**：用 `/sandtable-*` 斜杠命令（或把命令名当普通消息发给 AI）。命令是薄入口，会加载上表对应的 skill。
+- **Codex**：插件只暴露 **skills**（用 `$技能名` 触发，不是 `/`）。入口是 `$using-sandtable`——它讲清整条状态机并按需加载子 skill；移动端用 `$mobile-companion`。Codex 不通过插件提供 `/sandtable-*` 斜杠命令。
+
+命令（动作入口）与 skill（方法论知识）是多对多关系：一个命令加载一个或多个 skill，部分 skill（`being-truthful`/`closing-the-loop`）无独立命令。
+
 ## Mobile Review Companion（可选）
+
+> 完整操作见 `mobile-companion` skill（Codex 用 `$mobile-companion`）。
 
 若当前项目显式启用了 Sandtable mobile review runtime，主 agent 在完成阶段性动作后应同步当前 feature 状态，并保持 agent 流水线处于工作态，直到收到电脑端 stop、stop mailbox event 或开发者明确停止请求。
 
@@ -132,27 +143,7 @@ Sandtable 吸收了 Karpathy 的四原则（不猜测、极简、外科手术式
 
 ## 问题分级与克制 · P0–P3（推演的共同裁决口径）
 
-推演（头脑预演 / 红蓝对抗）发现的问题，必须**站在用户使用角度分级**，不是为了"逻辑完美"凑数。先判级，再决定是否驱动修正循环。
-
-判级看四个维度：
-
-- **触发概率**：必现 / 大概率 / 小概率 / 仅理论可达
-- **功能影响**：核心不可用·数据损坏·违反红线 / 重要功能受损 / 体验瑕疵
-- **可恢复性**：用户无法绕过 / 用户重试可救回 / 系统自动救回
-- **用户感知**：明显 / 轻微 / 基本无感
-
-| 级别 | 典型组合 | 处置 |
-|------|---------|------|
-| **P0** | 必现或大概率 + 核心不可用/数据损坏/违反 MUST·MUST-NOT，用户明显感知且无法自救 | 必须作为 `ANOMALY_FOUND`/`BREACH_FOUND` 进修正循环，阻塞落地 |
-| **P1** | 大概率影响重要功能，或小概率但后果严重（数据/安全/资金），用户感知、难自救 | 进修正循环修复；确需延后须开发者明确同意 |
-| **P2** | 小概率/边缘场景，功能受损但可重试或可自动救回，用户轻微感知 | 记为**残余风险**，向开发者说明，由其拍板本轮是否修 |
-| **P3** | 仅理论可达 / 纯瑕疵，用户基本无感或可忽略 | 记录备查，不驱动循环 |
-
-**裁决铁律：只有 P0/P1 驱动修正循环；P2/P3 一律记为残余风险交开发者决定，不得自动拉起重演、不得为追求逻辑完美反复打磨。** 与之配套的真实性口径继续生效：只上报真实、相关、可复现、会影响验收/红线/闭环的问题；不构造无现实触发路径、与本需求无关的偏题场景来凑 `ANOMALY_FOUND`/`BREACH_FOUND`（`being-truthful` 的不猜测原则不变：关键未知不能带着继续）。
-
-**克制与反思**：若一轮推演冒出**大量 P0/P1**，先怀疑**方案本身**（设计过复杂、边界没收敛、需求理解偏差），回到 PLAN/OBJECTIVES 重审，而不是逐条打补丁。问题成堆通常是设计信号，不是补丁清单。
-
-**向开发者解释**：每轮推演结论用人话讲清——发现了什么、定几级、为什么是/不是真问题、对用户的实际影响、建议怎么办。不堆术语、不报"为完美而完美"的伪问题。
+**必须完整读取并逐条遵循 `skills/_shared/issue-grading.md`（P0–P3 分级口径与裁决铁律），不得跳过或凭记忆简写。**
 
 ## 推演强度分级 · 按风险裁剪（别用牛刀杀鸡）
 
@@ -169,11 +160,4 @@ Sandtable 吸收了 Karpathy 的四原则（不猜测、极简、外科手术式
 
 ## PRD 确认门禁与已选择路径直接执行
 
-- 优先级：真实阻塞 (`blocked=true`、缺产品意图/权限/登录/外部资源/关键事实) 最高，必须写 `questions.md`、设置 `blocked=true` 并提问；其次是 PRD 未确认门禁；之后才执行用户选择。
-- 若用户已经通过 AskQuestion 选择下一步，或自然语言明确表达“确认并继续 / 按 X 继续 / 就选 X”，且没有真实阻塞，agent 必须在同一回合执行该选择对应动作。不得再次 AskQuestion，也不得只输出同一动作的复制命令要求用户重复输入。
-- 若该选择本身构成 PRD 确认，执行 TESTCASES/PLAN/MENTAL/REDTEAM/IMPL/rehearse/live/debrief 前或同时，必须把可核实 PRD 确认证据写入 `state.md` 或 `journal.md`：AskQuestion 记录 answer id 或 `source: askquestion:<id>` + 选项原文/确认时间；自然语言记录用户原话摘录 + 确认时间 + 用户消息来源。
-- `/sandtable-start` 写完 PRD 且未获确认时仍停在 PRD 确认点；但同回合 AskQuestion 或自然语言已经确认 PRD 并要求继续时，应先落盘证据再直接进入 TESTCASES 写 `tests.md`，旧“本命令在此结束”边界不得压过已选择即续跑。
-- `/sandtable-objectives`、`/sandtable-refine`、`/sandtable-resume` 收到“PRD 已确认，请继续写 tests.md”时，先记录自然语言确认三元组，再直接加载 `writing-tests`；`phase=OBJECTIVES` 且 `prd.md` 已存在时不得重新进入 `writing-prd`。
-- `/sandtable-plan`、`writing-tests`、`writing-plan` 开始前必须检查 PRD 确认门禁；同条 PRD 确认触发写 tests/plan 时，必须在写入前或同时落盘证据。缺 `tests.md` 但 PRD 已确认时回 TESTCASES；PRD 未确认时停在确认点。
-- 修改 PRD 的 refine 反馈仍按 refine 修改；修改 tests/plan 或继续推演必须先满足 PRD 确认门禁。`blocked=true` 且用户同时说继续时，阻塞优先，不执行选择。
-- 完整收尾分两类：未选择路径时可给推荐和复制模板；已选择且已执行时只报告执行结果、当前 phase、下一建议，复制模板只能指向下一阶段，不能重复当前已执行选择。
+**开始本动作前，必须完整读取并逐条遵循 `skills/_shared/prd-gate.md`（PRD 确认门禁与已选择路径直接执行），不得跳过或凭记忆简写。**

@@ -42,7 +42,7 @@ Explicit user instruction > Sandtable methodology > default behavior. If the use
 
 ## Skill Index
 
-When needed, read the full contents of `skills/<name>/SKILL.md`: `using-sandtable`, `being-truthful`, `state-and-memory`, `gathering-intel`, `writing-prd`, `writing-tests`, `writing-plan`, `autonomous-orchestration`, `mental-rehearsal`, `red-team-wargame`, `implementation-rehearsal`, `evaluating-rehearsals`, `closing-the-loop`, `triaging-feedback`, `bugfix-with-evidence`.
+When needed, read the full contents of `skills/<name>/SKILL.md`: `using-sandtable`, `being-truthful`, `state-and-memory`, `gathering-intel`, `writing-prd`, `writing-tests`, `writing-plan`, `autonomous-orchestration`, `mental-rehearsal`, `red-team-wargame`, `implementation-rehearsal`, `evaluating-rehearsals`, `closing-the-loop`, `triaging-feedback`, `bugfix-with-evidence`, `mobile-companion`.
 
 ## Close the Loop (FR8)
 

@@ -54,6 +54,7 @@ Persist all work under `docs/sandtable/` in the target project: global `project.
 - `closing-the-loop` - close the turn: status, copy-paste templates, AskQuestion rules
 - `triaging-feedback` - triage acceptance feedback: lifecycle, user-confirms-to-close, the trio, lesson accumulation
 - `bugfix-with-evidence` - bugfix mode: confirm root cause via logs at 100%, auto-collect, investigation squad, no surface/temporary fix
+- `mobile-companion` - optional mobile review sync: on-demand pairing, single-job inbox waiter, worker discipline
 
 ## Close the Loop (FR8)
 

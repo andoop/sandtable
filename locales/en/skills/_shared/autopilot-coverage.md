@@ -1,0 +1,10 @@
+# Minimum Coverage, Autonomous Judgment, Resume Gate
+
+> Sandtable shared fragment (single source of truth). Commands and skills reference this file; **do not copy the full text elsewhere**. Change the rule only here.
+
+- `autonomy.min_rounds` and `autonomy.min_agents_per_round` mean minimum coverage, defaulting to `{ mental: 1, redteam: 1, impl: 1 }`. Do not migrate or overwrite historical features that already recorded 3/3/2.
+- Only a cold start initializes `phase=RECON` and runs the full `RECON -> OBJECTIVES -> TESTCASES -> PLAN` document chain. If `state.md` or any feature artifact already exists, resume in place and preserve existing `min_rounds`, `min_agents_per_round`, `completed_rounds`, and `phase`.
+- Before resuming into TESTCASES/PLAN/MENTAL/REDTEAM/IMPL, enforce the PRD confirmation gate. Confirmation must be traceable to developer input and persisted to `state.md` or `journal.md` before or while continuing. AskQuestion confirmation needs an answer id or `source: askquestion:<id>`; natural-language confirmation needs the quoted user text, confirmation time, and user-message source. Agent-authored progress logs, `autonomy.last_decision`, `phase>=TESTCASES`, vague “AskQuestion answer”, or source-less `prd_confirmed` fields do not count.
+- If documents are incomplete, resume from the earliest missing artifact. If `prd.md` exists but is not confirmed, stop at PRD confirmation instead of moving to tests or plan.
+- Rehearsal scheduling first fills mental -> redteam -> impl minimum coverage. Once minimum coverage is met, the main agent decides autonomously whether to add more rehearsal or enter `EVALUATE`, based on risk, change surface, lessons hit, recently fixed anomalies, implementation divergence, test confidence, and spot checks. Do not ask the user whether to continue unless truly blocked.
+- Implementation `DONE` is not enough to count the impl round or enter `EVALUATE`; the completeness gate must pass, and EVALUATE must re-check the current PRD/tests/plan structured baseline, coverage matrix, live TODO table, and real diff / changed file list.

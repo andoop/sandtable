@@ -47,7 +47,7 @@ alwaysApply: true
 
 ## 技能索引
 
-需要时读取对应 `skills/<name>/SKILL.md` 的完整内容：`using-sandtable`、`being-truthful`、`state-and-memory`、`gathering-intel`、`writing-prd`、`writing-tests`、`writing-plan`、`autonomous-orchestration`、`mental-rehearsal`、`red-team-wargame`、`implementation-rehearsal`、`evaluating-rehearsals`、`closing-the-loop`、`triaging-feedback`、`bugfix-with-evidence`。
+需要时读取对应 `skills/<name>/SKILL.md` 的完整内容：`using-sandtable`、`being-truthful`、`state-and-memory`、`gathering-intel`、`writing-prd`、`writing-tests`、`writing-plan`、`autonomous-orchestration`、`mental-rehearsal`、`red-team-wargame`、`implementation-rehearsal`、`evaluating-rehearsals`、`closing-the-loop`、`triaging-feedback`、`bugfix-with-evidence`、`mobile-companion`。
 
 ## 回合收尾（FR8）
 
