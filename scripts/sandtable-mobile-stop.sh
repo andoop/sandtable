@@ -19,8 +19,8 @@ PORT="${SANDTABLE_MOBILE_PORT:-$(cat "$PORT_FILE" 2>/dev/null || echo 8765)}"
 BASE_URL="http://127.0.0.1:${PORT}"
 PID_FILE="$REPO_ROOT/.sandtable-runtime/session/server.pid"
 
-curl -fsS -X POST "$BASE_URL/mobile-sync/stop" >/dev/null 2>&1 || true
-curl -fsS -X POST "$BASE_URL/stop" >/dev/null 2>&1 || true
+curl -fsS -m 3 -X POST "$BASE_URL/mobile-sync/stop" >/dev/null 2>&1 || true
+curl -fsS -m 3 -X POST "$BASE_URL/stop" >/dev/null 2>&1 || true
 
 if [[ -f "$PID_FILE" ]]; then
   PID="$(cat "$PID_FILE")"

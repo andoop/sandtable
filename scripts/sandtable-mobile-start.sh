@@ -38,22 +38,36 @@ health_repo() {
     | python3 -c 'import json,sys; print(json.load(sys.stdin).get("repo",""))' 2>/dev/null || true
 }
 
-# Pick a port: reuse the one already serving THIS repo, else the first free port.
-# Avoids clobbering another repo'\''s server that happens to hold the preferred port.
+# Probe whether a TCP port is truly free, without ever hanging.
+# curl exit 7 = "couldn't connect" (nobody listening) = free; any other outcome
+# (0 response / 28 timeout / 52 empty reply / ...) means something IS listening —
+# possibly a half-dead server — so the port is treated as occupied and skipped.
+port_state() {
+  local p="$1" rc=0
+  curl -sS -o /dev/null -m 1 "http://127.0.0.1:${p}/" >/dev/null 2>&1 || rc=$?
+  if [[ "$rc" -eq 7 ]]; then printf 'free\n'; else printf 'occupied\n'; fi
+}
+
+# Pick a port: reuse the one already serving THIS repo; skip ports held by
+# another repo's healthy server OR by an unresponsive half-dead process; else
+# the first genuinely free port.
 choose_port() {
-  local p
+  local p repo
   for p in $(seq "$PREFERRED_PORT" $((PREFERRED_PORT + 30))); do
-    local repo
     repo="$(health_repo "$p")"
-    if [[ -z "$repo" ]]; then
-      printf '%s\n' "$p"; return 0          # free port
-    fi
     if [[ "$repo" == "$REPO_ROOT" ]]; then
-      printf '%s\n' "$p"; return 0          # our own server, reuse
+      printf '%s\n' "$p"; return 0          # our own healthy server, reuse
     fi
-    # otherwise: another repo owns this port, keep scanning
+    if [[ -n "$repo" ]]; then
+      continue                              # another repo's healthy server
+    fi
+    # /health gave nothing: distinguish a truly free port from a half-dead one.
+    if [[ "$(port_state "$p")" == "free" ]]; then
+      printf '%s\n' "$p"; return 0          # genuinely free
+    fi
+    # otherwise: occupied by a half-dead / non-sandtable process — skip it
   done
-  printf '%s\n' "$PREFERRED_PORT"; return 0
+  printf '%s\n' "$PREFERRED_PORT"; return 0  # fallback; later -m curls error out cleanly
 }
 
 PORT="$(choose_port)"
@@ -69,7 +83,7 @@ if [[ "$(health_repo "$PORT")" != "$REPO_ROOT" ]]; then
     --port "$PORT" \
     --public-url "$PUBLIC_URL" >/dev/null 2>&1 || true
   for _ in $(seq 1 30); do
-    if curl -fsS "$BASE_URL/health" >/dev/null 2>&1; then break; fi
+    if curl -fsS -m 2 "$BASE_URL/health" >/dev/null 2>&1; then break; fi
     sleep 0.5
   done
 fi
@@ -79,14 +93,24 @@ if [[ -z "${FEATURE:-}" ]]; then
   exit 1
 fi
 
-RESPONSE="$(curl -fsS -X POST "$BASE_URL/mobile-sync/start" \
+RESPONSE="$(curl -fsS -m 5 -X POST "$BASE_URL/mobile-sync/start" \
   -H 'content-type: application/json' \
-  -d "{\"feature\":\"$FEATURE\"}")"
+  -d "{\"feature\":\"$FEATURE\"}" 2>/dev/null || true)"
 
-CODE="$(printf '%s' "$RESPONSE" | python3 -c 'import json,sys; print(json.load(sys.stdin)["code"])')"
+if [[ -z "$RESPONSE" ]]; then
+  echo "错误: 无法连接 server（$BASE_URL）。端口 $PORT 可能被一个半死进程占用（TCP 在听但不响应）。" >&2
+  echo "      请先运行 /sandtable-mobile-stop，或手动 kill 占用 $PORT 的进程，然后重试。" >&2
+  exit 1
+fi
+
+CODE="$(printf '%s' "$RESPONSE" | python3 -c 'import json,sys; print(json.load(sys.stdin)["code"])' 2>/dev/null || true)"
+if [[ -z "$CODE" ]]; then
+  echo "错误: server 返回异常（无配对码）。响应: $RESPONSE" >&2
+  exit 1
+fi
 
 # Durable token (persisted server-side) for scan-to-connect QR.
-PAIRING="$(curl -fsS "$BASE_URL/pairing?feature=$FEATURE" 2>/dev/null || echo '{}')"
+PAIRING="$(curl -fsS -m 3 "$BASE_URL/pairing?feature=$FEATURE" 2>/dev/null || echo '{}')"
 QR_TOKEN="$(printf '%s' "$PAIRING" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("token",""))' 2>/dev/null || true)"
 QR_PAYLOAD=""
 if [[ -n "$QR_TOKEN" ]]; then
@@ -120,32 +144,18 @@ if [[ -n "$QR_PAYLOAD" ]]; then
   echo
 fi
 
-# Poll up to 90s for phone pairing (optional wait, non-blocking for script exit)
-for _ in $(seq 1 45); do
-  STATUS="$(curl -fsS "$BASE_URL/mobile-sync/status" 2>/dev/null || echo '{}')"
-  PAIRED="$(printf '%s' "$STATUS" | python3 -c 'import json,sys; d=json.load(sys.stdin); print(d.get("steps",{}).get("phonePaired", False))' 2>/dev/null || echo False)"
-  if [[ "$PAIRED" == "True" ]]; then
-    PHASE="$(printf '%s' "$STATUS" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("phase") or "")')"
-    cat <<EOF2
+# 主 agent 已就绪、空闲，等待手机消息（运行态同步到手机，best-effort）。
+curl -fsS -m 3 -X POST "$BASE_URL/mobile-sync/agent-state" \
+  -H 'content-type: application/json' \
+  -d '{"role":"main","state":"idle","detail":"已就绪，等待手机消息"}' >/dev/null 2>&1 || true
 
-[✓] 手机已配对成功
-[✓] Agent 已同步${PHASE:+ · 阶段 $PHASE}
-
-电脑照常推进 Sandtable 即可，手机会自动更新。
-
-下一步: /sandtable-mobile-wait  （启动 inbox 等待子 agent）
-
-EOF2
-    exit 0
-  fi
-  sleep 2
-done
-
+# 不阻塞等待配对：出码后立即返回，把"等配对/等消息"交给 status/wait（避免主 agent 卡在脚本里）。
 cat <<EOF3
 
-[ ] 尚未检测到手机配对（可稍后在 App 输入配对码）
-    查看状态: /sandtable-mobile-status
-    等待手机消息: /sandtable-mobile-wait
-    停止同步: /sandtable-mobile-stop
+[✓] Server 与配对码已就绪——本脚本不阻塞等待配对。
+    手机输入上面的 URL + 配对码（或扫码）即可；配对后 Agent 会在收到消息时自动处理。
+    等待手机消息: /sandtable-mobile-wait   （主 agent 据此拉起单职责等待子 agent）
+    查看状态:     /sandtable-mobile-status
+    停止同步:     /sandtable-mobile-stop
 
 EOF3

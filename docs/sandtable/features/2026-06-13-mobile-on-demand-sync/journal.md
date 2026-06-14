@@ -267,6 +267,13 @@
 
 - 来源: mobile-app:sess_lOuzQMt00pj8
 
+## 2026-06-14T13:36Z · [手机同步]
+- 背景: Codex 触发 `$mobile-companion`，恢复 on-demand 手机同步处理。
+- 状态: server 健康，Server URL `http://192.168.5.198:8765`，手机已配对，当前阶段 VERIFY。
+- 手机消息: 收到 `mobile_paired` 与聊天「测试一下」。
+- 处理: 已 ack 2 条 inbox 消息；原 `mobile-sync.json` sessionId `sess_lOuzQMt00pj8` 已不在当前 session store，改用当前 feature session `sess_NpSKR4t9_6Fz` 回复手机；已 `push-state` 同步 VERIFY。
+- 依据/来源: `scripts/sandtable-mobile-status.sh`、`scripts/sandtable-mobile-wait.sh`、`POST /mailbox/inbox/ack`、`POST /agent/sessions/sess_NpSKR4t9_6Fz/messages`
+
 ## 2026-06-14 · [bugfix]
 - 背景: 用户反馈——手机连了两个仓库的服务，子 agent 跑等待脚本一直"没有任何消息"，但手机已发多条。
 - 根因(代码证据 100%): `scripts/sandtable-mobile-wait.sh` 端口硬编码 `PORT="${SANDTABLE_MOBILE_PORT:-8765}"`，未读 `.sandtable-runtime/session/server.port`；而 `status.sh`/`stop.sh` 都读 server.port。多仓库下 `start.sh` 的 choose_port 会给后启动的仓库分配非 8765 端口（如 8766）并写入其 server.port；手机连该仓库（8766），消息进其 inbox，但 wait 仍查 8765（= 另一仓库的 server），再按 feature 过滤 → 永远为空。
@@ -274,3 +281,87 @@
 - 验证: `bash -n` 通过；单仓库本机端口仍解析为 8765（行为不变）；多仓库下解析为各自端口。
 - 教训: 同一组脚本对"同一事实（server 端口）"必须用同一份解析逻辑；新增脚本(wait)漏抄端口解析，在多实例下静默查错且无报错，最难排查。
 - 依据/来源: `scripts/sandtable-mobile-{wait,status,stop}.sh`、`sandtable-mobile-start.sh` choose_port
+
+## 2026-06-14T13:39:23.651Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 还在吗
+- Target: conversation
+
+- 来源: mobile-app:sess_NpSKR4t9_6Fz
+
+## 2026-06-14 · [feature/bugfix] 手机功能三连改进
+- #1 子 agent inbox 输出致 Codex "Markdown couldn't render"：根因为等待子 agent 把裸 JSON 贴进对话。改 wait 命令 / mobile-companion：纯文本结构化转述 `- [id] text` + 末尾 `ack-ids:`，必要时 ```json 包裹。
+- #2 start 主 agent "戏太多/卡"：`start.sh` 去掉出码后 90s 阻塞轮询（秒回）；start 命令精简为"出码 + 立即拉单职责等待子 agent，无消息时空闲"。
+- #3 运行态同步到手机（商业级全链路）：server 新增 `agent_state` SSE 广播 + `POST /mobile-sync/agent-state` + `GET /mobile-sync/status` 返回 `agent`；脚本上报（start→main idle、wait→waiter waiting/processing、stop→disconnected/exited）；mobile-companion 文档要求主 agent 上报 working/idle/error；手机新增 `AgentRuntimeState` 模型 + `AgentStatePill`，会话详情头显示 主 agent/等待器 状态徽标。
+- 附带 bugfix：`stop.sh` 两个 curl 缺 `-m` 超时，旧 server 半死时永久挂起（本轮 e2e 即卡于此，也解释了历史 stop 挂起）。已加 `-m 3`。
+- 验证：Dart/TS 分析器对全部改动文件（4 手机 + 3 server）无诊断；mobile 脚本 `bash -n` 通过；命令/skill 镜像 `sandtable-sync.sh` + `--check` 全绿。运行时 e2e 因 stop.sh 旧挂起 bug 中断（已修复），后端正确性以分析器 + 代码审查为据，建议重启该仓库 server 后用手机验收。
+- 依据/来源：`runtime/server/src/{types,mobile-sync,http}.ts`、`scripts/sandtable-mobile-{start,wait,stop}.sh`、`skills/mobile-companion`、`apps/mobile/lib/{data/models/agent_state.dart,ui/widgets/agent_state_pill.dart,state/session_store.dart,ui/screens/session_detail_screen.dart}`
+
+## 2026-06-14T14:38Z · [手机同步]
+- 背景: `/sandtable-mobile-start`（按需开启手机同步）。
+- 状态: 重新拉起 detached daemon，Server URL `http://192.168.5.198:8765`，新配对码 1631；脚本秒回不阻塞。
+- 手机消息: inbox 待处理一条聊天「还在吗」（id `20260614T133923654Z-mobile-JsrvvSwy`, session `sess_NpSKR4t9_6Fz`）。
+- 处理: agent-state main=working → `POST /agent/sessions/sess_NpSKR4t9_6Fz/messages` 回复「在的，Agent 已就绪并已与手机同步」(200) → `POST /mailbox/inbox/ack`（acked:1）→ agent-state main=idle → 重新拉起单职责 inbox 等待子 agent。
+- 依据/来源: `scripts/sandtable-mobile-start.sh`、`POST /agent/sessions/.../messages`、`POST /mailbox/inbox/ack`
+
+## 2026-06-14T14:40:08.952Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 你觉得当前项目还有那些地方设计的不好
+- Target: conversation
+
+- 来源: mobile-app:sess_NpSKR4t9_6Fz
+
+## 2026-06-14T14:43Z · [问答]
+- 背景: 主 agent 处理手机消息「你觉得当前项目还有那些地方设计的不好」(id `20260614T144008956Z-mobile-__oKolnp`)。
+- 处理: 读 `runtime/server/src/{mailbox,sessions,pairing,polling,continuation}.ts` + 历史 journal 后，给出有代码依据的设计弱点（按影响排序）：①文件邮箱无锁/非原子，多消费者(processInboxOnce/bash wait/ack)竞争 ②会话/消息生命周期对账脆弱(stale sessionId) ③SSE 与 bash 5s 轮询传输不统一 ④运行时状态散落多 JSON、bash↔TS 文件耦合 ⑤4 位 PIN claimByCode 无限流可暴力 ⑥续约/游标只写不回收死 worker。并澄清 token 跨重启持久性其实 OK（devices.ts 提升到 devices.json 启动恢复）。已回复(200)、ack 1 条、main=idle。
+- 依据/来源: `runtime/server/src/*.ts`、`POST /agent/sessions/sess_NpSKR4t9_6Fz/messages`、`POST /mailbox/inbox/ack`
+
+## 2026-06-14 · [bugfix/跨工具适配] Kiro 等待体验差
+- 背景: 用户反馈 Kiro 中 mobile 同步体验差——开子 agent 费劲，主 agent 不停检查/设超时/骚动；Cursor 则安静地"派子 agent 阻塞等其返回，不论多久"。
+- 根因: 等待协议按 Cursor 的"Task background 子 agent"措辞写成，"background/启动后台"在 Kiro 被理解为"起个后台再自己继续盯着"→ 主 agent 轮询/超时/忙活。
+- 修复: 等待协议重写为 **harness 中立铁律**——主 agent 派**一个**子 agent 后**阻塞等其返回、不限时长、期间零动作**（不自查 inbox/status/health、不设超时、不反复检查、不忙活）；明确各工具"派子 agent 并阻塞等返回"原语（Cursor/Claude=Task，**Kiro=`invoke_sub_agent`**）；`wait.sh` 默认无限阻塞、不超时，新增可选 `SANDTABLE_WAIT_MAX_SECONDS` 兜底（仅当工具对子 agent 有硬执行上限时，到时返回 `{"messages":[],"timeout":true}`，主 agent 再派一个等待子 agent，仍不自轮询）。改 wait 命令 + mobile-companion（中英）；Red Flags 加"派了等待子 agent 别去忙别的"。
+- 验证局限: 本轮持久 shell 被上一轮 e2e 的旧 stop curl（已修无超时）拖住，`sandtable-sync.sh` 未能跑成；已**手动**同步全部 6 个镜像并使真源==镜像；建议环境恢复后跑 `scripts/sandtable-sync.sh --check` 复核一致性。
+- 依据/来源: `commands/sandtable-mobile-wait.md`、`skills/mobile-companion`、`scripts/sandtable-mobile-wait.sh`
+
+## 2026-06-14 · [bugfix/健壮性] mobile 脚本无超时 curl 致挂起 + 半死端口
+- 现象: 主 agent 执行 `./scripts/sandtable-mobile-start.sh` 一直不返回。
+- 根因: start/status/wait 脚本里多处 curl 缺 `-m` 超时；当某端口上有"半死 server"（TCP 在听但 /health 不响应，多为前次 e2e 残留）时，curl 永久挂 → 脚本不返回。choose_port 还会把"半死端口"误判为 free 并在其上起新 server（bind 失败）。
+- 修复:
+  - `start.sh`: health 轮询 `-m 2`、`mobile-sync/start` `-m 5` + 失败 5s 内友好报错、`pairing` `-m 3`；新增 `port_state()`（curl 退出码 7=无监听=free，其它=占用）让 `choose_port` **自动跳过半死/被占端口**、选下一个真正空闲端口（`-m 1`，无 hang 风险），用户无需手动 kill。
+  - `status.sh`: 4 处 curl 全加 `-m`；server 在听但 status 无响应时报"半死，请 stop 后重试"。
+  - `wait.sh`: inbox 轮询 curl 加 `-m 5`。
+  - `stop.sh`: 上一轮已加 `-m 3`。
+- 至此所有 mobile 脚本在任何 server 异常下都不会无限挂。
+- 验证局限: 本环境终端不可靠（持久 shell 被旧 e2e 进程拖死、独立终端输出捕获也不稳），`bash -n` 未跑出可读结果；改动为标准 bash + curl `-m` + 标准函数/if，以逐行人工审查为据，建议环境恢复后 `bash -n` 复核。
+- 依据/来源: `scripts/sandtable-mobile-{start,status,wait,stop}.sh`
+
+## 2026-06-14T16:06:54.674Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 测试一下
+- Target: conversation
+
+- 来源: mobile-app:sess_LZhq16aZxPsH
+
+## 2026-06-14T16:12:06.159Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 如果没有给你发消息，你会等多久
+- Target: conversation
+
+- 来源: mobile-app:sess_LZhq16aZxPsH
+
+## 2026-06-14T16:14:06.403Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 匹配码逻辑是怎样的
+- Target: conversation
+
+- 来源: mobile-app:sess_LZhq16aZxPsH

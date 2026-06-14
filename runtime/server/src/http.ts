@@ -10,6 +10,9 @@ import { PairingRegistry } from "./pairing.js";
 import { appendMobileJournal, readFeatureDocument, readFeatureStateSummary, recordQuestionAnswer, setBlocked } from "./sandtable.js";
 import { deleteSession, ensureFeatureSession, getSession, listSessions, markSessionPaired, touchSession, upsertSession } from "./sessions.js";
 import type {
+  AgentRole,
+  AgentRunState,
+  AgentRuntimeState,
   ConversationKind,
   ConversationRole,
   MailboxMessage,
@@ -397,6 +400,10 @@ export async function createHttpServer(
         phonePaired: session?.paired === true,
         agentSynced: Boolean(session?.agentSyncedAt || summary?.phase)
       },
+      agent: {
+        main: session?.agentMain ?? null,
+        waiter: session?.agentWaiter ?? null
+      },
       phase: summary?.phase ?? null,
       feature: session?.feature ?? null
     };
@@ -409,11 +416,36 @@ export async function createHttpServer(
     return { ok: true, ...result };
   });
 
+  // Report the live runtime state of the main agent / waiting sub-agent so the
+  // phone can show "idle / working / waiting / processing / disconnected / error".
+  app.post("/mobile-sync/agent-state", async (request) => {
+    const body = (request.body ?? {}) as { role?: string; state?: string; detail?: string };
+    const role = body.role as AgentRole;
+    const state = body.state as AgentRunState;
+    const validRoles = ["main", "waiter"];
+    const validStates = ["idle", "working", "disconnected", "error", "ready", "waiting", "processing", "exited"];
+    if (!validRoles.includes(role)) throw new Error("role must be 'main' or 'waiter'");
+    if (!validStates.includes(state)) throw new Error("invalid agent state");
+    const session = await readMobileSyncSession(paths);
+    if (!session) return { ok: false, reason: "mobile sync not active" };
+    const entry: AgentRuntimeState = { role, state, at: new Date().toISOString() };
+    if (typeof body.detail === "string" && body.detail.trim()) entry.detail = body.detail.trim();
+    await writeMobileSyncSession(paths, {
+      ...session,
+      ...(role === "main" ? { agentMain: entry } : { agentWaiter: entry })
+    });
+    events.broadcast({ kind: "agent_state", feature: session.feature, agent: entry });
+    return { ok: true, agent: entry };
+  });
+
   app.post("/mobile-sync/stop", async () => {
     const session = await readMobileSyncSession(paths);
     if (session?.feature) {
       await events.publish(createMessage(session.feature, "server", "stop", { reason: "mobile-sync-stop" }, { sessionId: session.sessionId }));
       if (session.sessionId) await touchSession(paths, session.sessionId, { status: "stopped" });
+      const at = new Date().toISOString();
+      events.broadcast({ kind: "agent_state", feature: session.feature, agent: { role: "main", state: "disconnected", at } });
+      events.broadcast({ kind: "agent_state", feature: session.feature, agent: { role: "waiter", state: "exited", at } });
     }
     pairing.clear();
     await clearMobileSyncSession(paths);

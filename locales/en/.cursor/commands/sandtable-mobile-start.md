@@ -9,15 +9,10 @@ Start Sandtable mobile sync on demand; read `docs/mobile-review-companion/runtim
 - **Phone**: just the Server URL + 4-digit code; once connected, **wait for the Agent to sync automatically**.
 - **Success signals**: the phone app shows "Ready / Agent synced"; on the computer `/sandtable-mobile-status` shows all three steps as ✓.
 
-Execute:
-1. Determine the repo root and feature; run `scripts/sandtable-mobile-start.sh [feature-id]`.
-2. Prominently print the **pairing code**, **Server URL**, and the three-step progress notes.
-3. Run `/sandtable-mobile-wait` (or equivalent steps) to spawn the **inbox waiting sub-agent**:
-   - The sub-agent **only** runs `scripts/sandtable-mobile-wait.sh <feature>`, polling the inbox every 5s.
-   - On receiving one message, hand it verbatim to the main agent and **exit immediately**.
-   - The sub-agent **must not** check status/health, read the journal, or edit documents.
-4. After the main agent handles a phone message: `POST /mailbox/inbox/ack`, then `/sandtable-mobile-wait` to start the next waiter.
-5. After the main agent updates Sandtable documents, if sync is active: `curl -X POST http://127.0.0.1:8765/mobile-sync/push-state`.
-6. Update the feature `journal.md`.
+Execute (keep the main agent light; hand waiting and heavy work to the sub-agent / script, and stay idle when there is no message):
+1. Run `scripts/sandtable-mobile-start.sh [feature-id]` (returns immediately, non-blocking) and show me the **pairing code + Server URL** verbatim.
+2. **Immediately** run `/sandtable-mobile-wait` to spawn the **single-job** inbox waiter; the main agent does not poll or repeatedly check status/health itself.
+3. Only when the waiter hands back a phone message does the main agent act (port from `.sandtable-runtime/session/server.port`): report `agent-state main=working` → handle it → `POST /mailbox/inbox/ack` → report `agent-state main=idle` → then `/sandtable-mobile-wait` for the next waiter. On error, report `main=error`.
+4. Only after the main agent updates Sandtable documents and sync is active: `POST /mobile-sync/push-state`; record a line in `journal.md` for phase actions.
 
 Do not ask whether to continue.

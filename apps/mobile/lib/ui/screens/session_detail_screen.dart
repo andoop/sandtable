@@ -7,6 +7,7 @@ import '../../data/models/message.dart';
 import '../../data/models/session.dart';
 import '../../state/session_store.dart';
 import '../widgets/agent_avatar.dart';
+import '../widgets/agent_state_pill.dart';
 import '../widgets/chat_composer.dart';
 import '../widgets/empty_state.dart';
 import '../widgets/message_bubble.dart';
@@ -313,6 +314,19 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                       TextStyle(color: scheme.onSurfaceVariant, fontSize: 12)),
             ],
           ),
+          if (_store.agentMain != null || _store.agentWaiter != null) ...[
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 8,
+              runSpacing: 6,
+              children: [
+                if (_store.agentMain != null)
+                  AgentStatePill(state: _store.agentMain!),
+                if (_store.agentWaiter != null)
+                  AgentStatePill(state: _store.agentWaiter!),
+              ],
+            ),
+          ],
           const SizedBox(height: 12),
           SizedBox(
             height: 34,

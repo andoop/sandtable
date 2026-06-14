@@ -1,0 +1,18 @@
+{
+  "id": "20260614T144008956Z-mobile-__oKolnp",
+  "feature": "2026-06-13-mobile-on-demand-sync",
+  "sessionId": "sess_NpSKR4t9_6Fz",
+  "agent": {
+    "id": "custom-Dgm9c-1O",
+    "kind": "custom",
+    "name": "Sandtable agent"
+  },
+  "source": "mobile",
+  "type": "chat_message",
+  "createdAt": "2026-06-14T14:40:08.956Z",
+  "payload": {
+    "text": "你觉得当前项目还有那些地方设计的不好",
+    "target": "conversation",
+    "kind": "chat"
+  }
+}

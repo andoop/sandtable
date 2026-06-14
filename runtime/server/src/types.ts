@@ -58,6 +58,32 @@ export interface AgentIdentity {
 
 export type RuntimeSessionStatus = "active" | "idle" | "blocked" | "done" | "stopped";
 
+/**
+ * Live runtime state of the agent pipeline behind a mobile-synced feature,
+ * surfaced to the phone so the developer can see what the computer side is doing.
+ * - `main`   : the orchestrating (main) agent.
+ * - `waiter` : the single-job inbox waiting sub-agent.
+ */
+export type AgentRole = "main" | "waiter";
+export type AgentRunState =
+  // main agent
+  | "idle"
+  | "working"
+  | "disconnected"
+  | "error"
+  // waiting sub-agent
+  | "ready"
+  | "waiting"
+  | "processing"
+  | "exited";
+
+export interface AgentRuntimeState {
+  role: AgentRole;
+  state: AgentRunState;
+  detail?: string;
+  at: string;
+}
+
 export interface RuntimeSession {
   id: string;
   title: string;
@@ -133,4 +159,5 @@ export interface ConversationMessage {
 export type RuntimeBroadcast =
   | { kind: "session"; session: RuntimeSession }
   | { kind: "session_removed"; sessionId: string }
-  | { kind: "message"; message: ConversationMessage };
+  | { kind: "message"; message: ConversationMessage }
+  | { kind: "agent_state"; feature: string; agent: AgentRuntimeState };

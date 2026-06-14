@@ -30,12 +30,25 @@ Dependency: the repo must contain `runtime/server/` with deps installed (`npm --
 ## On-demand sync loop
 
 1. **Start**: run `scripts/sandtable-mobile-start.sh [feature-id]`; print the pairing code, Server URL, and three-step progress. The computer needs no extra "connect"; the phone enters URL + 4-digit code (or scans the QR).
-2. **Spawn the waiter**: run `/sandtable-mobile-wait` — the sub-agent **only** runs `scripts/sandtable-mobile-wait.sh <feature>` (polls inbox every 5s), hands one message verbatim to the main agent, then **exits immediately**; it **must not** check status/health, read the journal, or edit documents.
+2. **Spawn the waiter**: run `/sandtable-mobile-wait` — per the Waiting protocol, dispatch **one** sub-agent that **only** runs `scripts/sandtable-mobile-wait.sh <feature>` (block-polls the inbox until one message arrives, then returns), relays it to the main agent as plain text (not a raw JSON blob, to avoid Codex render failure; wrap raw JSON in a ```json code block``` if needed), then **exits**; it **must not** check status/health, read the journal, or edit documents.
 3. **Handle the phone message**: after the main agent handles it:
    - `curl -X POST http://127.0.0.1:8765/mailbox/inbox/ack -H 'content-type: application/json' -d '{"ids":["<message-id>"]}'`
    - then run `/sandtable-mobile-wait` to spawn the next waiter.
 4. **Reply / push state**: reply to the phone via `POST /agent/sessions/<sid>/messages` (kind: chat/answer/confirmation); after updating Sandtable docs, if sync is active: `curl -X POST http://127.0.0.1:8765/mobile-sync/push-state`.
 5. **Persist**: append a sync/handling entry to the feature `journal.md`.
+
+## Waiting protocol (cross-tool iron law)
+
+After dispatching **one** waiting sub-agent, the main agent **blocks for its return, for as long as it takes**; while waiting it does **nothing**: no inbox/status/health polling, no timeouts, no re-checking, no busywork. The "dispatch a sub-agent and block for its return" primitive per tool: Cursor / Claude Code use Task, **Kiro uses `invoke_sub_agent`**. Do not read "dispatch a sub-agent" as "start a background thing and keep watching it". See `/sandtable-mobile-wait`.
+
+## Runtime state sync to the phone
+
+Scripts report automatically: `start` → main agent `idle`; `wait` → waiter `waiting`, on a message → `processing`; `stop` → main agent `disconnected`, waiter `exited`. **When the main agent handles a phone message** it should also report its own state (port from `.sandtable-runtime/session/server.port`):
+- start handling: `POST /mobile-sync/agent-state {"role":"main","state":"working","detail":"…"}`
+- done, back to waiting: `{"role":"main","state":"idle"}`
+- on error: `{"role":"main","state":"error","detail":"<reason>"}`
+
+The phone then shows: main agent (idle / working / disconnected / error) and waiter (ready / waiting / processing / exited).
 
 ## Persistent worker discipline
 
@@ -53,7 +66,8 @@ Dependency: the repo must contain `runtime/server/` with deps installed (`npm --
 | Thought | Reality |
 |------|------|
 | "Starting the server means it's set up." | You must also spawn the inbox waiter, or phone messages go unhandled. |
-| "The waiter can also check status / read the journal." | No. The waiter is single-job: poll inbox, deliver, exit. |
+| "I dispatched the waiter, let me go check status / do other things." | No. After dispatching, the main agent blocks for its return — zero actions, no polling, no timeouts. |
+| "The waiter can also check status / read the journal." | No. The waiter is single-job: block-poll inbox, deliver, exit. |
 | "No need to ack after handling." | You must ack, or the same message is fetched repeatedly. |
 | "No need to push state after editing docs." | When sync is active, push-state so the phone updates. |
 | "It works without the runtime installed." | It needs repo `runtime/server` + npm deps; install per runtime.md first. |

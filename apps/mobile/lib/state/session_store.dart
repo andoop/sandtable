@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 
 import '../data/connections_repository.dart';
+import '../data/models/agent_state.dart';
 import '../data/models/connection.dart';
 import '../data/models/document.dart';
 import '../data/models/message.dart';
@@ -50,6 +51,14 @@ class SessionStore extends ChangeNotifier {
   /// is "unread" when its [RuntimeSession.lastActivityAt] is newer than this.
   final Map<String, DateTime> _readMarksData = {};
   bool _seedReadOnNextList = false;
+
+  /// Latest runtime state of the main agent / waiting sub-agent for this server
+  /// (connection-level; mirrored from `agent_state` broadcasts).
+  AgentRuntimeState? _agentMain;
+  AgentRuntimeState? _agentWaiter;
+
+  AgentRuntimeState? get agentMain => _agentMain;
+  AgentRuntimeState? get agentWaiter => _agentWaiter;
 
   bool _loadingSessions = false;
   String? _sessionsError;
@@ -269,7 +278,21 @@ class SessionStore extends ChangeNotifier {
       case 'message':
         _applyMessage(envelope.data['message']);
         break;
+      case 'agent_state':
+        _applyAgentState(envelope.data['agent']);
+        break;
     }
+  }
+
+  void _applyAgentState(dynamic raw) {
+    if (raw is! Map<String, dynamic>) return;
+    final state = AgentRuntimeState.fromJson(raw);
+    if (state.role == AgentRole.main) {
+      _agentMain = state;
+    } else {
+      _agentWaiter = state;
+    }
+    notifyListeners();
   }
 
   void _applySession(dynamic raw) {

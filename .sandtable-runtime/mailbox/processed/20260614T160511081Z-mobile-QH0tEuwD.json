@@ -1,0 +1,13 @@
+{
+  "id": "20260614T160511081Z-mobile-QH0tEuwD",
+  "feature": "2026-06-13-mobile-on-demand-sync",
+  "sessionId": "sess_NpSKR4t9_6Fz",
+  "source": "mobile",
+  "type": "mobile_paired",
+  "createdAt": "2026-06-14T16:05:11.081Z",
+  "payload": {
+    "code": "4597",
+    "publicUrl": "http://192.168.5.198:8765",
+    "sessionId": "sess_NpSKR4t9_6Fz"
+  }
+}

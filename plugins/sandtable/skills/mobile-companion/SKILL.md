@@ -30,12 +30,25 @@ description: Use when the developer enables Sandtable mobile review / 手机同�
 ## On-demand sync 主循环
 
 1. **开启**：运行 `scripts/sandtable-mobile-start.sh [feature-id]`，醒目输出配对码、Server URL、三步进度。电脑无需额外"连接"，手机输 URL + 4 位码（或扫码）即可。
-2. **拉起等待子 agent**：执行 `/sandtable-mobile-wait`——子 agent **只**运行 `scripts/sandtable-mobile-wait.sh <feature>`（每 5s 查 inbox），收到一条消息原样交主 agent 后**立即退出**；**禁止**子 agent 查 status/health、读 journal、改文档。
+2. **拉起等待子 agent**：执行 `/sandtable-mobile-wait`——按「等待协议」派**一个**子 agent，子 agent **只**运行 `scripts/sandtable-mobile-wait.sh <feature>`（阻塞轮询 inbox 直到拿到一条消息才返回），拿到后以**纯文本结构化**交主 agent（**不要贴裸 JSON**，否则 Codex 渲染失败；如需原文用 ```json 代码块``` 包裹）再**退出**；**禁止**子 agent 查 status/health、读 journal、改文档。
 3. **处理手机消息**：主 agent 处理完后：
    - `curl -X POST http://127.0.0.1:8765/mailbox/inbox/ack -H 'content-type: application/json' -d '{"ids":["<message-id>"]}'`
    - 再执行 `/sandtable-mobile-wait` 拉起下一个等待子 agent。
 4. **回话 / 推状态**：给手机回话 `POST /agent/sessions/<sid>/messages`（kind: chat/answer/confirmation）；更新 Sandtable 文档后若 sync active：`curl -X POST http://127.0.0.1:8765/mobile-sync/push-state`。
 5. **落盘**：在 feature `journal.md` 追加同步/处理记录。
+
+## 等待协议（跨工具铁律）
+
+主 agent 派**一个**等待子 agent 后，**阻塞等待其返回，不限时长**；等待期间**零动作**：不自查 inbox/status/health、不设超时、不反复检查、不忙活。各工具的"派子 agent 并阻塞等返回"原语：Cursor / Claude Code 用 Task，**Kiro 用 `invoke_sub_agent`**。不要把"派子 agent"误解为"起后台再自己盯着"。详见 `/sandtable-mobile-wait`。
+
+## 运行态同步到手机
+
+脚本自动上报：`start` → 主 agent `idle`；`wait` → 等待器 `waiting`，收到消息 → `processing`；`stop` → 主 agent `disconnected`、等待器 `exited`。**主 agent 处理手机消息时**补报自身状态（端口取自 `.sandtable-runtime/session/server.port`）：
+- 开始处理：`POST /mobile-sync/agent-state {"role":"main","state":"working","detail":"…"}`
+- 处理完、回到等待：`{"role":"main","state":"idle"}`
+- 出错：`{"role":"main","state":"error","detail":"<原因>"}`
+
+手机据此显示：主 agent（空闲 / 处理中 / 已断开 / 出错）与 等待器（就绪 / 收信中 / 处理中 / 已退出）。
 
 ## 长驻 worker 纪律
 
@@ -53,7 +66,8 @@ description: Use when the developer enables Sandtable mobile review / 手机同�
 | 念头 | 现实 |
 |------|------|
 | "起了 server 就算开好了" | 还要拉起 inbox 等待子 agent，否则手机消息无人处理。 |
-| "等待子 agent 顺便查下状态/读 journal" | 不行。等待子 agent 单职责：只轮询 inbox、交付、退出。 |
+| "派了等待子 agent，我先去查查状态/忙别的" | 不行。派出后主 agent 阻塞等其返回，零动作、不轮询、不设超时。 |
+| "等待子 agent 顺便查下状态/读 journal" | 不行。等待子 agent 单职责：只阻塞轮询 inbox、交付、退出。 |
 | "处理完消息不用 ack" | 必须 ack，否则同一条消息会被反复取出。 |
 | "改完文档不用推状态" | sync active 时要 push-state，手机才会更新。 |
 | "项目没装 runtime 也能跑" | 需要仓库内 runtime/server + npm 依赖；缺则先按 runtime.md 装。 |

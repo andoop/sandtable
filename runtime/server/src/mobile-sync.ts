@@ -1,6 +1,6 @@
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import type { RuntimePaths } from "./types.js";
+import type { AgentRuntimeState, RuntimePaths } from "./types.js";
 
 export interface MobileSyncSession {
   active: boolean;
@@ -15,6 +15,9 @@ export interface MobileSyncSession {
   startedAt: string;
   expiresAt: string;
   workerHint: string;
+  /** Latest runtime state of the main agent and the waiting sub-agent. */
+  agentMain?: AgentRuntimeState;
+  agentWaiter?: AgentRuntimeState;
 }
 
 export function mobileSyncPath(paths: RuntimePaths): string {
