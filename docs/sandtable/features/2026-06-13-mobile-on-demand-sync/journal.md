@@ -244,3 +244,16 @@
 - Target: conversation
 
 - 来源: mobile-app:sess_lOuzQMt00pj8
+
+## 2026-06-14 · [手机同步]
+- 背景: `/sandtable-mobile-start`
+- 内容: 配对码 9936；Server http://192.168.5.198:8765；feature=2026-06-13-mobile-on-demand-sync；server 已就绪、Agent 已同步 VERIFY（手机暂未配对）。
+- 依据/来源: `scripts/sandtable-mobile-start.sh`、`GET /mobile-sync/status`
+
+## 2026-06-14 · [修复]
+- 背景: 主 agent 处理手机消息「手机上回话列表上做一下未读消息吧，明显一些，方便我很快了解」
+- 内容: 为会话列表加未读标记。新增 per-connection 已读游标（`ReadMarksCache`，SharedPreferences 持久化）：未读 = `session.lastActivityAt` 晚于该会话已读游标；进入会话详情即 `markRead`（在底部时持续保持已读）；首次连接服务器把历史会话种子为已读，避免一上来全未读；会话消失/断开时清理游标。UI：未读 tile 显示蓝点+加粗标题+蓝色描边，列表顶部「N 条未读」汇总。
+- 改动文件: `connections_repository.dart`(+ReadMarksCache/_PrefsReadMarksCache)、`session_store.dart`(isUnread/markRead/unreadCount/seed/prune)、`connections_controller.dart`(注入 readMarks + unreadSessionCount + detach 清理)、`core/theme.dart`(SurfaceCard borderColor/borderWidth)、`ui/widgets/session_tile.dart`(unread 指示)、`ui/screens/session_list_screen.dart`(传 unread + onTap markRead + 汇总徽标)、`ui/screens/session_detail_screen.dart`(在底部保持已读)。
+- 验证: Dart 分析服务器对 7 个改动文件均无诊断。flutter analyze/test 在本沙箱内挂起（历史遗留十余个未结束的 flutter 进程印证），无法运行；已用 IDE 分析作为编译校验，待手机端热重启做功能验证。
+- 处理: 已回复手机（200）；push-state（200, VERIFY）；inbox ack 1 条（200）。
+- 依据/来源: 手机 inbox `20260614T093823221Z-mobile-RKzto8BM`

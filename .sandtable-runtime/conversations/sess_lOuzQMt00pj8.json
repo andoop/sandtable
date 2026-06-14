@@ -481,6 +481,36 @@
         "name": "Sandtable agent"
       },
       "createdAt": "2026-06-14T09:38:23.219Z"
+    },
+    {
+      "id": "msg_20260614T095932744Z_Z5qQqHwp",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "agent",
+      "kind": "chat",
+      "text": "已做好手机会话列表的未读标记：未读会话会显示蓝色圆点 + 加粗标题 + 蓝色描边，列表顶部还有「N 条未读」汇总，一眼就能看出哪些有新动静。进入会话即自动标为已读，已读状态本地持久化（重开 App 仍记得）。首次连接某服务器时不会把历史会话全标成未读。请热重启 App 验证效果。",
+      "payload": {},
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T09:59:32.783Z"
+    },
+    {
+      "id": "msg_20260614T095954507Z_DgfKHrRI",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "agent",
+      "kind": "chat",
+      "text": "已做好手机会话列表的未读标记：未读会话会显示蓝色圆点 + 加粗标题 + 蓝色描边，列表顶部还有「N 条未读」汇总，一眼就能看出哪些有新动静。进入会话即自动标为已读，已读状态本地持久化（重开 App 仍记得）。首次连接某服务器时不会把历史会话全标成未读。请热重启 App 验证效果。",
+      "payload": {},
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T09:59:54.546Z"
     }
   ]
 }

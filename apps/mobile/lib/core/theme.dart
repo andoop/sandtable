@@ -71,11 +71,17 @@ class SurfaceCard extends StatelessWidget {
     required this.child,
     this.padding = const EdgeInsets.all(16),
     this.onTap,
+    this.borderColor,
+    this.borderWidth,
   });
 
   final Widget child;
   final EdgeInsetsGeometry padding;
   final VoidCallback? onTap;
+
+  /// Optional border tint/width override (e.g. to highlight an unread row).
+  final Color? borderColor;
+  final double? borderWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -90,7 +96,10 @@ class SurfaceCard extends StatelessWidget {
           padding: padding,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(16),
-            border: Border.all(color: scheme.outlineVariant.withOpacity(0.6)),
+            border: Border.all(
+              color: borderColor ?? scheme.outlineVariant.withOpacity(0.6),
+              width: borderWidth ?? 1,
+            ),
           ),
           child: child,
         ),

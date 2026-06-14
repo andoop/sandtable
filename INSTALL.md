@@ -45,7 +45,7 @@ English official prompt:
 - `AGENTS.md` 仍是受保护文件、绝不覆盖；但在本次 locale-pack 安装规则下，它同时属于语言相关资产，所以只要 `AGENTS.md` 已存在，就视为 locale-pack 冲突，停止复制该语言包并如实报告，而不是继续追加。
 - 外科手术式：只安装本说明列出的文件；不要顺手安装其它仓库文件。
 - 诚实报告（硬性）：只要跳过的是核心项（`skills/`、`templates/`、`commands/`、`plugins/sandtable/commands`、`plugins/sandtable/skills`、`AGENTS.md`、`.cursor/rules/sandtable.mdc`、`plugins/sandtable/.codex-plugin/plugin.json`、`.agents/plugins/marketplace.json`、`hooks/run-hook.cmd`、`hooks/session-start` 之一），最终都必须报告“安装不完整”。存在性检查只是辅助，跳过清单才是权威。
-- Mobile Review Companion 是可选 runtime；本安装流程不安装 Node、Flutter、Dart 或 runtime 依赖。需要手机审阅时，安装方法论资产后再按 `docs/mobile-review-companion/runtime.md` 显式启用。
+- Mobile Review Companion 是可选能力；本安装流程不安装 Node、Flutter、Dart 运行时或 npm/pub 依赖，但会复制 `runtime/` server 源码（排除 `node_modules/`、`dist/`、`.vite/`）。需要手机审阅时，安装方法论资产后先 `npm --prefix runtime/server install`，再按 `docs/mobile-review-companion/runtime.md` 显式启用。`apps/`（Flutter App）不随安装复制。
 
 ### 2. 取得 Sandtable 源
 
@@ -91,10 +91,24 @@ git clone --depth 1 https://github.com/andoop/sandtable "$SB_SRC"
   - `hooks/hooks-cursor.json` ← `$SB_SRC/hooks/hooks-cursor.json`
   - `plugins/sandtable/.codex-plugin/plugin.json` ← `$SB_SRC/plugins/sandtable/.codex-plugin/plugin.json`
   - `.agents/plugins/marketplace.json` ← `$SB_SRC/.agents/plugins/marketplace.json`
+- 可选 Mobile Companion 脚本（共享机器资产，zh-first；随方法论安装，但需仓库内 `runtime/` 就位才能真正启动 server）：
+  - `scripts/sandtable-mobile-start.sh` ← `$SB_SRC/scripts/sandtable-mobile-start.sh`
+  - `scripts/sandtable-mobile-status.sh` ← `$SB_SRC/scripts/sandtable-mobile-status.sh`
+  - `scripts/sandtable-mobile-stop.sh` ← `$SB_SRC/scripts/sandtable-mobile-stop.sh`
+  - `scripts/sandtable-mobile-wait.sh` ← `$SB_SRC/scripts/sandtable-mobile-wait.sh`
+- 可选 Mobile Companion 文档（共享，供 `/sandtable-mobile-*` 命令引用）：
+  - `docs/mobile-review-companion/protocol.md` ← `$SB_SRC/docs/mobile-review-companion/protocol.md`
+  - `docs/mobile-review-companion/runtime.md` ← `$SB_SRC/docs/mobile-review-companion/runtime.md`
+  - `docs/mobile-review-companion/verification.md` ← `$SB_SRC/docs/mobile-review-companion/verification.md`
+- 可选 Mobile Companion runtime 源码（共享；复制 `runtime/server/` 全部源码文件，**排除** `node_modules/`、`dist/`、`.vite/`）：
+  - `runtime/server/**`（src、scripts、test、`package.json`、`package-lock.json`、`tsconfig.json`、`.gitignore` 等）← `$SB_SRC/runtime/server/**`
 
 说明：
 
 - `templates/` 必须始终是唯一模板根目录；英文模板也必须安装到用户项目的 `templates/`，不能变成第二个平行模板根。
+- `commands/`、`.cursor/commands/`、`plugins/sandtable/commands/` 三处都包含 `sandtable-mobile-*`（可选移动端命令），随各自 locale pack 一起安装；它们依赖上面的 Mobile Companion 脚本与仓库内 `runtime/`。
+- `runtime/`（Node server）随方法论**复制源码**（排除 `node_modules/`、`dist/`、`.vite/`），但**不**自动 `npm install`；`apps/`（Flutter App）属于可选 Mobile Review Companion，本安装流程**绝不复制**，需用户单独 clone 仓库取得。
+- `.claude-plugin/`（Claude Code 插件 / marketplace 清单）与 `.cursor-plugin/plugin.json`（Cursor 插件清单）是**仓库侧分发清单**（指向上游 GitHub 仓库），用于用户从插件市场添加 Sandtable，**不复制进用户项目**。
 - `CLAUDE.md` 不维护独立语言副本；若目标项目没有 `CLAUDE.md`，继续按原规则创建 `CLAUDE.md -> AGENTS.md` 的符号链接即可，语言跟随 `AGENTS.md` 内容本身。
 - `scripts/test-sandtable-init.sh` 是仓库内部测试脚本，绝不安装到用户项目。
 - Codex plugin manifest 和 marketplace 注册文件是共享机器资产；它们不随语言切换，但 `plugins/sandtable/commands/*.md` 与 `plugins/sandtable/skills/**` 必须跟随 locale pack。
@@ -222,6 +236,36 @@ Codex 插件命令使用插件命名空间；安装后优先尝试 `/sandtable:s
 
 - Kiro / 通用 agent：步骤 5.1 的 `AGENTS.md` 即为行为基线；没有专属 slash 接线时，把 `/sandtable-start` 作为普通消息发给 AI 执行。
 
+#### 5.3 可选 Mobile Companion 资产（脚本 / 文档 / runtime 源码；目标已存在则跳过并报告）
+
+这些资产支撑 `/sandtable-mobile-*` 命令。脚本与 runtime 源码随方法论一起安装；首次启用移动端时需 `npm --prefix runtime/server install` 装一次依赖（见 README「Mobile Review Companion」）。
+
+```bash
+mkdir -p ./scripts
+for s in sandtable-mobile-start.sh sandtable-mobile-status.sh sandtable-mobile-stop.sh sandtable-mobile-wait.sh; do
+  [ -e "./scripts/$s" ] && echo "跳过 ./scripts/$s（已存在）" \
+    || cp "$SB_SRC/scripts/$s" "./scripts/$s"
+done
+mkdir -p ./docs/mobile-review-companion
+for d in protocol.md runtime.md verification.md; do
+  [ -e "./docs/mobile-review-companion/$d" ] && echo "跳过 ./docs/mobile-review-companion/$d（已存在）" \
+    || cp "$SB_SRC/docs/mobile-review-companion/$d" "./docs/mobile-review-companion/$d"
+done
+# runtime server 源码：复制全部源码文件，排除 node_modules/dist/.vite（纯 coreutils）
+if [ -e ./runtime/server ]; then
+  echo "跳过 ./runtime/server（已存在）"
+else
+  ( cd "$SB_SRC/runtime/server" && \
+    find . -type d \( -name node_modules -o -name dist -o -name .vite \) -prune -o -type f -print ) \
+    | while IFS= read -r f; do
+        mkdir -p "./runtime/server/$(dirname "$f")"
+        cp "$SB_SRC/runtime/server/$f" "./runtime/server/$f"
+      done
+fi
+```
+
+不要复制 `scripts/mobile-listening-e2e.sh` 与 `scripts/test-sandtable-init.sh`（仓库内部测试脚本，绝不安装到用户项目）。不要复制 `apps/`（Flutter App，需用户单独 clone），也不要复制 `runtime/server/node_modules`、`dist`、`.vite`。`docs/mobile-review-companion/` 是只读参考文档，与用户的 `docs/sandtable/` 战役记忆互不相干。
+
 ### 6. 初始化运行时工作区（可选，推荐）
 
 仅当 `scripts/sandtable-init.sh` 已就位时：
@@ -252,6 +296,10 @@ done
 # Claude Code 用户追加（hooks 文件级检查）
 for p in hooks/hooks.json hooks/hooks-cursor.json hooks/run-hook.cmd hooks/session-start; do
   [ -e "./$p" ] && echo "ok ./$p" || echo "MISSING ./$p（Claude Code 不完整）"
+done
+# 可选 Mobile Companion（装了移动端命令就一并校验脚本与 runtime 源码到位）
+for p in scripts/sandtable-mobile-start.sh scripts/sandtable-mobile-wait.sh commands/sandtable-mobile-start.md runtime/server/package.json runtime/server/src; do
+  [ -e "./$p" ] && echo "ok ./$p" || echo "缺 ./$p（移动端可选，未启用可忽略）"
 done
 ```
 

@@ -155,6 +155,14 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
         }
         _lastMessageCount = messages.length;
 
+        // While the newest messages are on screen, keep this session marked
+        // read so leaving it doesn't leave a stale unread flag on the list.
+        if (_atBottom && session != null) {
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (mounted) _store.markRead(widget.sessionId);
+          });
+        }
+
         return Scaffold(
           resizeToAvoidBottomInset: true,
           appBar: AppBar(

@@ -69,6 +69,11 @@ class ConnectionsController extends ChangeNotifier {
           s.session.status == SessionStatus.blocked)
       .length;
 
+  /// Total sessions with unseen activity across all servers, for an at-a-glance
+  /// badge on the list.
+  int get unreadSessionCount =>
+      _connections.fold(0, (sum, c) => sum + c.store.unreadCount);
+
   /// Worst connection status across all servers, for the global banner.
   StreamStatus get aggregateStatus {
     if (_connections.isEmpty) return StreamStatus.disconnected;
@@ -151,6 +156,7 @@ class ConnectionsController extends ChangeNotifier {
       id: stored.id,
       connection: stored.connection,
       cache: _repo.cacheFor(stored.id),
+      readMarks: _repo.readMarksFor(stored.id),
     );
     final managed = ManagedConnection(stored: stored, store: store);
     store.addListener(() => _onStoreChanged(managed));
@@ -161,7 +167,10 @@ class ConnectionsController extends ChangeNotifier {
   Future<void> _detach(ManagedConnection managed, {required bool clearCache}) async {
     _connections.remove(managed);
     managed.store.dispose();
-    if (clearCache) await _repo.cacheFor(managed.id).clear();
+    if (clearCache) {
+      await _repo.cacheFor(managed.id).clear();
+      await _repo.readMarksFor(managed.id).clear();
+    }
   }
 
   void _onStoreChanged(ManagedConnection managed) {

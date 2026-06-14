@@ -105,11 +105,20 @@ English：
 - `/sandtable-resume`: 按 `state.md` 与 `journal.md` 恢复现场继续。
 - `/sandtable-status`: 查看阶段、任务、推演结果和未决问题。
 
+可选 Mobile Review Companion 命令（需先按下文启用 runtime）：
+
+- `/sandtable-mobile-start`: 按需开启手机同步，生成 4 位配对码与 Server URL，并拉起 inbox 等待子 agent。
+- `/sandtable-mobile-status`: 查看手机同步状态、配对码、是否已配对。
+- `/sandtable-mobile-stop`: 终止手机同步并停止 runtime server。
+- `/sandtable-mobile-wait`: 启动单职责 inbox 等待子 agent（等到一条手机消息即交给主 agent 并退出）。
+
 ## Mobile Review Companion（可选）
 
 Sandtable 现在包含一个可选 mobile review runtime：本机/局域网 server、MCP 风格 handler、文件信箱 fallback、长驻 waiting worker 队列，以及 Android/iOS Flutter App。它用于在手机上查看 PRD/tests/plan/state/journal/questions，并提交确认或回答。
 
-默认 Sandtable 方法论安装仍不安装 Node、Flutter、Dart 或 runtime 依赖。启用移动端审阅时，按 [`docs/mobile-review-companion/runtime.md`](docs/mobile-review-companion/runtime.md) 单独启动。
+默认 Sandtable 方法论安装仍不安装 Node、Flutter、Dart 运行时或 npm/pub 依赖。安装/更新会**复制并覆盖 `runtime/`（Node server）源码**（排除 `node_modules/`、`dist/`、`.vite/` 等依赖与构建产物），让 `/sandtable-mobile-*` 命令开箱即用；但 **`apps/`（Flutter App）不随方法论安装**，需用户单独 clone 本仓库取得。要启用移动端审阅，先 `npm --prefix runtime/server install` 安装依赖，再按 [`docs/mobile-review-companion/runtime.md`](docs/mobile-review-companion/runtime.md) 启动；协议与真机验证分别见 [`protocol.md`](docs/mobile-review-companion/protocol.md) 与 [`verification.md`](docs/mobile-review-companion/verification.md)。
+
+安装/更新方法论资产时会带上 `/sandtable-mobile-*` 命令、`scripts/sandtable-mobile-*.sh` 与 `runtime/` server 源码；这些就绪后，移动端命令即可在本机启动 server（首次需先装一次 npm 依赖）。
 
 ## Sandtable vs Superpowers
 [Superpowers](https://github.com/obra/superpowers) 是一套优秀的、被广泛使用的 agent 方法论，Sandtable 与它同源同宗：都不让 agent“看见需求就开写”，都用自动触发的 skill、都在隔离 worktree 里干活、都把设计落盘。
@@ -132,11 +141,16 @@ Sandtable 现在包含一个可选 mobile review runtime：本机/局域网 serv
 ```text
 sandtable/
   README.md
+  INSTALL.md / UPDATE.md
   AGENTS.md / CLAUDE.md
   .cursor/rules/sandtable.mdc
   .cursor/commands/*.md
-  commands/*.md
-  .agents/plugins/marketplace.json
+  commands/*.md                      # 含 sandtable-mobile-*（可选移动端命令）
+  scripts/                           # sandtable-init.sh + sandtable-mobile-*.sh
+  locales/en/**                      # 英文 locale pack（与根目录中文资产镜像）
+  .claude-plugin/                    # Claude Code 插件 / marketplace 清单（仓库侧分发，不复制进用户项目）
+  .cursor-plugin/plugin.json         # Cursor 插件清单（仓库侧分发）
+  .agents/plugins/marketplace.json   # Codex 本地 marketplace 注册
   plugins/sandtable/
     .codex-plugin/plugin.json
     commands/*.md
@@ -150,6 +164,9 @@ sandtable/
     state-and-memory/
     ... more skills
   templates/
+  docs/mobile-review-companion/      # 可选 runtime 的协议/启动/验证文档
+  runtime/                           # 可选 Node server 源码（随方法论安装/更新，排除 node_modules 等）
+  apps/                              # 可选 Android/iOS Flutter App（不随方法论安装，需单独 clone）
 ```
 
 运行时会在目标项目生成:

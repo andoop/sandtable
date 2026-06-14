@@ -14,6 +14,7 @@ class SessionTile extends StatelessWidget {
     required this.session,
     required this.onTap,
     this.serverLabel,
+    this.unread = false,
   });
 
   final RuntimeSession session;
@@ -21,6 +22,10 @@ class SessionTile extends StatelessWidget {
 
   /// Optional server/repo label, shown when managing more than one server.
   final String? serverLabel;
+
+  /// Whether this session has activity the user hasn't opened yet. Drives a
+  /// prominent unread indicator (accent dot + bolder title + accent border).
+  final bool unread;
 
   @override
   Widget build(BuildContext context) {
@@ -30,6 +35,8 @@ class SessionTile extends StatelessWidget {
     return SurfaceCard(
       padding: const EdgeInsets.all(14),
       onTap: onTap,
+      borderColor: unread ? scheme.primary.withOpacity(0.85) : null,
+      borderWidth: unread ? 1.6 : null,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -41,12 +48,31 @@ class SessionTile extends StatelessWidget {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    Text(
-                      session.title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: const TextStyle(
-                          fontSize: 15.5, fontWeight: FontWeight.w700),
+                    Row(
+                      children: [
+                        if (unread) ...[
+                          Container(
+                            width: 9,
+                            height: 9,
+                            decoration: BoxDecoration(
+                              color: scheme.primary,
+                              shape: BoxShape.circle,
+                            ),
+                          ),
+                          const SizedBox(width: 7),
+                        ],
+                        Expanded(
+                          child: Text(
+                            session.title,
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: TextStyle(
+                                fontSize: 15.5,
+                                fontWeight:
+                                    unread ? FontWeight.w800 : FontWeight.w700),
+                          ),
+                        ),
+                      ],
                     ),
                     const SizedBox(height: 2),
                     Row(

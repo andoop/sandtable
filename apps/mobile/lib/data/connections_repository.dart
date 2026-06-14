@@ -47,11 +47,21 @@ abstract class SessionCache {
   Future<void> clear();
 }
 
+/// Per-connection record of "how far the user has read" each session, so the
+/// list can flag sessions with activity newer than the last time they were
+/// opened. Keyed by sessionId → last-read activity time (UTC millis).
+abstract class ReadMarksCache {
+  Future<Map<String, DateTime>> load();
+  Future<void> save(Map<String, DateTime> marks);
+  Future<void> clear();
+}
+
 /// Stores the list of connected servers and their cached sessions. Replaces the
 /// old single-connection store so the app can manage multiple repos/servers.
 class ConnectionsRepository {
   static const String _connectionsKey = 'sandtable.connections';
   static const String _sessionsPrefix = 'sandtable.sessions.';
+  static const String _readMarksPrefix = 'sandtable.read.';
 
   Future<List<StoredConnection>> load() async {
     final prefs = await SharedPreferences.getInstance();
@@ -78,6 +88,9 @@ class ConnectionsRepository {
 
   SessionCache cacheFor(String connectionId) =>
       _PrefsSessionCache('$_sessionsPrefix$connectionId');
+
+  ReadMarksCache readMarksFor(String connectionId) =>
+      _PrefsReadMarksCache('$_readMarksPrefix$connectionId');
 }
 
 class _PrefsSessionCache implements SessionCache {
@@ -106,6 +119,46 @@ class _PrefsSessionCache implements SessionCache {
     await prefs.setString(
       _key,
       jsonEncode(sessions.map((s) => s.toJson()).toList()),
+    );
+  }
+
+  @override
+  Future<void> clear() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove(_key);
+  }
+}
+
+class _PrefsReadMarksCache implements ReadMarksCache {
+  _PrefsReadMarksCache(this._key);
+  final String _key;
+
+  @override
+  Future<Map<String, DateTime>> load() async {
+    final prefs = await SharedPreferences.getInstance();
+    final raw = prefs.getString(_key);
+    if (raw == null || raw.isEmpty) return {};
+    try {
+      final decoded = jsonDecode(raw) as Map<String, dynamic>;
+      final marks = <String, DateTime>{};
+      decoded.forEach((id, millis) {
+        if (millis is int) {
+          marks[id] = DateTime.fromMillisecondsSinceEpoch(millis, isUtc: true);
+        }
+      });
+      return marks;
+    } catch (_) {
+      return {};
+    }
+  }
+
+  @override
+  Future<void> save(Map<String, DateTime> marks) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString(
+      _key,
+      jsonEncode(marks.map(
+          (id, time) => MapEntry(id, time.toUtc().millisecondsSinceEpoch))),
     );
   }
 

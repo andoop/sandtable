@@ -21,8 +21,10 @@ class SessionStore extends ChangeNotifier {
     required this.id,
     required this.connection,
     required SessionCache cache,
+    required ReadMarksCache readMarks,
   })  : api = SandtableApi(connection),
         _cache = cache,
+        _readMarks = readMarks,
         _stream = RuntimeStream(connection: connection);
 
   /// Stable id of the owning connection (used for per-server caching/routing).
@@ -30,6 +32,7 @@ class SessionStore extends ChangeNotifier {
   final SandtableConnection connection;
   final SandtableApi api;
   final SessionCache _cache;
+  final ReadMarksCache _readMarks;
   final RuntimeStream _stream;
 
   /// How long to keep the "Agent is working" indicator before giving up.
@@ -42,6 +45,11 @@ class SessionStore extends ChangeNotifier {
   final Set<String> _conversationLoaded = {};
   final Map<String, bool> _awaitingReply = {};
   final Map<String, Timer> _awaitTimers = {};
+
+  /// sessionId → the session activity time the user has already seen. A session
+  /// is "unread" when its [RuntimeSession.lastActivityAt] is newer than this.
+  final Map<String, DateTime> _readMarksData = {};
+  bool _seedReadOnNextList = false;
 
   bool _loadingSessions = false;
   String? _sessionsError;
@@ -71,12 +79,44 @@ class SessionStore extends ChangeNotifier {
   /// True while we are waiting for the agent to respond to a sent chat message.
   bool awaitingReply(String sessionId) => _awaitingReply[sessionId] ?? false;
 
+  /// Whether [sessionId] has activity the user has not seen yet. A session with
+  /// no read mark counts as unread (it's new to the user) unless it predates
+  /// read tracking, in which case it was seeded as read on first list load.
+  bool isUnread(String sessionId) {
+    final session = _sessions[sessionId];
+    if (session == null) return false;
+    final mark = _readMarksData[sessionId];
+    if (mark == null) return true;
+    return session.lastActivityAt.isAfter(mark);
+  }
+
+  /// Total number of sessions with unseen activity, for an aggregate badge.
+  int get unreadCount =>
+      _sessions.keys.where(isUnread).length;
+
+  /// Mark [sessionId] as read up to its current activity. Idempotent: only
+  /// notifies/persists when the stored mark actually advances.
+  void markRead(String sessionId) {
+    final session = _sessions[sessionId];
+    if (session == null) return;
+    final existing = _readMarksData[sessionId];
+    if (existing != null && !session.lastActivityAt.isAfter(existing)) return;
+    _readMarksData[sessionId] = session.lastActivityAt;
+    unawaited(_readMarks.save(_readMarksData));
+    notifyListeners();
+  }
+
   Future<void> init() async {
     final cached = await _cache.load();
     if (cached.isNotEmpty && _sessions.isEmpty) {
       _sessions.addEntries(cached.map((s) => MapEntry(s.id, s)));
       notifyListeners();
     }
+    final marks = await _readMarks.load();
+    _readMarksData.addAll(marks);
+    // First run on this server: don't blast every pre-existing session as
+    // unread — seed them as read once the first authoritative list arrives.
+    _seedReadOnNextList = marks.isEmpty;
     _stream.status.addListener(notifyListeners);
     _streamSub = _stream.envelopes.listen(_onEnvelope);
     await _stream.start();
@@ -101,6 +141,14 @@ class SessionStore extends ChangeNotifier {
       // Drop conversations/indicators for sessions that no longer exist.
       _conversations.removeWhere((id, _) => !ids.contains(id));
       _awaitingReply.removeWhere((id, _) => !ids.contains(id));
+      _pruneReadMarks(ids);
+      if (_seedReadOnNextList) {
+        _seedReadOnNextList = false;
+        for (final s in sessions) {
+          _readMarksData[s.id] = s.lastActivityAt;
+        }
+        unawaited(_readMarks.save(_readMarksData));
+      }
       unawaited(_cache.save(sessions));
     } on SandtableAuthException {
       _flagUnauthorized();
@@ -271,7 +319,19 @@ class SessionStore extends ChangeNotifier {
     _sessions.remove(sessionId);
     _conversations.remove(sessionId);
     _conversationLoaded.remove(sessionId);
+    if (_readMarksData.remove(sessionId) != null) {
+      unawaited(_readMarks.save(_readMarksData));
+    }
     _clearAwaitingReply(sessionId);
+  }
+
+  /// Forget read marks for sessions the server no longer reports.
+  void _pruneReadMarks(Set<String> liveIds) {
+    final before = _readMarksData.length;
+    _readMarksData.removeWhere((id, _) => !liveIds.contains(id));
+    if (_readMarksData.length != before) {
+      unawaited(_readMarks.save(_readMarksData));
+    }
   }
 
   void _beginAwaitingReply(String sessionId) {

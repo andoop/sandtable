@@ -157,14 +157,18 @@ class SessionListScreen extends StatelessWidget {
           child: SessionTile(
             session: item.session,
             serverLabel: multiServer ? item.connection.label : null,
-            onTap: () => Navigator.of(context).push(
-              MaterialPageRoute<void>(
-                builder: (_) => SessionDetailScreen(
-                  store: item.connection.store,
-                  sessionId: item.session.id,
+            unread: item.connection.store.isUnread(item.session.id),
+            onTap: () {
+              item.connection.store.markRead(item.session.id);
+              Navigator.of(context).push(
+                MaterialPageRoute<void>(
+                  builder: (_) => SessionDetailScreen(
+                    store: item.connection.store,
+                    sessionId: item.session.id,
+                  ),
                 ),
-              ),
-            ),
+              );
+            },
           ),
         );
       },
@@ -196,17 +200,39 @@ class SessionListScreen extends StatelessWidget {
   Widget _summaryHeader(BuildContext context, int total) {
     final scheme = Theme.of(context).colorScheme;
     final servers = controller.connections.length;
+    final unread = controller.unreadSessionCount;
     return Padding(
       padding: const EdgeInsets.only(bottom: 6, top: 4),
       child: Row(
         children: [
-          Text(
-            '$servers 个服务器 · $total 个会话 · ${controller.activeSessionCount} 个进行中',
-            style: TextStyle(
-                color: scheme.onSurfaceVariant,
-                fontSize: 13,
-                fontWeight: FontWeight.w600),
+          Flexible(
+            child: Text(
+              '$servers 个服务器 · $total 个会话 · ${controller.activeSessionCount} 个进行中',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                  color: scheme.onSurfaceVariant,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600),
+            ),
           ),
+          if (unread > 0) ...[
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+              decoration: BoxDecoration(
+                color: scheme.primary,
+                borderRadius: BorderRadius.circular(999),
+              ),
+              child: Text(
+                '$unread 条未读',
+                style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 11.5,
+                    fontWeight: FontWeight.w700),
+              ),
+            ),
+          ],
           const Spacer(),
           Text('左滑删除',
               style: TextStyle(color: scheme.onSurfaceVariant, fontSize: 12)),
