@@ -16,8 +16,12 @@ import 'document_screen.dart';
 
 const _documents = ['state', 'prd', 'tests', 'plan', 'questions', 'journal'];
 
-/// Per-session conversation: live transcript plus a chat composer to message the
-/// agent (chat / answer / confirmation).
+/// Per-session conversation: a live transcript plus a chat composer.
+///
+/// The message list is rendered with `reverse: true` so the newest message sits
+/// at the bottom and is visible the instant the screen opens — no manual scroll
+/// math (which is unreliable for variable-height / Markdown bubbles in a lazily
+/// built list). Scroll offset 0 == the bottom (newest).
 class SessionDetailScreen extends StatefulWidget {
   const SessionDetailScreen({
     super.key,
@@ -36,10 +40,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
   final ScrollController _scrollController = ScrollController();
   bool _sending = false;
   int _lastMessageCount = 0;
-  bool _lastAwaiting = false;
-  double _lastInset = 0;
   bool _atBottom = true;
-  bool _didInitialScroll = false;
   int _unreadWhileAway = 0;
 
   SessionStore get _store => widget.store;
@@ -61,8 +62,7 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
 
   void _onScroll() {
     if (!_scrollController.hasClients) return;
-    final position = _scrollController.position;
-    final atBottom = position.pixels >= position.maxScrollExtent - 80;
+    final atBottom = _scrollController.position.pixels <= 80;
     if (atBottom != _atBottom) {
       setState(() {
         _atBottom = atBottom;
@@ -71,27 +71,15 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
     }
   }
 
-  void _scrollToBottom({bool animated = true}) {
-    void scrollNow() {
-      if (!_scrollController.hasClients) return;
-      final target = _scrollController.position.maxScrollExtent;
-      if (animated) {
-        _scrollController.animateTo(
-          target,
-          duration: const Duration(milliseconds: 240),
-          curve: Curves.easeOut,
-        );
-      } else {
-        _scrollController.jumpTo(target);
-      }
-    }
-
-    // ListView.builder may not have final maxScrollExtent on the first frame.
+  // Reverse list: the bottom (newest) is offset 0.
+  void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      scrollNow();
-      if (!animated) {
-        WidgetsBinding.instance.addPostFrameCallback((_) => scrollNow());
-      }
+      if (!_scrollController.hasClients) return;
+      _scrollController.animateTo(
+        0,
+        duration: const Duration(milliseconds: 220),
+        curve: Curves.easeOut,
+      );
     });
   }
 
@@ -104,6 +92,8 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
   }
 
   Future<void> _send(String text, ComposerMode mode) async {
+    // Sending implies wanting to see the result: snap to the bottom.
+    _jumpToBottom();
     setState(() => _sending = true);
     final kind = mode == ComposerMode.answer
         ? 'answer'
@@ -114,9 +104,8 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
       await _store.sendMessage(widget.sessionId, text: text, kind: kind);
     } catch (error) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('发送失败：$error')),
-        );
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text('发送失败：$error')));
       }
     } finally {
       if (mounted) setState(() => _sending = false);
@@ -134,16 +123,15 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
     try {
       final document = await _store.readDocument(widget.sessionId, name);
       if (!mounted) return;
-      Navigator.of(context).pop(); // dismiss loader
+      Navigator.of(context).pop();
       await Navigator.of(context).push(MaterialPageRoute<void>(
         builder: (_) => DocumentScreen(document: document),
       ));
     } catch (error) {
       if (!mounted) return;
       Navigator.of(context).pop();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('无法打开文档：$error')),
-      );
+      ScaffoldMessenger.of(context)
+          .showSnackBar(SnackBar(content: Text('无法打开文档：$error')));
     }
   }
 
@@ -154,30 +142,19 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
       builder: (context, _) {
         final session = _store.session(widget.sessionId);
         final messages = _store.conversation(widget.sessionId);
-        final loaded = _store.isConversationLoaded(widget.sessionId);
         final awaiting = _store.awaitingReply(widget.sessionId);
-        final changed =
-            messages.length != _lastMessageCount || awaiting != _lastAwaiting;
-        if (loaded && !_didInitialScroll && messages.isNotEmpty) {
-          _didInitialScroll = true;
-          _atBottom = true;
-          _lastMessageCount = messages.length;
-          _lastAwaiting = awaiting;
-          _scrollToBottom(animated: false);
-        } else if (changed) {
-          final grew = messages.length > _lastMessageCount;
-          _lastMessageCount = messages.length;
-          _lastAwaiting = awaiting;
+
+        final grew = messages.length > _lastMessageCount;
+        if (grew) {
+          final delta = messages.length - _lastMessageCount;
           if (_atBottom) {
             _scrollToBottom();
-          } else if (grew) {
-            // New content arrived while scrolled up — surface an unread badge.
-            _unreadWhileAway += 1;
+          } else {
+            _unreadWhileAway += delta;
           }
         }
-        final inset = MediaQuery.of(context).viewInsets.bottom;
-        if (inset > _lastInset) _scrollToBottom();
-        _lastInset = inset;
+        _lastMessageCount = messages.length;
+
         return Scaffold(
           resizeToAvoidBottomInset: true,
           appBar: AppBar(
@@ -272,7 +249,8 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
                 session.title,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
+                style:
+                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w700),
               ),
               Text(
                 AgentVisuals.agentLabel(session.agent.kind),
@@ -366,14 +344,19 @@ class _SessionDetailScreenState extends State<SessionDetailScreen> {
         ],
       );
     }
+    // reverse: index 0 is the bottom. The typing indicator (if any) sits at the
+    // very bottom (index 0); messages follow from newest upward.
     return ListView.builder(
       controller: _scrollController,
+      reverse: true,
       keyboardDismissBehavior: ScrollViewKeyboardDismissBehavior.onDrag,
       padding: const EdgeInsets.fromLTRB(16, 14, 16, 14),
       itemCount: messages.length + (awaiting ? 1 : 0),
       itemBuilder: (context, index) {
-        if (index >= messages.length) return const TypingIndicator();
-        final message = messages[index];
+        if (awaiting && index == 0) return const TypingIndicator();
+        final messageIndex =
+            awaiting ? messages.length - index : messages.length - 1 - index;
+        final message = messages[messageIndex];
         return MessageBubble(
           message: message,
           onRetry: message.failed

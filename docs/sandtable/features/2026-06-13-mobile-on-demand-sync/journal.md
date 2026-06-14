@@ -235,3 +235,12 @@
 - 背景: 主 agent 处理会话页未自动滚到底部
 - 内容: 修 `session_detail_screen.dart`：conversation loaded 后双帧 jumpTo；已回复手机待 hot restart 验证。
 - 依据/来源: `apps/mobile/lib/ui/screens/session_detail_screen.dart`
+
+## 2026-06-14T09:38:23.217Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 手机上回话列表上做一下未读消息吧，明显一些，方便我很快了解
+- Target: conversation
+
+- 来源: mobile-app:sess_lOuzQMt00pj8

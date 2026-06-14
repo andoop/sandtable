@@ -449,6 +449,38 @@
         "name": "Sandtable agent"
       },
       "createdAt": "2026-06-14T09:30:43.091Z"
+    },
+    {
+      "id": "msg_20260614T093406631Z_b3FsMZCV",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "agent",
+      "kind": "chat",
+      "text": "✅ 已修复：会话改用 reverse 列表，最新消息天然置底，进入即在底部，发送/收到也会自动跟随。注意这是代码改动，需要在电脑上重新构建/热重载 App 才能看到效果。",
+      "payload": {},
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T09:34:06.632Z"
+    },
+    {
+      "id": "msg_20260614T093823219Z_qdMlVHY3",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "mobile",
+      "kind": "chat",
+      "text": "手机上回话列表上做一下未读消息吧，明显一些，方便我很快了解",
+      "payload": {
+        "target": "conversation"
+      },
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T09:38:23.219Z"
     }
   ]
 }

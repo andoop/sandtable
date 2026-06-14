@@ -16,9 +16,9 @@
       "blocked": false,
       "paired": true,
       "createdAt": "2026-06-14T04:38:48.964Z",
-      "updatedAt": "2026-06-14T09:30:43.092Z",
-      "lastActivityAt": "2026-06-14T09:30:43.092Z",
-      "summary": "收到，确实有这个问题 🛠 根因是消息高度不一时 ListView 估算的底部不准。我改成 reverse 列表(最新消息天然置底,进入即在底),马上修。"
+      "updatedAt": "2026-06-14T09:38:23.220Z",
+      "lastActivityAt": "2026-06-14T09:38:23.220Z",
+      "summary": "手机上回话列表上做一下未读消息吧，明显一些，方便我很快了解"
     }
   ]
 }
