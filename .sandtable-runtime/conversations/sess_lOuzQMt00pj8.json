@@ -511,6 +511,23 @@
         "name": "Sandtable agent"
       },
       "createdAt": "2026-06-14T09:59:54.546Z"
+    },
+    {
+      "id": "msg_20260614T122055858Z_IowBeVIV",
+      "sessionId": "sess_lOuzQMt00pj8",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "mobile",
+      "kind": "chat",
+      "text": "测试一下",
+      "payload": {
+        "target": "conversation"
+      },
+      "agent": {
+        "id": "custom-NCTtLbBi",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T12:20:55.858Z"
     }
   ]
 }

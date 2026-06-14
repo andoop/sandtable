@@ -257,3 +257,20 @@
 - 验证: Dart 分析服务器对 7 个改动文件均无诊断。flutter analyze/test 在本沙箱内挂起（历史遗留十余个未结束的 flutter 进程印证），无法运行；已用 IDE 分析作为编译校验，待手机端热重启做功能验证。
 - 处理: 已回复手机（200）；push-state（200, VERIFY）；inbox ack 1 条（200）。
 - 依据/来源: 手机 inbox `20260614T093823221Z-mobile-RKzto8BM`
+
+## 2026-06-14T12:20:55.856Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 测试一下
+- Target: conversation
+
+- 来源: mobile-app:sess_lOuzQMt00pj8
+
+## 2026-06-14 · [bugfix]
+- 背景: 用户反馈——手机连了两个仓库的服务，子 agent 跑等待脚本一直"没有任何消息"，但手机已发多条。
+- 根因(代码证据 100%): `scripts/sandtable-mobile-wait.sh` 端口硬编码 `PORT="${SANDTABLE_MOBILE_PORT:-8765}"`，未读 `.sandtable-runtime/session/server.port`；而 `status.sh`/`stop.sh` 都读 server.port。多仓库下 `start.sh` 的 choose_port 会给后启动的仓库分配非 8765 端口（如 8766）并写入其 server.port；手机连该仓库（8766），消息进其 inbox，但 wait 仍查 8765（= 另一仓库的 server），再按 feature 过滤 → 永远为空。
+- 修复: wait.sh 增加 detect_repo_root + 读 server.port（与 status/stop 完全一致），保留 `SANDTABLE_MOBILE_PORT` 覆盖与 8765 兜底。
+- 验证: `bash -n` 通过；单仓库本机端口仍解析为 8765（行为不变）；多仓库下解析为各自端口。
+- 教训: 同一组脚本对"同一事实（server 端口）"必须用同一份解析逻辑；新增脚本(wait)漏抄端口解析，在多实例下静默查错且无报错，最难排查。
+- 依据/来源: `scripts/sandtable-mobile-{wait,status,stop}.sh`、`sandtable-mobile-start.sh` choose_port

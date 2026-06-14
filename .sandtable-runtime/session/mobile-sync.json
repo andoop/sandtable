@@ -2,12 +2,13 @@
   "active": true,
   "feature": "2026-06-13-mobile-on-demand-sync",
   "sessionId": "sess_lOuzQMt00pj8",
-  "code": "9936",
-  "token": "bhXstuuNBns3bIXQ",
+  "code": "1887",
+  "token": "OEgT-3mgvE8VJbH2",
   "publicUrl": "http://192.168.5.198:8765",
-  "paired": false,
-  "startedAt": "2026-06-14T09:45:03.065Z",
-  "expiresAt": "2026-06-14T09:55:03.065Z",
+  "paired": true,
+  "startedAt": "2026-06-14T12:10:55.824Z",
+  "expiresAt": "2026-06-14T12:20:55.824Z",
   "workerHint": "Poll GET /mobile-sync/outbox or run scripts/sandtable-mobile-wait.sh; notify main agent on mobile messages.",
-  "agentSyncedAt": "2026-06-14T09:59:55.755Z"
+  "pairedAt": "2026-06-14T12:11:39.191Z",
+  "agentSyncedAt": "2026-06-14T12:11:39.201Z"
 }
