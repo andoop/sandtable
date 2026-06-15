@@ -1,0 +1,13 @@
+{
+  "id": "20260615T070559131Z-mobile-iC3KoJ0c",
+  "feature": "2026-06-13-mobile-review-companion",
+  "sessionId": "sess_KZxtECWdip0o",
+  "source": "mobile",
+  "type": "mobile_paired",
+  "createdAt": "2026-06-15T07:05:59.131Z",
+  "payload": {
+    "code": "8708",
+    "publicUrl": "http://10.33.205.16:8767",
+    "sessionId": "sess_KZxtECWdip0o"
+  }
+}

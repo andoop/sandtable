@@ -2,23 +2,23 @@
   "version": 1,
   "sessions": [
     {
-      "id": "sess_LZhq16aZxPsH",
-      "title": "2026-06-13-mobile-on-demand-sync",
-      "feature": "2026-06-13-mobile-on-demand-sync",
-      "workspace": "/Users/andoop/Documents/projects/sss/sandtable",
+      "id": "sess_d1FgN5CFpdPY",
+      "title": "2026-06-13-mobile-review-companion",
+      "feature": "2026-06-13-mobile-review-companion",
+      "workspace": "/Volumes/rsext/projects/sandtable",
       "agent": {
-        "id": "custom-1NBm-ZIn",
+        "id": "custom-deMImi_h",
         "kind": "custom",
         "name": "Sandtable agent"
       },
-      "status": "stopped",
+      "status": "active",
       "phase": "VERIFY",
       "blocked": false,
-      "paired": true,
-      "createdAt": "2026-06-14T16:05:11.084Z",
-      "updatedAt": "2026-06-15T01:04:33.951Z",
-      "lastActivityAt": "2026-06-15T01:04:33.951Z",
-      "summary": "收到，我现在停止手机同步。停止后手机端会显示断开，需要再次开启时重新生成配对码即可。"
+      "paired": false,
+      "createdAt": "2026-06-15T07:56:11.398Z",
+      "updatedAt": "2026-06-15T08:28:10.181Z",
+      "lastActivityAt": "2026-06-15T08:28:10.181Z",
+      "summary": "在 ✅ 刚把你那 4 条规则全部落盘实现并验证通过了（详情我上一条状态消息有列）。现在按新规则纯等待+常驻同步待命。需要我做什么？"
     }
   ]
 }

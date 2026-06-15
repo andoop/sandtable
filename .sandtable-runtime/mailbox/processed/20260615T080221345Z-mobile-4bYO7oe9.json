@@ -1,0 +1,18 @@
+{
+  "id": "20260615T080221345Z-mobile-4bYO7oe9",
+  "feature": "2026-06-13-mobile-review-companion",
+  "sessionId": "sess_d1FgN5CFpdPY",
+  "agent": {
+    "id": "custom-deMImi_h",
+    "kind": "custom",
+    "name": "Sandtable agent"
+  },
+  "source": "mobile",
+  "type": "chat_message",
+  "createdAt": "2026-06-15T08:02:21.345Z",
+  "payload": {
+    "text": "1、告诉 子 agent 不要做任何事情，只需要等 wait 命令返回就行，不设超时，永久等待\n2、人不用手机，直接通过电脑端跟 agent 继续会话时，只要判定 sync server 还在，那么就要在关键和恰当的时机继续同步消息\n3、手机上通知做事情，或者电脑端直接跟 agent 会话，只要 sync server 还在，那么就要在做事情的前中后，等重要时机进行信息同步\n4、怎么能让在电脑端跟 agent 持续对话过程中也不忘我们以上的规则",
+    "target": "conversation",
+    "kind": "chat"
+  }
+}

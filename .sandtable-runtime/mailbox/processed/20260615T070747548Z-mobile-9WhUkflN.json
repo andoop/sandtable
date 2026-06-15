@@ -1,0 +1,18 @@
+{
+  "id": "20260615T070747548Z-mobile-9WhUkflN",
+  "feature": "2026-06-13-mobile-review-companion",
+  "sessionId": "sess_KZxtECWdip0o",
+  "agent": {
+    "id": "custom-jfv3FupF",
+    "kind": "custom",
+    "name": "Sandtable agent"
+  },
+  "source": "mobile",
+  "type": "chat_message",
+  "createdAt": "2026-06-15T07:07:47.548Z",
+  "payload": {
+    "text": "测试一下",
+    "target": "conversation",
+    "kind": "chat"
+  }
+}

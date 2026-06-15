@@ -59,6 +59,19 @@ POST /mobile-sync/agent-state {"role":"main","state":"working|idle|error","detai
 
 The phone then shows main agent (idle/working/disconnected/error) and waiter (ready/waiting/processing/exited).
 
+## Standing sync duty (active whenever the sync server is alive)
+
+Whenever mobile-sync is **active** (server running + `.sandtable-runtime/session/mobile-sync.json` has `active=true`), syncing to the phone is a **standing duty, regardless of trigger source** — whether the instruction came from the phone or the developer is talking to you directly **on the computer**, the rule is the same.
+
+- **Do not sync only when the phone sends a message.** Proactively sync **before / during / after** important actions:
+  - Phase change → `POST /features/<feature>/sync/phase` or `POST /agent/sessions/<sid>/messages {"kind":"status"}`.
+  - Key decision / option choice / trade-off → sync a one-line summary.
+  - A confirmation or blocker arises → sync `{"kind":"question"}` and persist to `questions.md` / `state.md` per protocol.
+  - Edited a Sandtable doc (PRD/tests/plan/state) → `POST /mobile-sync/push-state`.
+  - Start / finish an important piece of work → report `agent-state main=working|idle` + a one-line progress note.
+- **What counts as an "important moment"**: anything affecting the loop / acceptance / key decisions, or that the developer would want to see on the phone. Don't spam trivial intermediate steps.
+- **The waiting sub-agent blocks forever with no timeout (pure wait)**: by default do **not** pass `SANDTABLE_WAIT_MAX_SECONDS`; the sub-agent blocks until it gets one message. **Only** when the host imposes a **hard execution cap** that would truncate an infinite block, use the fallback (e.g. `=240`); on timeout the main agent **immediately, seamlessly dispatches another** waiter, never polling or setting any other timeout.
+
 ## Red Flags
 
 | Thought | Reality |
@@ -68,5 +81,7 @@ The phone then shows main agent (idle/working/disconnected/error) and waiter (re
 | "Using automation / a background task for wait is easier." | Forbidden (Codex especially). Dispatch a real sub-agent and have the main agent block for its reply. |
 | "The waiter can also read the journal / edit docs." | Forbidden. Single-job: poll, deliver, exit. |
 | "No need to ack after handling." | You must ack, or the same message is fetched repeatedly. |
+| "Sync only when the phone sends a message." | Wrong. A live sync server is a standing duty; computer-side conversation must also sync before/during/after important actions. |
+| "Set a timeout on the waiter for peace of mind." | Default is infinite block, no timeout; use `SANDTABLE_WAIT_MAX_SECONDS` only when the host has a hard execution cap, then seamlessly re-dispatch on timeout. |
 
 Full protocol in `docs/mobile-review-companion/protocol.md`; startup and on-device verification in `runtime.md` / `verification.md`.

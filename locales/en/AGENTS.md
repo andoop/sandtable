@@ -65,3 +65,7 @@ Issues found by rehearsal must be **graded from the user's point of view**, not 
 ## PRD Confirmation Gate
 
 - If `prd.md` exists without traceable developer confirmation, do not dispatch mental/OPFOR subagents. If the same message confirms the PRD, persist the confirmation evidence to `state.md` or `journal.md` before or while dispatching.
+
+## Standing Mobile-Sync Duty (only when mobile-sync is active)
+
+Whenever `.sandtable-runtime/session/mobile-sync.json` has `active=true` and the sync server is running, **syncing to the phone is a standing duty, regardless of trigger source** — whether the instruction came from the phone or the developer is talking to you directly on the computer. Proactively sync to the phone **before / during / after** important actions, on phase changes, key decisions, and whenever a confirmation or blocker arises (do not sync only when the phone sends a message). The **waiting subagent blocks forever with no timeout** (use `SANDTABLE_WAIT_MAX_SECONDS` only as a fallback when the host imposes a hard execution cap; on timeout, seamlessly dispatch another waiter). See `skills/mobile-companion/SKILL.md`.

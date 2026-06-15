@@ -68,3 +68,61 @@
 - 内容: 服务端新增 `RuntimeSession` / `AgentIdentity` 抽象和持久化 `sessions.json`，新增 `/agent/sessions`、`/sessions`、`/sessions/:id`、`/sessions/:id/events`、`/sessions/:id/documents/:name`、`/sessions/:id/messages` API；旧 feature API 和 mobile-sync API 保持兼容，并把旧配对流程桥接到 session。手机端把 connection 改为 server-level token，新增会话列表工作台和会话详情页，详情页支持文档入口、实时事件、对话、answer/confirmation 快捷发送。
 - 验证: `npm --prefix runtime/server run typecheck` 通过；`npm --prefix runtime/server test` 通过，新增多 agent 多会话 HTTP 测试；`flutter analyze` 通过；`flutter test` 通过。
 - 依据/来源: 开发者 2026-06-14 对多 agent、多会话、商业化 UI、解耦架构的明确要求。
+
+## 2026-06-15T07:07:47.544Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-review-companion
+- 内容: Mobile message
+- 内容: 测试一下
+- Target: conversation
+
+- 来源: mobile-app:sess_KZxtECWdip0o
+
+## 2026-06-15T07:49:08.785Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-review-companion
+- 内容: Mobile message
+- 内容: 在吗
+- Target: conversation
+
+- 来源: mobile-app:sess_KZxtECWdip0o
+
+## 2026-06-15T08:01:08.030Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-review-companion
+- 内容: Mobile message
+- 内容: 还在吗
+- Target: conversation
+
+- 来源: mobile-app:sess_d1FgN5CFpdPY
+
+## 2026-06-15T08:02:21.340Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-review-companion
+- 内容: Mobile message
+- 内容: 1、告诉 子 agent 不要做任何事情，只需要等 wait 命令返回就行，不设超时，永久等待
+2、人不用手机，直接通过电脑端跟 agent 继续会话时，只要判定 sync server 还在，那么就要在关键和恰当的时机继续同步消息
+3、手机上通知做事情，或者电脑端直接跟 agent 会话，只要 sync server 还在，那么就要在做事情的前中后，等重要时机进行信息同步
+4、怎么能让在电脑端跟 agent 持续对话过程中也不忘我们以上的规则
+- Target: conversation
+
+- 来源: mobile-app:sess_d1FgN5CFpdPY
+
+## 2026-06-15 16:05 · [决策/实现]
+- 背景: 手机端提出 4 条规则（见上一条 08:02:21 消息）：①等待子 agent 纯等待、永久阻塞、不设超时；②③只要 sync server 活着，无论指令来自手机还是电脑端直接对话，都要在重要动作前/中/后等关键时机主动同步到手机；④如何在电脑端长对话中不遗忘以上规则。
+- 内容: 把规则落成持久方法论资产（外科手术式改动）：
+  - `skills/mobile-companion/SKILL.md` 新增「常驻同步义务（sync server 活着即生效）」小节 + 两条 Red Flag（覆盖 ①②③）；英文真源 `locales/en/skills/mobile-companion/SKILL.md` 同步。
+  - `AGENTS.md` 与 `.cursor/rules/sandtable.mdc`（始终加载）各加「手机同步常驻义务」段；英文 `locales/en/AGENTS.md` 与 `locales/en/.cursor/rules/sandtable.mdc` 同步（覆盖 ④：放进始终加载的行为基线）。
+  - `hooks/session-start`：检测 `.sandtable-runtime/session/mobile-sync.json` 的 `active=true` 时，向 SessionStart 上下文追加常驻同步义务提醒（覆盖 ④：换会话/上下文压缩后自动重新注入）。
+  - 运行行为调整：等待子 agent 默认不再传 `SANDTABLE_WAIT_MAX_SECONDS`，改为永久阻塞（仅宿主有硬执行上限时才用兜底，超时即无缝再派）。
+- 验证: `bash scripts/sandtable-sync.sh` 镜像到 `plugins/sandtable/skills` 等并 `--check` 全部一致；`hooks/session-start` 在 active/非 active 两种情形均输出合法 JSON，且仅 active 时注入提醒。
+- 依据/来源: 手机端开发者 2026-06-15 08:02 的 4 点要求。
+
+## 2026-06-15T08:27:31.532Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-review-companion
+- 内容: Mobile message
+- 内容: 在吗
+- Target: conversation
+
+- 来源: mobile-app:sess_d1FgN5CFpdPY

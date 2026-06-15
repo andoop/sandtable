@@ -2,36 +2,6 @@
   "version": 1,
   "devices": [
     {
-      "token": "PRZ9sE0sz2cfuVvT",
-      "label": "qr",
-      "pairedAt": "2026-06-15T00:14:20.860Z"
-    },
-    {
-      "token": "LPPvFD2hv6tuFrr8",
-      "label": "qr",
-      "pairedAt": "2026-06-15T00:14:35.281Z"
-    },
-    {
-      "token": "19eJiafTeNNQkJh_",
-      "label": "qr",
-      "pairedAt": "2026-06-15T00:23:02.144Z"
-    },
-    {
-      "token": "W7Nsk2JqmeRvMoYV",
-      "label": "qr",
-      "pairedAt": "2026-06-15T00:23:17.805Z"
-    },
-    {
-      "token": "c_EI_spH4Mkwp4ex",
-      "label": "qr",
-      "pairedAt": "2026-06-15T00:24:09.713Z"
-    },
-    {
-      "token": "indREm731VMByUFb",
-      "label": "qr",
-      "pairedAt": "2026-06-15T00:25:58.431Z"
-    },
-    {
       "token": "RH-efye1wthDwErp",
       "label": "qr",
       "pairedAt": "2026-06-15T00:27:26.334Z"
@@ -100,6 +70,36 @@
       "token": "pWVdz01LUAopNMeQ",
       "label": "qr",
       "pairedAt": "2026-06-15T01:02:08.066Z"
+    },
+    {
+      "token": "pv3UpM0WEaSuSQaz",
+      "label": "qr",
+      "pairedAt": "2026-06-15T07:05:12.882Z"
+    },
+    {
+      "token": "oBK1KQF1Bad50F2V",
+      "label": "mobile",
+      "pairedAt": "2026-06-15T07:05:59.129Z"
+    },
+    {
+      "token": "J72b0_f-vLlcjqVz",
+      "label": "qr",
+      "pairedAt": "2026-06-15T07:46:18.565Z"
+    },
+    {
+      "token": "174-bNNY-3Y_AW3G",
+      "label": "mobile",
+      "pairedAt": "2026-06-15T07:48:29.319Z"
+    },
+    {
+      "token": "hFsAo--FaxgOT3P6",
+      "label": "qr",
+      "pairedAt": "2026-06-15T07:55:19.887Z"
+    },
+    {
+      "token": "eZPAGsf6gTJrj0w1",
+      "label": "mobile",
+      "pairedAt": "2026-06-15T07:56:11.389Z"
     }
   ]
 }

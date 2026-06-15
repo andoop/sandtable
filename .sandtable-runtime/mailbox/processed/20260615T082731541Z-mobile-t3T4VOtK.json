@@ -1,0 +1,18 @@
+{
+  "id": "20260615T082731541Z-mobile-t3T4VOtK",
+  "feature": "2026-06-13-mobile-review-companion",
+  "sessionId": "sess_d1FgN5CFpdPY",
+  "agent": {
+    "id": "custom-deMImi_h",
+    "kind": "custom",
+    "name": "Sandtable agent"
+  },
+  "source": "mobile",
+  "type": "chat_message",
+  "createdAt": "2026-06-15T08:27:31.541Z",
+  "payload": {
+    "text": "在吗",
+    "target": "conversation",
+    "kind": "chat"
+  }
+}
