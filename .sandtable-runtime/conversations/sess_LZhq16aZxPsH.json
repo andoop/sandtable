@@ -127,6 +127,102 @@
         "name": "Sandtable agent"
       },
       "createdAt": "2026-06-14T16:15:19.783Z"
+    },
+    {
+      "id": "msg_20260614T162803059Z_kOOkPhT5",
+      "sessionId": "sess_LZhq16aZxPsH",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "mobile",
+      "kind": "chat",
+      "text": "你终止吧",
+      "payload": {
+        "target": "conversation"
+      },
+      "agent": {
+        "id": "custom-1NBm-ZIn",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T16:28:03.059Z"
+    },
+    {
+      "id": "msg_20260614T162914644Z_EPO6W-0B",
+      "sessionId": "sess_LZhq16aZxPsH",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "agent",
+      "kind": "chat",
+      "text": "收到，正在终止手机同步并关闭 runtime server。手机 App 稍后会显示 Reconnecting/Disconnected。需要再同步时，在电脑上重新运行 /sandtable-mobile-start 即可。",
+      "payload": {},
+      "agent": {
+        "id": "custom-1NBm-ZIn",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-14T16:29:14.644Z"
+    },
+    {
+      "id": "msg_20260615T003004885Z_-Fh4-dHK",
+      "sessionId": "sess_LZhq16aZxPsH",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "mobile",
+      "kind": "chat",
+      "text": "测试一下",
+      "payload": {
+        "target": "conversation"
+      },
+      "agent": {
+        "id": "custom-1NBm-ZIn",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-15T00:30:04.885Z"
+    },
+    {
+      "id": "msg_20260615T003111782Z_m7t4O1rw",
+      "sessionId": "sess_LZhq16aZxPsH",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "agent",
+      "kind": "chat",
+      "text": "测试收到，手机同步链路正常：配对、inbox、Agent 回复都已打通。",
+      "payload": {},
+      "agent": {
+        "id": "custom-1NBm-ZIn",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-15T00:31:11.782Z"
+    },
+    {
+      "id": "msg_20260615T003521433Z_NJHk5NYA",
+      "sessionId": "sess_LZhq16aZxPsH",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "mobile",
+      "kind": "chat",
+      "text": "停止手机同步",
+      "payload": {
+        "target": "conversation"
+      },
+      "agent": {
+        "id": "custom-1NBm-ZIn",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-15T00:35:21.433Z"
+    },
+    {
+      "id": "msg_20260615T003546725Z_qUYJOKaS",
+      "sessionId": "sess_LZhq16aZxPsH",
+      "feature": "2026-06-13-mobile-on-demand-sync",
+      "role": "agent",
+      "kind": "chat",
+      "text": "收到，我现在停止手机同步。停止后手机端会显示断开，需要再次开启时重新生成配对码即可。",
+      "payload": {},
+      "agent": {
+        "id": "custom-1NBm-ZIn",
+        "kind": "custom",
+        "name": "Sandtable agent"
+      },
+      "createdAt": "2026-06-15T00:35:46.725Z"
     }
   ]
 }

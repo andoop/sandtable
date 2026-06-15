@@ -1,0 +1,14 @@
+{
+  "feature": "2026-06-13-mobile-on-demand-sync",
+  "phase": "VERIFY",
+  "active": true,
+  "stopped": false,
+  "mainAgent": "codex",
+  "waitingWorkers": [
+    "heartbeat:sandtable-mobile-inbox-watcher"
+  ],
+  "workerMode": "heartbeat",
+  "renewAfter": "2026-06-15T00:54:00.000Z",
+  "expiresAt": "2026-06-16T00:44:00.000Z",
+  "resumeHint": "Read docs/sandtable/features/<feature>/state.md and journal.md, then process mailbox message."
+}

@@ -1,0 +1,18 @@
+{
+  "id": "20260615T003521436Z-mobile-uwlHF31j",
+  "feature": "2026-06-13-mobile-on-demand-sync",
+  "sessionId": "sess_LZhq16aZxPsH",
+  "agent": {
+    "id": "custom-1NBm-ZIn",
+    "kind": "custom",
+    "name": "Sandtable agent"
+  },
+  "source": "mobile",
+  "type": "chat_message",
+  "createdAt": "2026-06-15T00:35:21.436Z",
+  "payload": {
+    "text": "停止手机同步",
+    "target": "conversation",
+    "kind": "chat"
+  }
+}

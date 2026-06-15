@@ -365,3 +365,90 @@
 - Target: conversation
 
 - 来源: mobile-app:sess_LZhq16aZxPsH
+
+## 2026-06-14T16:28:03.056Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 你终止吧
+- Target: conversation
+
+- 来源: mobile-app:sess_LZhq16aZxPsH
+
+## 2026-06-14 · 手机同步会话（按需）
+
+- `/sandtable-mobile-start`：拉起 detached runtime server（port 8765, publicUrl http://192.168.5.198:8765），生成配对码 4597。
+- 手机配对成功（`mobile_paired`，token 升级为持久 device）。
+- 通过单职责 inbox 等待子 agent 阻塞接收手机消息，主 agent 全程空闲、收到才动作：
+  - 「测试一下」→ 回复链路自检正常。
+  - 「如果没有给你发消息，你会等多久」→ 说明无限期阻塞、不设超时。
+  - 「匹配码逻辑是怎样的」→ 据 `runtime/server/src/pairing.ts` + `http.ts` 解释：4 位码（1000–9999 查重唯一）、10 分钟 TTL、一次性 claim、配对后 token 升级持久 device。
+- 「你终止吧」（开发者显式停止指令，经手机通道）→ ack + 告别回复 → `scripts/sandtable-mobile-stop.sh` 停止。
+- 已验证：`GET /health` 不可达（000），server 关闭。再次同步需重新 `/sandtable-mobile-start`。
+
+## 2026-06-15 · [改进] mobile-start 先用 AskQuestion 让用户选 feature
+- 背景: 用户反馈——执行 `/sandtable-mobile-start` 时不要默认取最新 feature，要先用 question 工具让用户从 `docs/sandtable/features/` 中选择本次同步哪个 feature。
+- 改动（单一真源）:
+  - `commands/sandtable-mobile-start.md`（zh 真源）执行段加步骤1「先确认 feature·用 AskQuestion」，后续步骤顺延；末句改为「除开头 feature 选择外，不就推进与否反复询问」。
+  - `locales/en/commands/sandtable-mobile-start.md`（en 真源）同步：新增 "First confirm the feature" 步骤 + AskQuestion；末句改为只有 initial feature choice 必须先问。
+  - `skills/mobile-companion/SKILL.md` 与 `locales/en/skills/mobile-companion/SKILL.md` 主循环第1步「开启」加「先列 features 目录、用 AskQuestion 选 feature，再跑 start.sh <feature>」。
+- 同步: `bash scripts/sandtable-sync.sh` 同步 6 个镜像；`--check` 全绿（真源==镜像）。
+- 依据/来源: `commands/sandtable-mobile-start.md`、`locales/en/commands/sandtable-mobile-start.md`、`skills/mobile-companion/SKILL.md`、`locales/en/skills/mobile-companion/SKILL.md`
+
+## 2026-06-15 · [集成] /sandtable-mobile-stop
+- 背景: 用户执行 `/sandtable-mobile-stop`。
+- 内容: 运行 `scripts/sandtable-mobile-stop.sh`（"Sandtable mobile sync stopped."）；`GET /health` 返回 000 不可达，确认 runtime server 已关闭、同步停止。
+- 依据/来源: `scripts/sandtable-mobile-stop.sh`、`GET /health`
+
+## 2026-06-15 08:24 CST · [集成] 手机同步开启
+- 背景: 用户要求"开启手机同步"。
+- 内容: 运行 `scripts/sandtable-mobile-start.sh`，启动 runtime server，Feature 为 `2026-06-13-mobile-on-demand-sync`，Server URL 为 `http://192.168.5.198:8765`，配对码为 `3797`；随后写入 `.sandtable-runtime/session/continuation.json`，并启动单职责 inbox 等待器 `shell-waiter:15111`。
+- 当前状态: Server 已运行，Agent 已同步，手机尚未配对；等待器正在轮询 `scripts/sandtable-mobile-wait.sh 2026-06-13-mobile-on-demand-sync`。
+- 依据/来源: `scripts/sandtable-mobile-start.sh`、`scripts/sandtable-mobile-status.sh`、`.sandtable-runtime/session/continuation.json`、`.sandtable-runtime/session/mobile-waiter.pid`
+
+## 2026-06-15 08:31 CST · [问答] 手机链路测试
+- 背景: 手机端完成配对并提交聊天消息。
+- Feature: `2026-06-13-mobile-on-demand-sync`
+- 内容: `mobile_paired` + `chat_message`；用户消息为「测试一下」。
+- 处理: 通过 `POST /agent/sessions/sess_LZhq16aZxPsH/messages` 回复「测试收到，手机同步链路正常：配对、inbox、Agent 回复都已打通。」；随后 `POST /mailbox/inbox/ack` 确认 2 条 inbox 消息，`POST /mobile-sync/push-state` 同步 VERIFY 状态，并将 main agent 状态切回 idle。
+- 依据/来源: `GET /mailbox/inbox?feature=2026-06-13-mobile-on-demand-sync`、`POST /agent/sessions/sess_LZhq16aZxPsH/messages`、`POST /mailbox/inbox/ack`、`POST /mobile-sync/push-state`
+
+## 2026-06-15 08:36 CST · [集成] 手机端请求停止同步
+- 背景: 手机端发送聊天消息「停止手机同步」。
+- 处理: 回复手机「收到，我现在停止手机同步。停止后手机端会显示断开，需要再次开启时重新生成配对码即可。」；`POST /mailbox/inbox/ack` 确认该消息；运行 `scripts/sandtable-mobile-stop.sh` 停止 runtime；将 `.sandtable-runtime/session/continuation.json` 标记为 `active=false`、`stopped=true`、清空 waiting workers。
+- 验证: `GET /health` 连接 127.0.0.1:8765 失败（000），确认 server 已关闭。
+- 依据/来源: `GET /mailbox/inbox?feature=2026-06-13-mobile-on-demand-sync`、`POST /agent/sessions/sess_LZhq16aZxPsH/messages`、`POST /mailbox/inbox/ack`、`scripts/sandtable-mobile-stop.sh`、`.sandtable-runtime/session/continuation.json`
+
+## 2026-06-15T00:30:04.883Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 测试一下
+- Target: conversation
+
+- 来源: mobile-app:sess_LZhq16aZxPsH
+
+## 2026-06-15T00:35:21.430Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 停止手机同步
+- Target: conversation
+
+- 来源: mobile-app:sess_LZhq16aZxPsH
+
+## 2026-06-15 08:44 CST · [集成] 手机同步重新开启
+- 背景: 用户要求"开启手机同步"。
+- 内容: 运行 `scripts/sandtable-mobile-start.sh`，Feature 为 `2026-06-13-mobile-on-demand-sync`，Server URL 为 `http://192.168.5.198:8765`，配对码为 `3741`；随后刷新 `.sandtable-runtime/session/continuation.json` 为 active，并启动单职责 inbox 等待器 `shell-waiter:97781`。
+- 当前状态: Server 已运行，Agent 已同步，手机尚未配对；等待器正在轮询 `scripts/sandtable-mobile-wait.sh 2026-06-13-mobile-on-demand-sync`。
+- 依据/来源: `scripts/sandtable-mobile-start.sh`、`scripts/sandtable-mobile-status.sh`、`.sandtable-runtime/session/mobile-sync.json`、`.sandtable-runtime/session/continuation.json`
+
+## 2026-06-15 08:46 CST · [集成] 手机 inbox watcher 接管
+- 背景: 当前 Codex 执行环境会在 shell 命令结束后清理后台子进程，`nohup/disown` 启动的 `sandtable-mobile-wait.sh` 无法长期存活。
+- 内容: 创建 Codex heartbeat automation `sandtable-mobile-inbox-watcher`，每分钟检查 `2026-06-13-mobile-on-demand-sync` 的 mobile inbox；收到消息后处理、回复、ack 并记录 journal。`.sandtable-runtime/session/continuation.json` 的 waiting worker 已更新为 `heartbeat:sandtable-mobile-inbox-watcher`。
+- 当前状态: Server 已运行，Agent 已同步，手机尚未配对；消息接管机制为 heartbeat watcher。
+
+## 2026-06-15 09:02 CST · [集成] 配对码续期
+- 背景: heartbeat 检查发现手机尚未配对，上一轮配对码 `3741` 已过期。
+- 内容: 重新运行 `scripts/sandtable-mobile-start.sh` 续开同步，Server URL 仍为 `http://192.168.5.198:8765`，新配对码为 `2913`，有效期至 `2026-06-15T01:12:08.024Z`。
+- 当前状态: Server 已运行，Agent 已同步，手机尚未配对；heartbeat watcher 继续检查 inbox。

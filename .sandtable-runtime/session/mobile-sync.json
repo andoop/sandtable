@@ -1,26 +1,18 @@
 {
-  "active": true,
+  "active": false,
   "feature": "2026-06-13-mobile-on-demand-sync",
-  "sessionId": "sess_NpSKR4t9_6Fz",
-  "code": "4597",
-  "token": "bTaksZHnXJNeGZA6",
+  "sessionId": "sess_LZhq16aZxPsH",
+  "code": "2913",
+  "token": "GcclM9H_A62SSikW",
   "publicUrl": "http://192.168.5.198:8765",
-  "paired": true,
-  "startedAt": "2026-06-14T16:04:37.686Z",
-  "expiresAt": "2026-06-14T16:14:37.686Z",
+  "paired": false,
+  "startedAt": "2026-06-15T01:02:08.024Z",
+  "expiresAt": "2026-06-15T01:12:08.024Z",
   "workerHint": "Poll GET /mobile-sync/outbox or run scripts/sandtable-mobile-wait.sh; notify main agent on mobile messages.",
   "agentMain": {
     "role": "main",
     "state": "idle",
-    "at": "2026-06-14T16:15:20.072Z",
-    "detail": "已回复，等待手机消息"
-  },
-  "pairedAt": "2026-06-14T16:05:11.077Z",
-  "agentSyncedAt": "2026-06-14T16:05:11.087Z",
-  "agentWaiter": {
-    "role": "waiter",
-    "state": "waiting",
-    "at": "2026-06-14T16:17:13.075Z",
-    "detail": "等待手机消息"
+    "at": "2026-06-15T01:02:08.281Z",
+    "detail": "已就绪，等待手机消息"
   }
 }

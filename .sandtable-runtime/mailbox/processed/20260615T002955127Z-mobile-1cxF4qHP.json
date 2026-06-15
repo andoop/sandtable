@@ -1,0 +1,13 @@
+{
+  "id": "20260615T002955127Z-mobile-1cxF4qHP",
+  "feature": "2026-06-13-mobile-on-demand-sync",
+  "sessionId": "sess_LZhq16aZxPsH",
+  "source": "mobile",
+  "type": "mobile_paired",
+  "createdAt": "2026-06-15T00:29:55.127Z",
+  "payload": {
+    "code": "3797",
+    "publicUrl": "http://192.168.5.198:8765",
+    "sessionId": "sess_LZhq16aZxPsH"
+  }
+}

@@ -2,54 +2,104 @@
   "version": 1,
   "devices": [
     {
-      "token": "trbaC9ikBpHXMOox",
+      "token": "PRZ9sE0sz2cfuVvT",
+      "label": "qr",
+      "pairedAt": "2026-06-15T00:14:20.860Z"
+    },
+    {
+      "token": "LPPvFD2hv6tuFrr8",
+      "label": "qr",
+      "pairedAt": "2026-06-15T00:14:35.281Z"
+    },
+    {
+      "token": "19eJiafTeNNQkJh_",
+      "label": "qr",
+      "pairedAt": "2026-06-15T00:23:02.144Z"
+    },
+    {
+      "token": "W7Nsk2JqmeRvMoYV",
+      "label": "qr",
+      "pairedAt": "2026-06-15T00:23:17.805Z"
+    },
+    {
+      "token": "c_EI_spH4Mkwp4ex",
+      "label": "qr",
+      "pairedAt": "2026-06-15T00:24:09.713Z"
+    },
+    {
+      "token": "indREm731VMByUFb",
+      "label": "qr",
+      "pairedAt": "2026-06-15T00:25:58.431Z"
+    },
+    {
+      "token": "RH-efye1wthDwErp",
+      "label": "qr",
+      "pairedAt": "2026-06-15T00:27:26.334Z"
+    },
+    {
+      "token": "Q8BQYolaQ4IzhNem",
+      "label": "qr",
+      "pairedAt": "2026-06-15T00:28:55.396Z"
+    },
+    {
+      "token": "NgJiv57pDfV_nvRt",
       "label": "mobile",
-      "pairedAt": "2026-06-14T07:31:11.047Z"
+      "pairedAt": "2026-06-15T00:29:55.120Z"
     },
     {
-      "token": "M-UvGrFbj49T1U0Z",
+      "token": "4fK3lk2sL3XbDoLd",
       "label": "qr",
-      "pairedAt": "2026-06-14T09:15:57.783Z"
+      "pairedAt": "2026-06-15T00:30:23.767Z"
     },
     {
-      "token": "NS3NWApO-bk61QbG",
-      "label": "mobile",
-      "pairedAt": "2026-06-14T09:17:55.941Z"
-    },
-    {
-      "token": "RJjp2GWiAP-jg9-E",
+      "token": "EALYDSM0w8IznuLg",
       "label": "qr",
-      "pairedAt": "2026-06-14T09:45:03.120Z"
+      "pairedAt": "2026-06-15T00:31:52.075Z"
     },
     {
-      "token": "XDcRly1-hzr4MDcy",
+      "token": "bHIqmhiWgx5U9rdY",
       "label": "qr",
-      "pairedAt": "2026-06-14T12:10:55.872Z"
+      "pairedAt": "2026-06-15T00:32:22.616Z"
     },
     {
-      "token": "OEgT-3mgvE8VJbH2",
-      "label": "mobile",
-      "pairedAt": "2026-06-14T12:11:39.191Z"
-    },
-    {
-      "token": "c-rTNBXU4OCglh0n",
+      "token": "G70UcUKGMb_6qQr9",
       "label": "qr",
-      "pairedAt": "2026-06-14T13:35:54.904Z"
+      "pairedAt": "2026-06-15T00:33:54.114Z"
     },
     {
-      "token": "VTTvI2-AWvIB2Fg9",
+      "token": "qSYBE_SXsFUGh-nB",
       "label": "qr",
-      "pairedAt": "2026-06-14T14:36:06.911Z"
+      "pairedAt": "2026-06-15T00:35:26.194Z"
     },
     {
-      "token": "YFY-lIDc0BbP5YK3",
+      "token": "Qbp8rRwP474ySxGY",
       "label": "qr",
-      "pairedAt": "2026-06-14T16:04:37.735Z"
+      "pairedAt": "2026-06-15T00:43:03.716Z"
     },
     {
-      "token": "bTaksZHnXJNeGZA6",
-      "label": "mobile",
-      "pairedAt": "2026-06-14T16:05:11.077Z"
+      "token": "OicKHkIqmaVa2GOv",
+      "label": "qr",
+      "pairedAt": "2026-06-15T00:43:09.750Z"
+    },
+    {
+      "token": "ITR_TzlIhJ8RO4Rx",
+      "label": "qr",
+      "pairedAt": "2026-06-15T00:43:47.448Z"
+    },
+    {
+      "token": "cK_qTBudbmpVvulj",
+      "label": "qr",
+      "pairedAt": "2026-06-15T00:44:55.766Z"
+    },
+    {
+      "token": "l04dXTNqlrNDRp_A",
+      "label": "qr",
+      "pairedAt": "2026-06-15T00:46:07.414Z"
+    },
+    {
+      "token": "pWVdz01LUAopNMeQ",
+      "label": "qr",
+      "pairedAt": "2026-06-15T01:02:08.066Z"
     }
   ]
 }

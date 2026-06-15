@@ -1,0 +1,18 @@
+{
+  "id": "20260615T003004887Z-mobile-faHVZNmK",
+  "feature": "2026-06-13-mobile-on-demand-sync",
+  "sessionId": "sess_LZhq16aZxPsH",
+  "agent": {
+    "id": "custom-1NBm-ZIn",
+    "kind": "custom",
+    "name": "Sandtable agent"
+  },
+  "source": "mobile",
+  "type": "chat_message",
+  "createdAt": "2026-06-15T00:30:04.887Z",
+  "payload": {
+    "text": "测试一下",
+    "target": "conversation",
+    "kind": "chat"
+  }
+}

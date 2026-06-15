@@ -11,14 +11,14 @@
         "kind": "custom",
         "name": "Sandtable agent"
       },
-      "status": "active",
+      "status": "stopped",
       "phase": "VERIFY",
       "blocked": false,
-      "paired": false,
+      "paired": true,
       "createdAt": "2026-06-14T16:05:11.084Z",
-      "updatedAt": "2026-06-14T16:15:19.784Z",
-      "lastActivityAt": "2026-06-14T16:15:19.784Z",
-      "summary": "配对码逻辑（看 runtime/server/src/pairing.ts + http.ts）：\n\n1) 生成：/sandtable-mobile-start 调 /mobile-sync/start，服务端生成一个 16 位长效 token（nanoid），再生成 4 位配对码——randomInt 取 1000–9999，与现有未过期码查重，最多重试 100 次保证唯一。码↔{feature, token, sessionId} 一起存进内存注册表（byCode/byToken 两张 Map）。\n\n2) 有效期：PIN_TTL_MS = 10 分钟。每次操作前 pruneExpired() 清掉过期项，过期码自动失效。\n\n3) 配对：手机提交 4 位码到 /pair/by-code，先校验必须是 4 位数字，再 claimByCode——码不存在或已配对就拒（过期/已用）。成功则标记 paired、记 pairedAt，并从 byCode 删除（一次性，用过即废）。\n\n4) 配对后：把 token 升级为持久 device（devices.add），所以即使服务器重启、配对码早过期，手机凭 token 仍能继续连——这就是二维码里直接塞 token、扫码免输码的原因。随后服务端发 mobile_paired 进 inbox 并推一次状态快照。\n\n要点：码短(4位)、短命(10分钟)、一次性、唯一；token 长效且持久。码只是引导首次配对的临时凭证，真正的长期身份是 token。"
+      "updatedAt": "2026-06-15T01:04:33.951Z",
+      "lastActivityAt": "2026-06-15T01:04:33.951Z",
+      "summary": "收到，我现在停止手机同步。停止后手机端会显示断开，需要再次开启时重新生成配对码即可。"
     }
   ]
 }
