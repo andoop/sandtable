@@ -2,10 +2,14 @@
 # Sandtable 资产同步 / 校验（仅限本仓库维护，不安装到用户项目）。
 #
 # 单一真源 → 镜像（杜绝手工复制遗漏，如 mobile 命令漏装到某个 harness）：
-#   zh commands: ./commands            -> .cursor/commands, plugins/sandtable/commands
+#   zh commands: ./commands            -> .cursor/commands, plugins/sandtable/commands, .kiro/prompts
 #   zh skills:   ./skills              -> plugins/sandtable/skills
-#   en commands: ./locales/en/commands -> locales/en/.cursor/commands, locales/en/plugins/sandtable/commands
+#   en commands: ./locales/en/commands -> locales/en/.cursor/commands, locales/en/plugins/sandtable/commands, locales/en/.kiro/prompts
 #   en skills:   ./locales/en/skills   -> locales/en/plugins/sandtable/skills
+#
+# 另：.kiro/steering/sandtable.md（中）与 locales/en/.kiro/steering/sandtable.md（英）是 Kiro CLI
+#     始终加载的精简方法论基线（各 locale 自己的真实文件，等价 .cursor/rules/sandtable.mdc），
+#     由本脚本校验存在性与 frontmatter（不镜像 commands）。
 #
 # 用法：
 #   scripts/sandtable-sync.sh          # 同步：镜像 := 真源（覆盖）
@@ -39,9 +43,11 @@ mirror() {
 echo "[1/4] 镜像命令与技能（真源 → 镜像）"
 mirror commands .cursor/commands
 mirror commands plugins/sandtable/commands
+mirror commands .kiro/prompts
 mirror skills plugins/sandtable/skills
 mirror locales/en/commands locales/en/.cursor/commands
 mirror locales/en/commands locales/en/plugins/sandtable/commands
+mirror locales/en/commands locales/en/.kiro/prompts
 mirror locales/en/skills locales/en/plugins/sandtable/skills
 
 echo "[2/4] 平台清单与结构校验"
@@ -57,11 +63,20 @@ for d in skills plugins/sandtable/skills locales/en/skills locales/en/plugins/sa
 done
 
 echo "[3/4] mobile 资产齐备校验"
-for d in commands .cursor/commands plugins/sandtable/commands \
-         locales/en/commands locales/en/.cursor/commands locales/en/plugins/sandtable/commands; do
+for d in commands .cursor/commands plugins/sandtable/commands .kiro/prompts \
+         locales/en/commands locales/en/.cursor/commands locales/en/plugins/sandtable/commands locales/en/.kiro/prompts; do
   for f in sandtable-mobile-start sandtable-mobile-status sandtable-mobile-stop sandtable-mobile-wait; do
     [[ -f "$d/$f.md" ]] || { echo "  ✗ 缺 $d/$f.md"; fail=1; }
   done
+done
+# Kiro CLI 始终加载基线：.kiro/steering/sandtable.md（中）与 locales/en/.kiro/steering/sandtable.md（英）
+# 是各自 locale 的精简方法论基线（真实文件，含 frontmatter；非 commands 镜像、非符号链接）。
+for f in .kiro/steering/sandtable.md locales/en/.kiro/steering/sandtable.md; do
+  if [[ -f "$f" && ! -L "$f" ]] && head -1 "$f" | grep -q '^---'; then
+    echo "  ✓ $f"
+  else
+    echo "  ✗ $f 应为真实的精简 steering 文件（含 YAML frontmatter，非符号链接）"; fail=1
+  fi
 done
 for d in skills plugins/sandtable/skills locales/en/skills locales/en/plugins/sandtable/skills; do
   [[ -f "$d/mobile-companion/SKILL.md" ]] || { echo "  ✗ 缺 $d/mobile-companion/SKILL.md"; fail=1; }

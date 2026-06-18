@@ -36,7 +36,7 @@ English official prompt:
 - 两条官方提示词同时出现
 - 只是用户自行改写、转述、删改后的非官方版本
 
-不要要求额外 `lang=...` 或独立语言 flag。`.cursor/commands` 只服务 Cursor；Codex 的命令入口由 Sandtable Codex plugin 提供，Kiro / 通用 agent 仍使用 `AGENTS.md` 行为基线与普通消息入口。
+不要要求额外 `lang=...` 或独立语言 flag。`.cursor/commands` 只服务 Cursor；Codex 的命令入口由 Sandtable Codex plugin 提供；Kiro CLI 使用 `.kiro/prompts/*.md`（用 `/prompts <名>` 或 `@<名>` 触发）作为命令入口、`.kiro/steering/sandtable.md`（始终加载的精简方法论基线）作为行为基线；其它通用 agent 仍使用 `AGENTS.md` 行为基线与普通消息入口。
 
 ### 1. 安装总规则（严格遵守）
 
@@ -69,6 +69,8 @@ git clone --depth 1 https://github.com/andoop/sandtable "$SB_SRC"
   - `plugins/sandtable/commands/*.md` ← `$SB_SRC/plugins/sandtable/commands/*.md`
   - `plugins/sandtable/skills/**` ← `$SB_SRC/plugins/sandtable/skills/**`
   - `.cursor/commands/*.md` ← `$SB_SRC/.cursor/commands/*.md`
+  - `.kiro/prompts/*.md` ← `$SB_SRC/.kiro/prompts/*.md`
+  - `.kiro/steering/sandtable.md` ← `$SB_SRC/.kiro/steering/sandtable.md`
   - `skills/**` ← `$SB_SRC/skills/**`
   - `templates/**` ← `$SB_SRC/templates/**`
   - `scripts/sandtable-init.sh` ← `$SB_SRC/scripts/sandtable-init.sh`
@@ -81,6 +83,8 @@ git clone --depth 1 https://github.com/andoop/sandtable "$SB_SRC"
   - `plugins/sandtable/commands/*.md` ← `$SB_SRC/locales/en/plugins/sandtable/commands/*.md`
   - `plugins/sandtable/skills/**` ← `$SB_SRC/locales/en/plugins/sandtable/skills/**`
   - `.cursor/commands/*.md` ← `$SB_SRC/locales/en/.cursor/commands/*.md`
+  - `.kiro/prompts/*.md` ← `$SB_SRC/locales/en/.kiro/prompts/*.md`
+  - `.kiro/steering/sandtable.md` ← `$SB_SRC/locales/en/.kiro/steering/sandtable.md`
   - `skills/**` ← `$SB_SRC/locales/en/skills/**`
   - `templates/**` ← `$SB_SRC/templates/en/**` 复制到目标项目的 `templates/`
   - `scripts/sandtable-init.sh` ← `$SB_SRC/locales/en/scripts/sandtable-init.sh`
@@ -110,6 +114,7 @@ git clone --depth 1 https://github.com/andoop/sandtable "$SB_SRC"
 - `runtime/`（Node server）随方法论**复制源码**（排除 `node_modules/`、`dist/`、`.vite/`），但**不**自动 `npm install`；`apps/`（Flutter App）属于可选 Mobile Review Companion，本安装流程**绝不复制**，需用户单独 clone 仓库取得。
 - `.claude-plugin/`（Claude Code 插件 / marketplace 清单）与 `.cursor-plugin/plugin.json`（Cursor 插件清单）是**仓库侧分发清单**（指向上游 GitHub 仓库），用于用户从插件市场添加 Sandtable，**不复制进用户项目**。
 - `CLAUDE.md` 不维护独立语言副本；若目标项目没有 `CLAUDE.md`，继续按原规则创建 `CLAUDE.md -> AGENTS.md` 的符号链接即可，语言跟随 `AGENTS.md` 内容本身。
+- Kiro CLI 接线：`.kiro/prompts/*.md` 与 `.kiro/steering/sandtable.md` 都跟随 commands 的 locale pack 一起安装。`.kiro/prompts/*.md` 是命令入口（`/prompts <名>` 或 `@<名>` 触发）；`.kiro/steering/sandtable.md` 是 Kiro CLI 默认 agent 始终加载的**精简方法论基线**（真实文件、含 frontmatter，等价 `.cursor/rules/sandtable.mdc`；只放底线与门禁，完整方法论按需读 `skills/`），按 locale 安装中文或英文版本，**不是**指向 `AGENTS.md` 的符号链接。
 - `scripts/test-sandtable-init.sh` 是仓库内部测试脚本，绝不安装到用户项目。
 - Codex plugin manifest 和 marketplace 注册文件是共享机器资产；它们不随语言切换，但 `plugins/sandtable/commands/*.md` 与 `plugins/sandtable/skills/**` 必须跟随 locale pack。
 

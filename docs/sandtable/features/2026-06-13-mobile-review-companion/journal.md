@@ -126,3 +126,9 @@
 - Target: conversation
 
 - 来源: mobile-app:sess_d1FgN5CFpdPY
+
+## 2026-06-15 18:05 · [停止]
+- 背景: 开发者在电脑端要求「停止同步/终止同步」。
+- 内容: 运行 `scripts/sandtable-mobile-stop.sh`，关闭 mobile-sync 与 runtime server（端口 8767）。
+- 验证: `GET http://127.0.0.1:8767/health` 已不可达，确认 server 已下线；手机 App 将显示 Reconnecting/Disconnected。需重新 `/sandtable-mobile-start` 才能再同步。
+- 依据/来源: 开发者本回合指令。
