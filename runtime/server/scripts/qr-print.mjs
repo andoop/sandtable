@@ -52,6 +52,25 @@ const quiet = 4;
 const dim = qr.size + quiet * 2;
 const dark = (x, y) => qr.getModule(x - quiet, y - quiet);
 
+// --utf8 : compact, ANSI-free rendering using half-block glyphs (space ▀ ▄ █).
+// One char per module wide, one char per two modules tall → roughly square,
+// ~1/4 the area of the ANSI version, and renders cleanly inside a chat/markdown
+// code block (no escape sequences, no color). Dark modules are the "ink".
+if (flag("--utf8")) {
+  const lines = [];
+  for (let y = 0; y < dim; y += 2) {
+    let line = "";
+    for (let x = 0; x < dim; x++) {
+      const top = dark(x, y);
+      const bottom = y + 1 < dim ? dark(x, y + 1) : false;
+      line += top && bottom ? "\u2588" : top ? "\u2580" : bottom ? "\u2584" : " ";
+    }
+    lines.push(line);
+  }
+  process.stdout.write(lines.join("\n") + "\n");
+  process.exit(0);
+}
+
 const out = [];
 for (let y = 0; y < dim; y += 2) {
   let line = "";

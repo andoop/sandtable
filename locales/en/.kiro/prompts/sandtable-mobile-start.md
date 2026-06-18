@@ -9,15 +9,21 @@ Start Sandtable mobile sync on demand. Details in `docs/mobile-review-companion/
 Execute:
 1. **Force feature choice**: list `docs/sandtable/features/` and you **must** use **AskQuestion** to make me pick one; do not assume and do not skip this step (most recent listed first as the recommendation).
 2. **Start the server**: with the chosen `<feature>`, run `scripts/sandtable-mobile-start.sh <feature>` (returns immediately). Do **not** hesitate or hold off because "the phone isn't paired yet / no one has sent a message" — just start the server and dispatch the waiter; pairing and messaging are the user's side.
-3. **Sync pairing info (mandatory)**: once the server is up, you **must** show me the Server URL and pairing code verbatim using this template (missing either field means start failed — investigate):
+3. **Show "pairing info + QR" in the conversation (mandatory)**: once the server is up, you **must** show me the Server URL, pairing code, Feature, and QR verbatim using this template (missing URL / code / QR means start failed — investigate). Take the QR straight from the script output, the compact block between `----- QR BEGIN -----` and `----- QR END -----` (produced by `qr-print.mjs --utf8`), and **put it inside a monospaced code block** so it stays aligned, scannable, and un-escaped:
 
-   ```
+   ~~~
    📱 Sandtable mobile sync started
-   Server URL   : <server_url>
-   Pairing code : <pairing_code> (valid for 10 minutes)
-   Feature      : <feature>
-   How to       : on the phone, enter the URL + 4-digit code (or scan the QR)
+   - Server URL   : <server_url>
+   - Pairing code : <pairing_code> (valid for 10 minutes)
+   - Feature      : <feature>
+   - How to       : in the iPhone app enter the URL + 4-digit code, or just scan the QR below
+
+   ```text
+   <paste the compact QR block from the script's QR BEGIN/END here, verbatim>
    ```
+   ~~~
+
+   Note: the QR must go inside a code block (```), otherwise non-monospaced characters misalign and it won't scan. If the script printed no QR block (no token), say so and tell the user to enter the URL + code manually.
 
 4. **Force-dispatch the waiter**: run `/sandtable-mobile-wait` to dispatch **one** sub-agent that block-polls the inbox, then stay idle until it returns.
 5. **Handle the message**: only after the sub-agent returns a message — report `agent-state main=working` → handle → `POST /mailbox/inbox/ack` → `main=idle` → `/sandtable-mobile-wait` again. On error report `main=error`.

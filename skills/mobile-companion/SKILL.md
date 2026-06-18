@@ -34,14 +34,17 @@ description: Use when the developer enables Sandtable mobile review / 手机同�
 
 ## 主循环
 
-1. **开启**：列出 `docs/sandtable/features/`，用 AskQuestion 让开发者**硬选** feature（不假定、不跳过），再跑 `sandtable-mobile-start.sh <feature>`。服务起来后**必须**按模版展示配对信息（缺 URL 或配对码即视为没开成功）：
+1. **开启**：列出 `docs/sandtable/features/`，用 AskQuestion 让开发者**硬选** feature（不假定、不跳过），再跑 `sandtable-mobile-start.sh <feature>`。服务起来后**必须**按模版在对话里展示配对信息**和二维码**（缺 URL / 配对码 / 二维码即视为没开成功）：
 
    ```
    📱 Sandtable 手机同步已开启
-   Server URL : <server_url>
-   配对码     : <pairing_code>（10 分钟内有效）
-   Feature    : <feature>
+   - Server URL : <server_url>
+   - 配对码     : <pairing_code>（10 分钟内有效）
+   - Feature    : <feature>
+   - 操作       : iPhone App 输入上面 URL + 4 位配对码，或扫下面二维码
    ```
+
+   二维码取脚本输出里 `----- QR BEGIN -----`/`----- QR END -----` 之间的紧凑块（`qr-print.mjs --utf8` 生成），**单独放进一个等宽代码块**展示，否则会错位、扫不出。
 2. **派等待子 agent**：执行 `/sandtable-mobile-wait`（见上「分工铁律」），然后空闲等其返回。
 3. **处理 + ack**：子 agent 交回消息后，主 agent 处理 → `POST /mailbox/inbox/ack {"ids":["<id>"]}` → 再 `/sandtable-mobile-wait` 拉下一个。
 4. **回话 / 推状态**：回话 `POST /agent/sessions/<sid>/messages`；改完 Sandtable 文档且 sync active 时 `POST /mobile-sync/push-state`。

@@ -34,14 +34,17 @@ Sync the current feature's phase, documents, and pending confirmations to the ph
 
 ## On-demand sync loop
 
-1. **Start**: list `docs/sandtable/features/`, use AskQuestion to make the developer **force-pick** the feature (no assuming, no skipping), then run `sandtable-mobile-start.sh <feature>`. Once the server is up you **must** show the pairing info using this template (missing URL or code = start failed):
+1. **Start**: list `docs/sandtable/features/`, use AskQuestion to make the developer **force-pick** the feature (no assuming, no skipping), then run `sandtable-mobile-start.sh <feature>`. Once the server is up you **must** show the pairing info **and the QR** in the conversation using this template (missing URL / code / QR = start failed):
 
    ```
    📱 Sandtable mobile sync started
-   Server URL   : <server_url>
-   Pairing code : <pairing_code> (valid 10 min)
-   Feature      : <feature>
+   - Server URL   : <server_url>
+   - Pairing code : <pairing_code> (valid 10 min)
+   - Feature      : <feature>
+   - How to       : in the iPhone app enter the URL + 4-digit code, or scan the QR below
    ```
+
+   Take the QR from the compact block between `----- QR BEGIN -----`/`----- QR END -----` in the script output (produced by `qr-print.mjs --utf8`) and **put it in its own monospaced code block**, otherwise it misaligns and won't scan.
 2. **Spawn the waiter**: run `/sandtable-mobile-wait` (see the split iron law above), then stay idle until it returns.
 3. **Handle + ack**: after the waiter returns a message, the main agent handles it → `POST /mailbox/inbox/ack {"ids":["<id>"]}` → `/sandtable-mobile-wait` for the next.
 4. **Reply / push state**: reply via `POST /agent/sessions/<sid>/messages`; after editing Sandtable docs with sync active, `POST /mobile-sync/push-state`.

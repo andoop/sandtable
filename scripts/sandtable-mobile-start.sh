@@ -138,9 +138,10 @@ Server URL: $PUBLIC_URL
 EOF
 
 if [[ -n "$QR_PAYLOAD" ]]; then
-  echo "或直接用 App 扫描下面的二维码连接（免输入）："
-  echo
-  node "$REPO_ROOT/runtime/server/scripts/qr-print.mjs" --text "$QR_PAYLOAD" 2>/dev/null || echo "（二维码渲染失败，请用上面的 URL + 配对码）"
+  echo "或直接用 App 扫描下面的二维码连接（免输入）。下面是紧凑二维码（可直接贴进对话的等宽代码块）："
+  echo "----- QR BEGIN (paste this block into chat verbatim) -----"
+  node "$REPO_ROOT/runtime/server/scripts/qr-print.mjs" --utf8 --text "$QR_PAYLOAD" 2>/dev/null || echo "（二维码渲染失败，请用上面的 URL + 配对码）"
+  echo "----- QR END -----"
   echo
 fi
 

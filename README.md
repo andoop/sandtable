@@ -11,11 +11,11 @@
 
 中文版：
 
-> 阅读 https://github.com/andoop/sandtable/blob/main/INSTALL.md ，并据此按中文把 Sandtable 安装进当前项目。
+> 阅读 https://github.com/andoop/sandtable/blob/remote/INSTALL.md ，并据此按中文把 Sandtable 安装进当前项目。
 
 English:
 
-> Read https://github.com/andoop/sandtable/blob/main/INSTALL.md and use it to install Sandtable into the current project in English.
+> Read https://github.com/andoop/sandtable/blob/remote/INSTALL.md and use it to install Sandtable into the current project in English.
 
 安装完成后按你的工具进入 Sandtable 命令：Cursor 使用 `.cursor/commands`，Codex 使用 Sandtable Codex plugin/commands，Kiro CLI 使用 `.kiro/prompts`（`/prompts sandtable-start` 或 `@sandtable-start`），Claude Code / 其它通用 agent 可直接把命令名作为消息发给 AI 执行。详见 [`Quickstart`](#quickstart)。
 
@@ -65,11 +65,11 @@ Sandtable 让 agent 用三种推演逐层逼出破口，全程落盘可续：
 
    中文：
 
-   > 阅读 https://github.com/andoop/sandtable/blob/main/INSTALL.md ，并据此按中文把 Sandtable 安装进当前项目。
+   > 阅读 https://github.com/andoop/sandtable/blob/remote/INSTALL.md ，并据此按中文把 Sandtable 安装进当前项目。
 
    English:
 
-   > Read https://github.com/andoop/sandtable/blob/main/INSTALL.md and use it to install Sandtable into the current project in English.
+   > Read https://github.com/andoop/sandtable/blob/remote/INSTALL.md and use it to install Sandtable into the current project in English.
 
 2. 按 AI 的安装结果完成最后接线；若它提示重载窗口、重开工作区或启用本地插件以使规则生效，就照做。
 3. 按工具选择命令入口：
@@ -85,11 +85,11 @@ Sandtable 让 agent 用三种推演逐层逼出破口，全程落盘可续：
 
 中文：
 
-> 阅读 https://github.com/andoop/sandtable/blob/main/UPDATE.md ，并据此按中文把当前项目里已安装的 Sandtable 更新到最新。
+> 阅读 https://github.com/andoop/sandtable/blob/remote/UPDATE.md ，并据此按中文把当前项目里已安装的 Sandtable 更新到最新。
 
 English：
 
-> Read https://github.com/andoop/sandtable/blob/main/UPDATE.md and use it to update the already-installed Sandtable in the current project to the latest, in English.
+> Read https://github.com/andoop/sandtable/blob/remote/UPDATE.md and use it to update the already-installed Sandtable in the current project to the latest, in English.
 
 细节见 [`UPDATE.md`](UPDATE.md)。注意：**重跑安装提示词无法更新**（安装器"已存在即跳过"）；请用与安装时相同的语言更新。
 
