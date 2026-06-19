@@ -50,6 +50,14 @@ Sync the current feature's phase, documents, and pending confirmations to the ph
 4. **Reply / push state**: reply via `POST /agent/sessions/<sid>/messages`; after editing Sandtable docs with sync active, `POST /mobile-sync/push-state`.
 5. **Persist**: append one entry to the feature `journal.md`.
 
+Use one entry point for proactive progress:
+
+```bash
+scripts/sandtable-mobile-notify.sh <status|phase|question|chat> '<phone-visible message>'
+```
+
+The script calls `POST /mobile-sync/notify`; the server resolves the current valid session and repairs `mobile-sync.json.sessionId` when an old session was replaced. Agents must not guess a session id from message history.
+
 Port comes from `.sandtable-runtime/session/server.port`.
 
 ## Runtime state sync to the phone
@@ -72,6 +80,7 @@ Whenever mobile-sync is **active** (server running + `.sandtable-runtime/session
   - A confirmation or blocker arises → sync `{"kind":"question"}` and persist to `questions.md` / `state.md` per protocol.
   - Edited a Sandtable doc (PRD/tests/plan/state) → `POST /mobile-sync/push-state`.
   - Start / finish an important piece of work → report `agent-state main=working|idle` + a one-line progress note.
+- **Visible progress must enter the conversation**: call `scripts/sandtable-mobile-notify.sh` at the points above. `POST /mobile-sync/agent-state` only drives the status indicator; by itself it does not count as a progress notification and cannot replace notify.
 - **What counts as an "important moment"**: anything affecting the loop / acceptance / key decisions, or that the developer would want to see on the phone. Don't spam trivial intermediate steps.
 - **The waiting sub-agent blocks forever with no timeout (pure wait)**: by default do **not** pass `SANDTABLE_WAIT_MAX_SECONDS`; the sub-agent blocks until it gets one message. **Only** when the host imposes a **hard execution cap** that would truncate an infinite block, use the fallback (e.g. `=240`); on timeout the main agent **immediately, seamlessly dispatches another** waiter, never polling or setting any other timeout.
 

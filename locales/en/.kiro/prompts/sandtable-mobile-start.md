@@ -27,5 +27,6 @@ Execute:
 
 4. **Force-dispatch the waiter**: run `/sandtable-mobile-wait` to dispatch **one** sub-agent that block-polls the inbox, then stay idle until it returns.
 5. **Handle the message**: only after the sub-agent returns a message — report `agent-state main=working` → handle → `POST /mailbox/inbox/ack` → `main=idle` → `/sandtable-mobile-wait` again. On error report `main=error`.
+6. **Standing proactive sync**: while sync is active, call `scripts/sandtable-mobile-notify.sh <kind> <message>` before / during / after important computer-side work, on phase changes, key decisions, confirmations, or blockers. `agent-state` only updates the status indicator and cannot replace a conversation notification.
 
 Port comes from `.sandtable-runtime/session/server.port`. Other than step 1, do not ask whether to continue.

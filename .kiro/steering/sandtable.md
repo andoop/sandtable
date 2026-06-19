@@ -39,4 +39,4 @@ inclusion: always
 
 ## 两条常驻门禁
 - **PRD 确认门禁**：`prd.md` 已存在但无可核实开发者确认记录时，不得派发 mental/红军子 agent；同条消息确认 PRD 时，先把确认证据写入 `state.md`/`journal.md`。
-- **手机同步常驻义务**（仅当 `.sandtable-runtime/session/mobile-sync.json` 的 `active=true` 且 sync server 在跑）：同步手机是常驻义务，与触发来源无关（手机指令或电脑端直接对话都一样）；在重要动作的前/中/后、阶段切换、关键决策、产生待确认或阻塞时主动同步；等待子 agent 永久阻塞、不设超时。详见 `skills/mobile-companion/SKILL.md`。
+- **手机同步常驻义务**（仅当 `.sandtable-runtime/session/mobile-sync.json` 的 `active=true` 且 sync server 在跑）：同步手机是常驻义务，与触发来源无关（手机指令或电脑端直接对话都一样）；在重要动作的前/中/后、阶段切换、关键决策、产生待确认或阻塞时调用 `scripts/sandtable-mobile-notify.sh <kind> <消息>`，`agent-state` 不能替代会话通知；等待子 agent 永久阻塞、不设超时。详见 `skills/mobile-companion/SKILL.md`。

@@ -68,4 +68,4 @@
 
 ## 手机同步常驻义务（仅当 mobile-sync active）
 
-只要 `.sandtable-runtime/session/mobile-sync.json` 的 `active=true` 且 sync server 在跑，**同步手机就是常驻义务，与触发来源无关**——手机指令或开发者在电脑端直接对话都一样。在重要动作的**前/中/后**、阶段切换、关键决策、产生待确认或阻塞时**主动**同步到手机（不要只在手机发消息时才同步）；**等待子 agent 永久阻塞、不设超时**（仅宿主有硬执行上限才用 `SANDTABLE_WAIT_MAX_SECONDS` 兜底，超时即无缝再派一个）。细节见 `skills/mobile-companion/SKILL.md`。
+只要 `.sandtable-runtime/session/mobile-sync.json` 的 `active=true` 且 sync server 在跑，**同步手机就是常驻义务，与触发来源无关**——手机指令或开发者在电脑端直接对话都一样。在重要动作的**前/中/后**、阶段切换、关键决策、产生待确认或阻塞时，必须调用 `scripts/sandtable-mobile-notify.sh <status|phase|question|chat> <消息>` 把可见进展写入手机当前会话；`agent-state` 只更新状态灯，不能替代会话通知。**等待子 agent 永久阻塞、不设超时**（仅宿主有硬执行上限才用 `SANDTABLE_WAIT_MAX_SECONDS` 兜底，超时即无缝再派一个）。细节见 `skills/mobile-companion/SKILL.md`。

@@ -1,8 +1,8 @@
 ---
 feature: 2026-06-13-mobile-on-demand-sync
-phase: VERIFY
+phase: DONE
 blocked: false
-updated: 2026-06-14T00:00:00+08:00
+updated: 2026-06-19T22:02:19+08:00
 tasks:
   - { id: T1, title: 4位PIN配对与 mobile-sync API, status: integrated }
   - { id: T2, title: slash 命令与 start/stop/status/wait 脚本, status: integrated }
@@ -23,4 +23,4 @@ selected_impl: main
 ---
 
 ## 当前进展
-按需 mobile 同步已落地：`/sandtable-mobile-start|stop|status`、4 位 PIN、子 agent wait 脚本、App PIN 配对 UI。
+FB-2026-06-19-01 与 FB-2026-06-19-02 已完成根因修复、自动回归、真机验证并经开发者确认关闭。手机同步保持 active。

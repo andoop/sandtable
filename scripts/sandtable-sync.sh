@@ -81,6 +81,7 @@ done
 for d in skills plugins/sandtable/skills locales/en/skills locales/en/plugins/sandtable/skills; do
   [[ -f "$d/mobile-companion/SKILL.md" ]] || { echo "  ✗ 缺 $d/mobile-companion/SKILL.md"; fail=1; }
 done
+[[ -x scripts/sandtable-mobile-notify.sh ]] || { echo "  ✗ 缺可执行 scripts/sandtable-mobile-notify.sh"; fail=1; }
 
 echo "[4/4] 共享片段（_shared 单一真源）齐备校验"
 for d in skills plugins/sandtable/skills locales/en/skills locales/en/plugins/sandtable/skills; do

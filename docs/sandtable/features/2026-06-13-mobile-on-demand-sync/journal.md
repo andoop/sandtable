@@ -452,3 +452,142 @@
 - 背景: heartbeat 检查发现手机尚未配对，上一轮配对码 `3741` 已过期。
 - 内容: 重新运行 `scripts/sandtable-mobile-start.sh` 续开同步，Server URL 仍为 `http://192.168.5.198:8765`，新配对码为 `2913`，有效期至 `2026-06-15T01:12:08.024Z`。
 - 当前状态: Server 已运行，Agent 已同步，手机尚未配对；heartbeat watcher 继续检查 inbox。
+
+## 2026-06-15 09:04 CST · [集成] 手机同步停止
+- 背景: 用户要求"停止"。
+- 内容: 删除 Codex heartbeat automation `sandtable-mobile-inbox-watcher`，运行 `scripts/sandtable-mobile-stop.sh` 停止 runtime server，并将 `.sandtable-runtime/session/continuation.json` 标记为 inactive/stopped、清空 waiting workers。
+- 验证: `GET http://127.0.0.1:8765/health` 返回 `000`，确认 server 已不可达。
+
+## 2026-06-15T01:09:40.064Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 测试一下
+- Target: conversation
+
+- 来源: mobile-app:sess_LZhq16aZxPsH
+
+## 2026-06-19T12:24:34.720Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 在吗
+- Target: conversation
+
+- 来源: mobile-app:sess_LZhq16aZxPsH
+
+## 2026-06-19T12:30:57.364Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 测试一下
+- Target: conversation
+
+- 来源: mobile-app:sess_LZhq16aZxPsH
+
+## 2026-06-19 20:34 CST · [反馈] 手机消息已发送但主 agent 无响应
+- 反馈: 开发者确认手机端已经发送消息，但主 agent 持续等待且没有响应。
+- 分诊: `INVESTIGATING`，真缺陷候选；与 `tests.md` TC5「wait 脚本在 5s 轮询内返回 inbox 消息」不符。
+- 已知证据: 本 journal 已记录 12:24 的「在吗」和 12:30 的「测试一下」，证明手机到 server 的提交链路成功；故障位于 inbox 到 waiter/主 agent 的交付段，根因待运行时证据确认。
+- 追踪: `feedback.md` FB-2026-06-19-01。
+
+## 2026-06-19 20:38 CST · [根因] waiter 无法访问 loopback 且吞掉连接错误
+- 运行时证据: 主 agent 与 wait 子 agent 分别执行 `curl http://127.0.0.1:8765/mailbox/inbox?...`，均返回 `Immediate connect fail ... Operation not permitted`、退出码 7。
+- 对照证据: `.sandtable-runtime/mailbox/inbox/` 同时存在 3 条待处理消息，其中包括开发者发送的「在吗」与「测试一下」。
+- 因果链: Codex 沙箱禁止 loopback → wait 脚本 curl 失败 → 第 54 行将失败吞成空消息数组 → 无限 sleep/retry → 主 agent永远收不到已经落盘的消息。
+- 修复: wait 脚本在 HTTP 不可达时按 server endpoint 同样的过滤语义直接读取 inbox JSON；新增回归用例 TC11。
+- 证据归档: `/tmp/sandtable-logs/FB-2026-06-19-01/server.log`。
+
+## 2026-06-19 20:42 CST · [验证] 文件回退恢复消息交付
+- 静态检查: `bash -n scripts/sandtable-mobile-wait.sh`、`git diff --check` 通过。
+- 自动测试: `runtime/server` Vitest 9 files / 23 tests 全部通过。
+- 关键回归: 子 agent 以 `SANDTABLE_MOBILE_PORT=1` 强制 HTTP 不可达，wait 脚本退出码 0，立即返回 3 条 inbox 消息，包括「在吗」与「测试一下」。
+- 消息处理: 使用项目 `conversations.ts` / `mailbox.ts` API 写入 agent 回复并 ack 3 条消息；inbox 验证为空。
+- 服务恢复: 清理半死进程后重新启动 `2026-06-13-mobile-on-demand-sync`，Server URL `http://192.168.5.75:8765`，新配对码 `1178`。
+- 反馈状态: `VERIFYING`，等待开发者真机确认后再关闭。
+
+## 2026-06-19 21:38 CST · [状态] 长等待被开发者中断
+- 现象: 主 agent 阻塞等待子 agent 约 52 分钟，期间没有新消息返回，开发者中断等待并询问为何卡住。
+- 核实: Server 进程正常运行；手机未配对；inbox 为空；waiter 已随中断结束，无残留 wait 进程。
+- 结论: 本轮长等待不是 server 崩溃，也不是消息再次丢失；当前没有已配对手机和待交付消息。反馈仍处于 VERIFYING，需重新配对后真机确认。
+- 当前配对码: `3074`，Server URL `http://192.168.5.75:8765`。
+
+## 2026-06-19 21:44 CST · [验证] 真机配对与聊天消息交付成功
+- 重启同步: Feature `2026-06-13-mobile-on-demand-sync`，Server URL `http://192.168.5.75:8765`，配对码 `2960`。
+- 配对验证: waiter 收到 `mobile_paired`，消息 id `20260619T134342208Z-mobile-mWPsyRRv`；主 agent ack 成功。
+- 聊天验证: 手机发送「测试一下」，waiter 收到 `chat_message`，消息 id `20260619T134351626Z-mobile-ryJYhlgL`。
+- 处理结果: 主 agent 回复手机，ack 返回 `acked: 1`，agent state 更新为 idle。
+- 反馈状态: 保持 `VERIFYING`，等待开发者确认手机端确实显示 agent 回复后再关闭。
+
+## 2026-06-19 21:47 CST · [反馈] 关键工作节点没有稳定同步到手机会话
+- 来源: 手机会话 `sess_vwd-nqlk2Vhv`，消息 id `20260619T134651567Z-mobile-hhm3Zz5V`。
+- 用户反馈: 已要求关键时刻同步手机，需确认并修正执行逻辑。
+- 初步证据: 常驻同步规则已存在于 AGENTS、Cursor/Kiro 基线和 mobile-companion 中英文副本；缺口集中在执行层，电脑端重要动作没有统一的会话通知入口和可验证触发。
+- 状态: FB-2026-06-19-02 `INVESTIGATING`。
+
+## 2026-06-19 21:54 CST · [修复] 关键节点通知绑定当前手机会话
+- 根因证据: 真机 mobile-sync 仍记录旧 `sess_LZhq16aZxPsH`，当前 sessions 仅有 `sess_vwd-nqlk2Vhv`；失败测试复现删除 session A 后配对仍返回 A。
+- server 修复: 配对、push-state 和 notify 统一解析真实 session 并回写 `mobile-sync.json.sessionId`；新增 `POST /mobile-sync/notify`。
+- agent 入口: 新增 `scripts/sandtable-mobile-notify.sh`；关键动作前/中/后、阶段切换、决策、待确认和阻塞均通过该入口写入手机会话。`agent-state` 只更新状态灯。
+- 规则传播: 已更新 AGENTS、Cursor/Kiro 基线、start 命令、mobile-companion 中英文真源并运行 `sandtable-sync.sh` 同步插件镜像。
+- 验证: runtime server 24/24 tests、typecheck、shell 语法、镜像 check、diff check 全部通过。
+- 真机验证: 热重启 server 后运行 notify，返回 `sessionId=sess_vwd-nqlk2Vhv`，mobile-sync stale id 被自动修正，完成消息已写入当前手机会话。
+- 状态: FB-2026-06-19-02 `VERIFYING`，等待开发者确认手机可见消息。
+
+## 2026-06-19 22:02 CST · [关闭] 手机同步两条验收反馈确认收敛
+- 用户确认: 手机端回复「确认了」，消息 id `20260619T140119003Z-mobile-dh-JGcnV`。
+- FB-01: wait 在 loopback 被禁止时改读 mailbox 文件，真机消息交付与回复确认通过。
+- FB-02: stale session 自动修正、统一 notify 入口、关键节点手机可见同步确认通过。
+- 回归: TC11、TC12 已验证；runtime server 24/24 tests、typecheck、shell 语法、镜像一致性、diff check 全部通过。
+- 教训: 已追加 `docs/sandtable/lessons.md`；constraints / RECON 候选更新等待开发者拍板。
+- 状态: 两条反馈 `USER_CONFIRMED → CLOSED`，feature 回到 `DONE`。
+
+## 2026-06-19 22:06 CST · [安全] runtime 状态退出 Git 跟踪
+- 背景: 开发者要求提交并推送全部改动；提交检查发现 `.sandtable-runtime/` 含配对 token、会话全文、mailbox 和 server 日志，且已有 55 个文件被 Git 跟踪。
+- 决策: 开发者确认排除 runtime，并同意完善 `.gitignore`。
+- 处理: `.gitignore` 忽略 `.sandtable-runtime/`；使用 `git rm --cached` 仅从 Git 索引移除 runtime，保留本机文件与当前手机同步服务。
+
+## 2026-06-19T13:43:51.623Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 测试一下
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-19T13:46:51.566Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 改一下吧，我记得改过呀，就是再关键时刻都要同步手机的呀，你确认一下逻辑
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-19T14:01:18.997Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 确认了
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-19T14:04:52.392Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 那你add all  然后push 吧
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-19T14:06:21.669Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 排除吧，或者有必要完善一下git ignore
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv

@@ -79,6 +79,57 @@ describe("http server", () => {
     expect((status.json() as { steps: { agentSynced: boolean } }).steps.agentSynced).toBe(true);
   });
 
+  it("repairs a stale sync session and notifies the current mobile conversation", async () => {
+    const { paths } = await createTempRepo();
+    const events = new RuntimeEvents();
+    const app = await createHttpServer(paths, events, async () => {}, "http://127.0.0.1:8765");
+
+    const registered = await app.inject({
+      method: "POST",
+      url: "/agent/sessions",
+      payload: {
+        id: "sess_stale",
+        feature: "feature-a",
+        workspace: paths.repoRoot,
+        agent: { id: "codex-local", kind: "codex", name: "Codex" }
+      }
+    });
+    expect(registered.statusCode).toBe(200);
+
+    const start = await app.inject({
+      method: "POST",
+      url: "/mobile-sync/start",
+      payload: { feature: "feature-a" }
+    });
+    const { code, token } = start.json() as { code: string; token: string };
+    const removed = await app.inject({ method: "DELETE", url: `/sessions/sess_stale?token=${token}` });
+    expect(removed.json()).toMatchObject({ ok: true, removed: true });
+
+    const claim = await app.inject({ method: "POST", url: "/pair/by-code", payload: { code } });
+    expect(claim.statusCode).toBe(200);
+    const currentSessionId = (claim.json() as { sessionId: string }).sessionId;
+    expect(currentSessionId).not.toBe("sess_stale");
+
+    const status = await app.inject({ method: "GET", url: "/mobile-sync/status" });
+    expect((status.json() as { session: { sessionId: string } }).session.sessionId).toBe(currentSessionId);
+
+    const notify = await app.inject({
+      method: "POST",
+      url: "/mobile-sync/notify",
+      payload: { kind: "status", text: "Started important work" }
+    });
+    expect(notify.statusCode).toBe(200);
+    expect((notify.json() as { sessionId: string }).sessionId).toBe(currentSessionId);
+
+    const conversation = await app.inject({
+      method: "GET",
+      url: `/sessions/${currentSessionId}/messages?token=${token}`
+    });
+    expect((conversation.json() as { messages: Array<{ text: string }> }).messages.at(-1)?.text).toBe(
+      "Started important work"
+    );
+  });
+
   it("manages multiple agent sessions from one paired mobile client", async () => {
     const { paths } = await createTempRepo();
     const featureB = path.join(paths.sandtableRoot, "features", "feature-b");

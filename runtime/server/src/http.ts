@@ -62,6 +62,18 @@ export async function createHttpServer(
     return ensureFeatureSession(paths, feature);
   }
 
+  async function resolveMobileSyncSession(
+    syncSession: NonNullable<Awaited<ReturnType<typeof readMobileSyncSession>>>
+  ): Promise<RuntimeSession> {
+    const runtimeSession =
+      (syncSession.sessionId ? await getSession(paths, syncSession.sessionId) : null) ??
+      (await sessionForFeature(syncSession.feature));
+    if (syncSession.sessionId !== runtimeSession.id) {
+      await writeMobileSyncSession(paths, { ...syncSession, sessionId: runtimeSession.id });
+    }
+    return runtimeSession;
+  }
+
   /** Read the freshest session row and push it to every live `/stream` client. */
   async function broadcastSession(sessionId: string): Promise<void> {
     const session = await getSession(paths, sessionId);
@@ -132,6 +144,7 @@ export async function createHttpServer(
     if (session && session.feature === feature) {
       await writeMobileSyncSession(paths, {
         ...session,
+        sessionId: runtimeSession.id,
         agentSyncedAt: new Date().toISOString()
       });
     }
@@ -416,6 +429,38 @@ export async function createHttpServer(
     return { ok: true, ...result };
   });
 
+  app.post("/mobile-sync/notify", async (request) => {
+    const body = (request.body ?? {}) as {
+      kind?: ConversationKind;
+      text?: string;
+      phase?: string;
+      blocked?: boolean;
+      summary?: string;
+    };
+    const syncSession = await readMobileSyncSession(paths);
+    if (!syncSession?.active || !syncSession.feature) throw new Error("mobile sync not active");
+    const validKinds: ConversationKind[] = ["chat", "phase", "question", "status"];
+    const kind = body.kind ?? "status";
+    if (!validKinds.includes(kind)) throw new Error("invalid notification kind");
+    const text = (body.text ?? body.summary ?? "").trim();
+    if (!text) throw new Error("text is required");
+
+    const runtimeSession = await resolveMobileSyncSession(syncSession);
+    const updates: Partial<RuntimeSession> = {};
+    if (body.phase) updates.phase = body.phase;
+    if (body.blocked !== undefined) updates.blocked = body.blocked;
+    updates.summary = body.summary?.trim() || text;
+    await recordConversation({
+      session: runtimeSession,
+      role: "agent",
+      kind,
+      text,
+      payload: { phase: body.phase, blocked: body.blocked, summary: body.summary },
+      sessionUpdates: updates
+    });
+    return { ok: true, sessionId: runtimeSession.id };
+  });
+
   // Report the live runtime state of the main agent / waiting sub-agent so the
   // phone can show "idle / working / waiting / processing / disconnected / error".
   app.post("/mobile-sync/agent-state", async (request) => {
@@ -462,19 +507,30 @@ export async function createHttpServer(
     // Promote the claimed token to a durable device so it survives restarts.
     await devices.add(claimed.token, "mobile");
 
+    let currentSessionId = claimed.sessionId;
+    if (claimed.feature) {
+      const runtimeSession =
+        (claimed.sessionId ? await getSession(paths, claimed.sessionId) : null) ??
+        (await sessionForFeature(claimed.feature));
+      currentSessionId = runtimeSession.id;
+      await markSessionPaired(paths, runtimeSession.id);
+      await publishMobileInbox(
+        claimed.feature,
+        "mobile_paired",
+        { code, publicUrl, sessionId: runtimeSession.id },
+        runtimeSession.id
+      );
+      await publishAgentSnapshot(claimed.feature, runtimeSession.id);
+    }
+
     const session = await readMobileSyncSession(paths);
     if (session && session.code === code) {
       await writeMobileSyncSession(paths, {
         ...session,
+        sessionId: currentSessionId,
         paired: true,
         pairedAt: claimed.pairedAt ?? new Date().toISOString()
       });
-    }
-
-    if (claimed.feature) {
-      if (claimed.sessionId) await markSessionPaired(paths, claimed.sessionId);
-      await publishMobileInbox(claimed.feature, "mobile_paired", { code, publicUrl, sessionId: claimed.sessionId }, claimed.sessionId);
-      await publishAgentSnapshot(claimed.feature, claimed.sessionId);
     }
 
     return {
@@ -482,7 +538,7 @@ export async function createHttpServer(
       url: publicUrl,
       token: claimed.token,
       feature: claimed.feature,
-      sessionId: claimed.sessionId ?? null,
+      sessionId: currentSessionId ?? null,
       sessions: await listSessions(paths)
     };
   });

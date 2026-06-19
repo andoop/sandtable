@@ -50,6 +50,14 @@ description: Use when the developer enables Sandtable mobile review / 手机同�
 4. **回话 / 推状态**：回话 `POST /agent/sessions/<sid>/messages`；改完 Sandtable 文档且 sync active 时 `POST /mobile-sync/push-state`。
 5. **落盘**：在 feature `journal.md` 追加一条。
 
+主动进展统一走：
+
+```bash
+scripts/sandtable-mobile-notify.sh <status|phase|question|chat> '<手机可见消息>'
+```
+
+该脚本调用 `POST /mobile-sync/notify`；server 负责解析当前有效 session，并在旧 session 被替换时自动修正 `mobile-sync.json.sessionId`。禁止让 agent 自己从历史消息猜 sessionId。
+
 端口取自 `.sandtable-runtime/session/server.port`。
 
 ## 运行态同步到手机
@@ -72,6 +80,7 @@ POST /mobile-sync/agent-state {"role":"main","state":"working|idle|error","detai
   - 产生待确认问题或阻塞 → 同步 `{"kind":"question"}`，并按 protocol 落 `questions.md` / `state.md`。
   - 改完 Sandtable 文档（PRD/tests/plan/state）→ `POST /mobile-sync/push-state`。
   - 开始 / 完成一项重要工作 → 补报 `agent-state main=working|idle` + 一句话进展。
+- **可见进展必须进入会话**：上述节点调用 `scripts/sandtable-mobile-notify.sh`。`POST /mobile-sync/agent-state` 只驱动状态灯，不算“已同步进展”，不能单独替代 notify。
 - **判据"重要时机"**：会影响闭环 / 验收 / 关键决策、或开发者会想在手机上看到的节点。琐碎中间步不刷屏。
 - **等待子 agent 永久阻塞、不设超时（纯等待）**：默认**不传** `SANDTABLE_WAIT_MAX_SECONDS`，子 agent 一直阻塞到拿到一条消息才返回。**仅当**宿主对单个子 agent 有**硬执行上限**会截断无限阻塞时，才用该兜底（如 `=240`）；超时返回后主 agent **立即无缝再派一个**等待子 agent，全程不自己轮询、不设别的超时。
 

@@ -8,3 +8,10 @@
 - 吸取的教训：判断"是否需要 en 镜像 / en 源在哪"，以 INSTALL.md §3 的权威映射为准，不靠目录名直觉；空目录 ≠ 不镜像。
 - 候选红线/检查项更新：RECON 清单加一项——"涉及多 locale 资产的需求，开工前对照 INSTALL.md §3 列全每个 locale 的真实源/目标路径"；可考虑加一个镜像完整性自检（比对 root templates 与 templates/en 的文件集差异）。
 - 采纳情况：待定（教训已记；是否落 constraints.md/RECON 清单由开发者拍板）。
+
+## 2026-06-19 · 来源 2026-06-13-mobile-on-demand-sync / 等待器静默失败与主动同步发错会话
+- 根因摘要：Codex 沙箱禁止 loopback 时，wait 脚本把 curl 失败吞成空 inbox 并永久等待；同时 mobile-sync 在 session 被替换后保留 stale sessionId，使电脑端主动进展没有稳定目标。规则虽要求关键时刻同步，但缺少统一可执行入口，`agent-state` 又被误当成可见会话进展。
+- 怎么预防：等待通道必须区分传输错误与空消息，并提供基于 mailbox source of truth 的独立取件路径；主动同步必须由 server 解析当前 session，统一走 `/mobile-sync/notify`，且用真实会话消息做端到端验收。
+- 吸取的教训：异步伴随通道不能只验证“服务活着”和“规则写了”；必须同时验证消息可达、会话身份正确、关键节点在用户实际看到的会话中可见。
+- 候选红线/检查项更新：建议在 `constraints.md` 增加“任何常驻通知义务必须有统一可执行入口，状态指示器不得替代用户可见消息”；RECON 增加“检查 transport failure 与 empty queue 是否可区分、session identity 是否可能 stale”。
+- 采纳情况：待定（是否写入 constraints.md / RECON 清单由开发者拍板）。

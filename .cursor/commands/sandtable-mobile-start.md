@@ -27,5 +27,6 @@ description: 按需开启手机同步：启动 runtime、生成 4 位配对码�
 
 4. **硬派等待子 agent**：执行 `/sandtable-mobile-wait` 派**一个**子 agent 阻塞等 inbox，然后空闲等它返回。
 5. **处理消息**：子 agent 交回消息后才动作——上报 `agent-state main=working` → 处理 → `POST /mailbox/inbox/ack` → `main=idle` → 再 `/sandtable-mobile-wait`。出错报 `main=error`。
+6. **常驻主动同步**：sync active 时，电脑端重要动作前/中/后、阶段切换、关键决策、待确认或阻塞均调用 `scripts/sandtable-mobile-notify.sh <kind> <消息>`；`agent-state` 只更新状态灯，不能替代会话通知。
 
 端口取自 `.sandtable-runtime/session/server.port`。除第 1 步选 feature 外，不就推进与否反复询问。

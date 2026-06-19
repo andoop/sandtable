@@ -26,6 +26,7 @@ REPO_ROOT="$(detect_repo_root)"
 PORT_FILE="$REPO_ROOT/.sandtable-runtime/session/server.port"
 PORT="${SANDTABLE_MOBILE_PORT:-$(cat "$PORT_FILE" 2>/dev/null || echo 8765)}"
 BASE_URL="http://127.0.0.1:${PORT}"
+INBOX_DIR="$REPO_ROOT/.sandtable-runtime/mailbox/inbox"
 
 if [[ -z "$FEATURE" ]]; then
   echo "Usage: $0 <feature-id> [after-message-id]" >&2
@@ -40,6 +41,39 @@ report_state() {
 }
 report_state waiting "等待手机消息"
 
+# Codex subagents may be allowed to read the workspace while loopback network
+# access is denied. The mailbox directory is the server's source of truth, so
+# use the same filters locally when HTTP cannot be reached from the waiter.
+read_inbox_files() {
+  python3 - "$INBOX_DIR" "$FEATURE" "$AFTER" <<'PY'
+import json
+import pathlib
+import sys
+
+inbox = pathlib.Path(sys.argv[1])
+feature = sys.argv[2]
+after = sys.argv[3]
+messages = []
+
+if inbox.is_dir():
+    for path in sorted(inbox.glob("*.json")):
+        try:
+            message = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, json.JSONDecodeError):
+            continue
+        if message.get("source") != "mobile":
+            continue
+        if feature and message.get("feature") != feature:
+            continue
+        if after and str(message.get("id", "")) <= after:
+            continue
+        messages.append(message)
+
+messages.sort(key=lambda message: str(message.get("id", "")))
+print(json.dumps({"ok": True, "messages": messages}, separators=(",", ":")))
+PY
+}
+
 # 默认无限阻塞等待（Cursor 等支持长子 agent 的工具最理想：主 agent 阻塞等其返回）。
 # 若工具对子 agent 有硬执行上限，设 SANDTABLE_WAIT_MAX_SECONDS=240：到时返回
 # {"messages":[],"timeout":true}，主 agent 据此再派一个等待子 agent（仍不自己轮询）。
@@ -51,7 +85,9 @@ while true; do
   if [[ -n "$AFTER" ]]; then
     QUERY="${QUERY}&after=${AFTER}"
   fi
-  RESPONSE="$(curl -fsS -m 5 "${BASE_URL}/mailbox/inbox?${QUERY}" 2>/dev/null || echo '{"messages":[]}')"
+  if ! RESPONSE="$(curl -fsS -m 5 "${BASE_URL}/mailbox/inbox?${QUERY}" 2>/dev/null)"; then
+    RESPONSE="$(read_inbox_files)"
+  fi
   COUNT="$(printf '%s' "$RESPONSE" | python3 -c 'import json,sys; print(len(json.load(sys.stdin).get("messages",[])))')"
   if [[ "$COUNT" != "0" ]]; then
     report_state processing "已收到消息，交主 agent 处理"

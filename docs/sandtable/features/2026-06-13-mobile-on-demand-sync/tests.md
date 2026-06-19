@@ -81,3 +81,19 @@
 - **When**：子 agent 运行 `scripts/sandtable-mobile-wait.sh <feature>`
 - **Then**：仅轮询 `GET /mailbox/inbox`；收到消息后原样交给主 agent 并退出；不读 journal、不改 PRD、不查 health
 - **状态**：已验证
+
+## TC11 · wait 子 agent 在 loopback 被沙箱禁止时读取 inbox
+
+- **映射**：FR5 / TC5 / Codex 运行环境兼容性
+- **Given**：手机消息 JSON 已写入当前仓库 `.sandtable-runtime/mailbox/inbox/`；wait 子 agent 对 `127.0.0.1:<server.port>` 的 curl 返回 `Operation not permitted`
+- **When**：子 agent 运行 `scripts/sandtable-mobile-wait.sh <feature>`
+- **Then**：脚本从 inbox 文件读取消息，执行与 HTTP endpoint 相同的 `source=mobile`、feature、after 过滤和 id 排序，并立即向主 agent 返回消息；不得把连接失败误判为永久空 inbox
+- **状态**：已验证（2026-06-19，强制端口 1 不可达时返回 3 条 inbox 消息，退出码 0）
+
+## TC12 · 关键节点通知自动修正 stale sessionId
+
+- **映射**：手机同步常驻义务 / FB-2026-06-19-02
+- **Given**：mobile-sync active；启动时绑定 session A，但配对前 A 被删除，server 为同一 feature 创建 session B
+- **When**：手机完成配对，随后 agent 调用 `POST /mobile-sync/notify` 或 `scripts/sandtable-mobile-notify.sh status <消息>`
+- **Then**：配对响应与 `mobile-sync.json.sessionId` 均指向 B；关键进展作为可见 conversation message 写入 B；无需等待手机先发消息来发现 B；`agent-state` 仅更新状态灯
+- **状态**：已验证（2026-06-19，自动测试 + 真机 live notify）
