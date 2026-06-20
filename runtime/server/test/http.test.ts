@@ -130,6 +130,48 @@ describe("http server", () => {
     );
   });
 
+  it("changes main state only when the main agent reports actual work", async () => {
+    const { paths } = await createTempRepo();
+    const events = new RuntimeEvents();
+    const app = await createHttpServer(paths, events, async () => {}, "http://127.0.0.1:8765");
+
+    const start = await app.inject({
+      method: "POST",
+      url: "/mobile-sync/start",
+      payload: { feature: "feature-a" }
+    });
+    const { code, token } = start.json() as { code: string; token: string };
+    const claim = await app.inject({ method: "POST", url: "/pair/by-code", payload: { code } });
+    const sessionId = (claim.json() as { sessionId: string }).sessionId;
+    const pairedInbox = await app.inject({ method: "GET", url: "/mailbox/inbox?feature=feature-a" });
+    const pairedIds = (pairedInbox.json() as { messages: Array<{ id: string }> }).messages.map((message) => message.id);
+    await app.inject({ method: "POST", url: "/mailbox/inbox/ack", payload: { ids: pairedIds } });
+
+    await app.inject({
+      method: "POST",
+      url: "/mobile-sync/agent-state",
+      payload: { role: "main", state: "idle", detail: "waiting" }
+    });
+    await app.inject({
+      method: "POST",
+      url: `/sessions/${sessionId}/messages`,
+      payload: { token, text: "Please handle this", kind: "chat" }
+    });
+
+    const inbox = await app.inject({ method: "GET", url: "/mailbox/inbox?feature=feature-a" });
+    expect((inbox.json() as { messages: unknown[] }).messages).toHaveLength(1);
+    const waitingStatus = await app.inject({ method: "GET", url: "/mobile-sync/status" });
+    expect((waitingStatus.json() as { agent: { main: { state: string } } }).agent.main.state).toBe("idle");
+
+    await app.inject({
+      method: "POST",
+      url: "/mobile-sync/agent-state",
+      payload: { role: "main", state: "working", detail: "handling the delivered message" }
+    });
+    const workingStatus = await app.inject({ method: "GET", url: "/mobile-sync/status" });
+    expect((workingStatus.json() as { agent: { main: { state: string } } }).agent.main.state).toBe("working");
+  });
+
   it("manages multiple agent sessions from one paired mobile client", async () => {
     const { paths } = await createTempRepo();
     const featureB = path.join(paths.sandtableRoot, "features", "feature-b");

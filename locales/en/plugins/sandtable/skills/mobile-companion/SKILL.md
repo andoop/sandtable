@@ -18,7 +18,7 @@ Sync the current feature's phase, documents, and pending confirmations to the ph
 - **`wait` (block-polling the inbox) is done ONLY by a real sub-agent; the main agent must never poll, check status/health, or set timeouts.**
 - **Running `/sandtable-mobile-start` or `/sandtable-mobile-wait` IS the user's explicit request to dispatch a sub-agent.** Any default rule like "only use multi-agent when the user explicitly asks" is **already satisfied here** — you must **force-dispatch** a sub-agent and **must not** substitute a background script / automation / timer citing "no explicit request for parallel agents" (Codex especially: do not use automation, and do not hang `wait.sh` as a background waiter in place of a sub-agent).
 - **Do not care** whether the phone is paired yet or whether anyone has sent a message — just start the server and force-dispatch the waiter; pairing and messaging are the user's side.
-- **Main agent's job**: ① dispatch **one** waiter, ② block for its return (for as long as it takes, zero actions), ③ on a message handle it + `ack` + reply/push-state, ④ dispatch the next. It never runs `wait.sh` itself and never starts an automation.
+- **Main agent's job**: ① dispatch **one** waiter, ② block for its return (for as long as it takes, zero actions), ③ after delivery make the **first action** `scripts/sandtable-mobile-main-state.sh working '<actual work>'`, then handle + `ack` + reply/push-state, ④ after everything completes run `scripts/sandtable-mobile-main-state.sh idle '<waiting for next message>'`, then dispatch the next. It never runs `wait.sh` itself and never starts an automation.
 - **Sub-agent's job**: only run `scripts/sandtable-mobile-wait.sh <feature>`, grab one message, hand it back as **plain text** (no raw JSON blob, or Codex fails to render), and exit. It never handles the message, acks, replies, checks status, reads the journal, edits docs, or loops/restarts.
 - Interaction loop: main dispatches → sub waits and returns one message → main handles and acks → main dispatches again. No role crosses over.
 - The "dispatch a sub-agent and block for its return" primitive: Cursor/Claude = Task, **Kiro = `invoke_sub_agent`**, **Codex = force-dispatch a sub-agent (not automation)**.
@@ -46,7 +46,7 @@ Sync the current feature's phase, documents, and pending confirmations to the ph
 
    Take the QR from the compact block between `----- QR BEGIN -----`/`----- QR END -----` in the script output (produced by `qr-print.mjs --utf8`) and **put it in its own monospaced code block**, otherwise it misaligns and won't scan.
 2. **Spawn the waiter**: run `/sandtable-mobile-wait` (see the split iron law above), then stay idle until it returns.
-3. **Handle + ack**: after the waiter returns a message, the main agent handles it → `POST /mailbox/inbox/ack {"ids":["<id>"]}` → `/sandtable-mobile-wait` for the next.
+3. **Handle + ack**: after the waiter returns a message, the main agent's **first action** must be `scripts/sandtable-mobile-main-state.sh working '<actual work>'`; then handle → `POST /mailbox/inbox/ack {"ids":["<id>"]}` → finish replies/docs/pushes → `scripts/sandtable-mobile-main-state.sh idle '<waiting for next message>'` → `/sandtable-mobile-wait` for the next. The server must not infer main state from an inbox GET; waiter=processing is not main=working.
 4. **Reply / push state**: reply via `POST /agent/sessions/<sid>/messages`; after editing Sandtable docs with sync active, `POST /mobile-sync/push-state`.
 5. **Persist**: append one entry to the feature `journal.md`.
 
@@ -57,6 +57,27 @@ scripts/sandtable-mobile-notify.sh <status|phase|question|chat> '<phone-visible 
 ```
 
 The script calls `POST /mobile-sync/notify`; the server resolves the current valid session and repairs `mobile-sync.json.sessionId` when an old session was replaced. Agents must not guess a session id from message history.
+
+## Phone-visible message format contract (MUST)
+
+- `status` / `phase`: **single-line plain text** expressing one state fact only.
+- `chat` / `question`: whenever the message contains multiple facts, decisions, test results, blockers, or confirmations, use **multi-line Markdown**; use a bold title, flat bullets for details, and backticks for paths/commands/identifiers.
+- Never send raw JSON, full terminal output, unstructured long paragraphs, or internal reasoning to the phone.
+- Fixed titles: `**Started**`, `**Progress**`, `**Completed**`, `**Confirmation needed**`, `**Error**`. Include only user-relevant results, impact, and next action.
+
+Send multi-line content through stdin so shell quoting cannot damage Markdown:
+
+```bash
+scripts/sandtable-mobile-notify.sh chat - <<'EOF'
+**Progress**
+
+- Completed: `runtime/server` state fix
+- Verified: 25/25 tests passed
+- Next: on-device confirmation
+EOF
+```
+
+Questions use `question` with `**Confirmation needed**`, one question, and 2–3 flat options. Completion messages use `**Completed**` plus changes, verification, and current state.
 
 Port comes from `.sandtable-runtime/session/server.port`.
 
@@ -93,6 +114,8 @@ Whenever mobile-sync is **active** (server running + `.sandtable-runtime/session
 | "Using automation / a background task for wait is easier." | Forbidden (Codex especially). Dispatch a real sub-agent and have the main agent block for its reply. |
 | "The waiter can also read the journal / edit docs." | Forbidden. Single-job: poll, deliver, exit. |
 | "No need to ack after handling." | You must ack, or the same message is fetched repeatedly. |
+| "Mark main=working automatically when the waiter fetches a message." | That is not truthful. waiter=processing and main=working are different phases; main reports working only as its first action after it actually resumes. |
+| "Plain text is understandable, so formatting is optional." | Multi-fact messages regress into walls of text unless formatting is explicit. The format contract is a MUST, not a style suggestion. |
 | "Sync only when the phone sends a message." | Wrong. A live sync server is a standing duty; computer-side conversation must also sync before/during/after important actions. |
 | "Set a timeout on the waiter for peace of mind." | Default is infinite block, no timeout; use `SANDTABLE_WAIT_MAX_SECONDS` only when the host has a hard execution cap, then seamlessly re-dispatch on timeout. |
 

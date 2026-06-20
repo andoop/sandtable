@@ -18,7 +18,7 @@ description: Use when the developer enables Sandtable mobile review / 手机同�
 - **`wait`（阻塞轮询 inbox）只能由一个真正的子 agent 执行；主 agent 禁止自己轮询、查 status/health、设超时。**
 - **运行 `/sandtable-mobile-start` 或 `/sandtable-mobile-wait` 就是用户对"派子 agent"的显式要求。** 任何"只在用户明确要求时才用多 agent"的默认规则在此**已满足**——必须**硬派**子 agent，**禁止**以"没人明确要求并行代理"为由改用后台脚本 / automation / 定时器替代（Codex 尤其：不要用 automation，也别把 `wait.sh` 当后台 waiter 挂起来代替子 agent）。
 - **不必关心**手机是否已配对、是否已有人发消息——只管起服务、硬派 waiter，配对与收信是用户那边的事。
-- **主 agent 职责**：①派**一个**等待子 agent，②阻塞等其返回（不限时长、零动作），③拿到消息后处理 + `ack` + 回话/推状态，④再派下一个。绝不自己跑 `wait.sh`、不开 automation。
+- **主 agent 职责**：①派**一个**等待子 agent，②阻塞等其返回（不限时长、零动作），③拿到消息后**第一动作**运行 `scripts/sandtable-mobile-main-state.sh working '<实际工作>'`，再处理 + `ack` + 回话/推状态，④全部完成后运行 `scripts/sandtable-mobile-main-state.sh idle '<等待下一条>'`，再派下一个。绝不自己跑 `wait.sh`、不开 automation。
 - **子 agent 职责**：只跑 `scripts/sandtable-mobile-wait.sh <feature>` 拿一条消息、以**纯文本**交回（勿贴裸 JSON，否则 Codex 渲染失败）、退出。绝不处理消息、ack、回话、查状态、读 journal、改文档、循环重启。
 - 交互闭环：主 agent 派 → 子 agent 等并交回一条 → 主 agent 处理并 ack → 主 agent 再派。任一环都不串台。
 - "派子 agent 并阻塞等返回"的原语：Cursor/Claude=Task，**Kiro=`invoke_sub_agent`**，**Codex=硬派子 agent（非 automation）**。
@@ -46,7 +46,7 @@ description: Use when the developer enables Sandtable mobile review / 手机同�
 
    二维码取脚本输出里 `----- QR BEGIN -----`/`----- QR END -----` 之间的紧凑块（`qr-print.mjs --utf8` 生成），**单独放进一个等宽代码块**展示，否则会错位、扫不出。
 2. **派等待子 agent**：执行 `/sandtable-mobile-wait`（见上「分工铁律」），然后空闲等其返回。
-3. **处理 + ack**：子 agent 交回消息后，主 agent 处理 → `POST /mailbox/inbox/ack {"ids":["<id>"]}` → 再 `/sandtable-mobile-wait` 拉下一个。
+3. **处理 + ack**：子 agent 交回消息后，主 agent 的**第一动作**必须是 `scripts/sandtable-mobile-main-state.sh working '<实际工作>'`；然后处理 → `POST /mailbox/inbox/ack {"ids":["<id>"]}` → 完成回复/文档/推送 → `scripts/sandtable-mobile-main-state.sh idle '<等待下一条>'` → 再 `/sandtable-mobile-wait` 拉下一个。禁止 server 根据 inbox GET 猜测 main 状态；waiter=processing 不等于 main=working。
 4. **回话 / 推状态**：回话 `POST /agent/sessions/<sid>/messages`；改完 Sandtable 文档且 sync active 时 `POST /mobile-sync/push-state`。
 5. **落盘**：在 feature `journal.md` 追加一条。
 
@@ -57,6 +57,27 @@ scripts/sandtable-mobile-notify.sh <status|phase|question|chat> '<手机可见�
 ```
 
 该脚本调用 `POST /mobile-sync/notify`；server 负责解析当前有效 session，并在旧 session 被替换时自动修正 `mobile-sync.json.sessionId`。禁止让 agent 自己从历史消息猜 sessionId。
+
+## 手机可见消息格式契约（MUST）
+
+- `status` / `phase`：只发**单行纯文本**，只表达一个状态事实。
+- `chat` / `question`：只要包含多个事实、决策、测试结果、阻塞或待确认事项，必须用**多行 Markdown**；标题用粗体，细节用扁平列表，路径/命令/标识符用反引号。
+- 禁止发送裸 JSON、整段终端输出、无结构长段落或把内部推理直接贴到手机。
+- 固定标题：`**开始**`、`**进展**`、`**完成**`、`**需要确认**`、`**错误**`。标题下只放用户关心的结果、影响和下一步。
+
+多行消息必须通过 stdin，避免 shell 引号破坏 Markdown：
+
+```bash
+scripts/sandtable-mobile-notify.sh chat - <<'EOF'
+**进展**
+
+- 已完成：`runtime/server` 状态修复
+- 验证：25/25 tests 通过
+- 下一步：真机确认
+EOF
+```
+
+问题使用 `question`，格式为 `**需要确认**` + 一句问题 + 2–3 个扁平选项；完成消息使用 `**完成**` + 改动 + 验证 + 当前状态。
 
 端口取自 `.sandtable-runtime/session/server.port`。
 
@@ -93,6 +114,8 @@ POST /mobile-sync/agent-state {"role":"main","state":"working|idle|error","detai
 | "用 automation / 后台任务跑 wait 更省事" | 禁止（Codex 尤其）。必须派真正的子 agent，主 agent 阻塞等它回话。 |
 | "等待子 agent 顺便读 journal / 改文档" | 禁止。单职责：轮询、交付、退出。 |
 | "处理完不用 ack" | 必须 ack，否则同一条被反复取出。 |
+| "waiter 取到消息就让 server 自动标 main=working" | 不真实。waiter=processing 与 main=working 是不同阶段；main 只在真正恢复执行后第一动作上报 working。 |
+| "纯文本也能看懂，不必每次套格式" | 多事实消息若无明确格式，agent 会逐轮退化成大段文字。格式契约是 MUST，不是审美建议。 |
 | "只在手机发消息时才同步" | 错。sync server 活着就是常驻同步义务，电脑端对话也要在重要动作前/中/后同步。 |
 | "给等待子 agent 设个超时省心" | 默认永久阻塞、不设超时；仅宿主有硬执行上限才用 `SANDTABLE_WAIT_MAX_SECONDS` 兜底，超时即无缝再派一个。 |
 

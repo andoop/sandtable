@@ -97,3 +97,19 @@
 - **When**：手机完成配对，随后 agent 调用 `POST /mobile-sync/notify` 或 `scripts/sandtable-mobile-notify.sh status <消息>`
 - **Then**：配对响应与 `mobile-sync.json.sessionId` 均指向 B；关键进展作为可见 conversation message 写入 B；无需等待手机先发消息来发现 B；`agent-state` 仅更新状态灯
 - **状态**：已验证（2026-06-19，自动测试 + 真机 live notify）
+
+## TC13 · 主 agent 状态只反映真实处理边界
+
+- **映射**：运行态同步 / FB-2026-06-19-03
+- **Given**：mobile-sync active 且 main agent 当前为 idle；waiter 取得一条手机 chat 消息
+- **When**：waiter GET inbox 但 main 尚未恢复执行；随后 main 从 wait 返回并开始处理；最后完成 reply/ack/文档/推送
+- **Then**：inbox GET 不擅自改变 main 状态；main 真正恢复后的第一动作通过 `sandtable-mobile-main-state.sh working` 显示处理中；全部处理完成的最后动作通过该脚本切回 idle
+- **状态**：已验证（2026-06-19，自动测试 + live helper；待开发者手机确认视觉时序）
+
+## TC14 · 手机可见消息遵循 Markdown 格式契约
+
+- **映射**：FR6 / FB-2026-06-20-04
+- **Given**：mobile-sync active；agent 需要同步多事实进展或待确认问题
+- **When**：agent 通过 `sandtable-mobile-notify.sh chat|question -` 从 stdin 发送多行 Markdown
+- **Then**：conversation 原样保留粗体标题、空行、扁平列表和反引号；手机 bubble 以 Markdown 渲染；`status/phase` 多行输入被拒绝；裸 JSON、终端噪声和无结构长段落不发送
+- **状态**：已验证（2026-06-20，live script + durable conversation；待开发者手机确认渲染）

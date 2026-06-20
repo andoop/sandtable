@@ -26,7 +26,8 @@ description: 按需开启手机同步：启动 runtime、生成 4 位配对码�
    注意：二维码必须放进代码块（```），否则字符不等宽会错位、扫不出。若脚本没输出 QR 块（无 token），就说明并提示用户用 URL + 配对码手输。
 
 4. **硬派等待子 agent**：执行 `/sandtable-mobile-wait` 派**一个**子 agent 阻塞等 inbox，然后空闲等它返回。
-5. **处理消息**：子 agent 交回消息后才动作——上报 `agent-state main=working` → 处理 → `POST /mailbox/inbox/ack` → `main=idle` → 再 `/sandtable-mobile-wait`。出错报 `main=error`。
+5. **处理消息**：子 agent 交回消息后，**第一动作**运行 `scripts/sandtable-mobile-main-state.sh working '<实际工作>'` → 处理 → 回复/文档/推状态 → `POST /mailbox/inbox/ack` → 运行 `scripts/sandtable-mobile-main-state.sh idle '<等待下一条>'` → 再 `/sandtable-mobile-wait`。出错报 `error`。禁止按 inbox GET 自动猜 main=working；waiter=processing 不等于 main=working。
 6. **常驻主动同步**：sync active 时，电脑端重要动作前/中/后、阶段切换、关键决策、待确认或阻塞均调用 `scripts/sandtable-mobile-notify.sh <kind> <消息>`；`agent-state` 只更新状态灯，不能替代会话通知。
+7. **格式契约**：`status/phase` 仅单行纯文本；多事实进展、决策、测试、阻塞和问题必须用 `chat/question` 多行 Markdown，并通过 `scripts/sandtable-mobile-notify.sh <kind> -` 从 stdin 发送。禁止裸 JSON、终端噪声和无结构长段落。
 
 端口取自 `.sandtable-runtime/session/server.port`。除第 1 步选 feature 外，不就推进与否反复询问。

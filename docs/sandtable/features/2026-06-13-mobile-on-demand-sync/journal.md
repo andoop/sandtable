@@ -547,6 +547,49 @@
 - 决策: 开发者确认排除 runtime，并同意完善 `.gitignore`。
 - 处理: `.gitignore` 忽略 `.sandtable-runtime/`；使用 `git rm --cached` 仅从 Git 索引移除 runtime，保留本机文件与当前手机同步服务。
 
+## 2026-06-19 22:50 CST · [反馈] 主 agent 处理中仍显示空闲
+- 来源: 手机会话 `sess_vwd-nqlk2Vhv`，消息 id `20260619T144936462Z-mobile-HBYqICIX`。
+- 反馈: 手机观察到主 agent 正在处理消息，但状态始终显示 idle。
+- 已知原因: wait 脚本仅自动上报 waiter=processing；main=working 依赖主 agent 手工调用，刚才多轮处理前漏调用。
+- 状态: FB-2026-06-19-03 `INVESTIGATING`，将以 server 自动状态转换消除手工依赖。
+
+## 2026-06-19 22:52 CST · [修复] inbox 交付自动切换 main=working
+- 根因: main=working 依赖主 agent 手工调用，waiter 自动路径只上报 waiter=processing，漏调时手机无法反映真实处理阶段。
+- 修复: server 统一 `updateAgentState`；`GET /mailbox/inbox` 返回非空消息时自动设置并广播 main=working。
+- 自动回归: 新测试先复现 idle，修复后 runtime server 25/25 tests 与 typecheck 通过。
+- 真机回归: 热重启后将 main 设为 idle，读取包含 1 条真实手机消息的 inbox；status 自动变为 working，detail「收到手机消息，主 agent 处理中」。
+- 状态: FB-2026-06-19-03 `VERIFYING`，等待开发者确认手机端显示正确。
+
+## 2026-06-19 23:11 CST · [修正] 撤回 server 猜状态，改为真实执行边界
+- 开发者反馈: 自动在 inbox GET 时标 main=working 不是真实反映，方案不合理。
+- 修正: 移除 inbox GET 的自动状态修改；waiter=processing 与 main=working 保持独立。
+- 执行入口: 新增 `scripts/sandtable-mobile-main-state.sh`。main 从 wait 返回后第一动作报 working；回复/ack/文档/推送完成后最后动作报 idle。
+- 规则加固: mobile-companion、start 命令及 AGENTS/Cursor/Kiro 中英文常驻基线均写入真实状态顺序，并明确 server 不得猜测。
+- 回归: 25/25 tests、typecheck、shell 语法、镜像一致性通过；测试锁定 inbox GET 后 main 保持 idle，显式上报后才 working。
+- live 验证: 热重启后 helper 返回 working，时间 `2026-06-19T15:11:26.165Z`，detail 与主 agent 实际工作一致。
+- 状态: FB-03 保持 `VERIFYING`，等待开发者手机确认完整视觉时序。
+
+## 2026-06-20 08:30 CST · [反馈] 手机可见消息缺少强制格式规范
+- 来源: 手机会话 `sess_vwd-nqlk2Vhv`，消息 id `20260620T002942982Z-mobile-d-DsbS24`。
+- 分诊: 漏需求。App 已支持 Markdown，但 agent 规则未规定 MUST，notify 标准入口又拒绝多行文本。
+- 确认: 开发者明确要求设计并加入规则，本消息作为新增 FR6 的确认依据。
+- 方向: status/phase 单行；多事实进展、决策、测试、阻塞、问题使用 chat/question 多行 Markdown；统一开始/进展/完成/问题/错误模板。
+- 状态: FB-04 `FIXING`。
+
+## 2026-06-20 08:33 CST · [验证] 手机消息 Markdown 格式契约
+- 规则: status/phase 单行纯文本；多事实进展、决策、测试、阻塞和问题必须使用 chat/question 多行 Markdown；禁止裸 JSON、终端噪声和无结构长段落。
+- 工具: `sandtable-mobile-notify.sh <kind> -` 支持 stdin，多行 JSON 编码只使用 bash + POSIX sed/awk；status/phase 多行会失败。
+- 传播: AGENTS、Cursor/Kiro 基线、mobile-companion 与 start 命令中英文真源和镜像均已更新并通过 sync check。
+- 验证: 25/25 tests、typecheck、shell/diff check 通过；live Markdown 原样落入 conversation；多行 status 被拒绝。
+- 状态: FB-04 `VERIFYING`，等待开发者确认手机渲染效果。
+
+## 2026-06-20 08:36 CST · [关闭] 手机消息 Markdown 格式确认通过
+- 用户确认: 手机回复「格式正常」，消息 id `20260620T003637693Z-mobile-7KGreO0e`。
+- 结果: 粗体标题、扁平列表、行内代码和多行结构在手机 chat/question bubble 正常渲染。
+- 闭环: FR6、TC14、AGENTS/Cursor/Kiro、mobile-companion、start 命令和 notify stdin 工具均已落地。
+- 教训: 已追加 `docs/sandtable/lessons.md`；constraints / RECON 候选更新等待开发者拍板。
+- 状态: FB-04 `USER_CONFIRMED → CLOSED`；FB-03 继续 VERIFYING。
+
 ## 2026-06-19T13:43:51.623Z · [问答]
 - 背景: 手机端提交开发者确认。
 - Feature: 2026-06-13-mobile-on-demand-sync
@@ -588,6 +631,195 @@
 - Feature: 2026-06-13-mobile-on-demand-sync
 - 内容: Mobile message
 - 内容: 排除吧，或者有必要完善一下git ignore
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-19T14:25:38.976Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 电脑已经熄屏了，我看你还在吗
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-19T14:26:53.683Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 可以配置域名，然后不在局域网，互联网通信吗
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-19T14:31:42.572Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 先不讨论这个，这个等待脚本，你觉得耗性能不
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-19T14:33:15.712Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 有没有类似android epoll 机制呢，handler 原理
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-19T14:36:00.563Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 但是注册监听这个，还能阻塞子agent 吗？
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-19T14:37:24.544Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 我的这个是全平台的，在windows Linux怎么适配呢
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-19T14:38:46.744Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 我要的是稳定性，兼容性，你评估吧
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-19T14:41:47.667Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 说实话，现在的实现，有必要改呀，现在方式最简单可靠
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-19T14:48:05.694Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 还在吗
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-19T14:49:36.456Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 我怎么感觉主agent的状态一直是空闲，明明它在处理中，手机上也是空闲
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-19T15:01:30.617Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 怎么样了，改好没有
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-19T15:05:24.993Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 测试一下
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-19T15:07:06.600Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 要真实反应呀，你这做的不合理吧
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-19T15:23:57.141Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 测试一下
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-20T00:22:31.762Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 测试一下
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-20T00:23:28.112Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 现在的agent的状态是怎样的
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-20T00:24:48.978Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 是在哪里发送的状态，什么时机
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-20T00:26:57.500Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 发送到手机上的消息，可以格式化一下吗，md格式也行
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-20T00:29:42.976Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 我的意思是如果不添加明确的要求，agent就会不遵循，你看看设计一下
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-20T00:36:37.686Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: 格式正常
+- Target: conversation
+
+- 来源: mobile-app:sess_vwd-nqlk2Vhv
+
+## 2026-06-20T00:40:57.058Z · [问答]
+- 背景: 手机端提交开发者确认。
+- Feature: 2026-06-13-mobile-on-demand-sync
+- 内容: Mobile message
+- 内容: commit push 吧
 - Target: conversation
 
 - 来源: mobile-app:sess_vwd-nqlk2Vhv

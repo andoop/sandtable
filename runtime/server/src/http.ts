@@ -80,6 +80,23 @@ export async function createHttpServer(
     if (session) events.broadcast({ kind: "session", session });
   }
 
+  async function updateAgentState(
+    role: AgentRole,
+    state: AgentRunState,
+    detail?: string
+  ): Promise<AgentRuntimeState | null> {
+    const session = await readMobileSyncSession(paths);
+    if (!session) return null;
+    const entry: AgentRuntimeState = { role, state, at: new Date().toISOString() };
+    if (detail?.trim()) entry.detail = detail.trim();
+    await writeMobileSyncSession(paths, {
+      ...session,
+      ...(role === "main" ? { agentMain: entry } : { agentWaiter: entry })
+    });
+    events.broadcast({ kind: "agent_state", feature: session.feature, agent: entry });
+    return entry;
+  }
+
   /**
    * Append a message to the durable conversation transcript and fan it out to
    * live clients. Optionally advances the owning session row (phase/blocked/
@@ -471,15 +488,8 @@ export async function createHttpServer(
     const validStates = ["idle", "working", "disconnected", "error", "ready", "waiting", "processing", "exited"];
     if (!validRoles.includes(role)) throw new Error("role must be 'main' or 'waiter'");
     if (!validStates.includes(state)) throw new Error("invalid agent state");
-    const session = await readMobileSyncSession(paths);
-    if (!session) return { ok: false, reason: "mobile sync not active" };
-    const entry: AgentRuntimeState = { role, state, at: new Date().toISOString() };
-    if (typeof body.detail === "string" && body.detail.trim()) entry.detail = body.detail.trim();
-    await writeMobileSyncSession(paths, {
-      ...session,
-      ...(role === "main" ? { agentMain: entry } : { agentWaiter: entry })
-    });
-    events.broadcast({ kind: "agent_state", feature: session.feature, agent: entry });
+    const entry = await updateAgentState(role, state, body.detail);
+    if (!entry) return { ok: false, reason: "mobile sync not active" };
     return { ok: true, agent: entry };
   });
 

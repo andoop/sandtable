@@ -26,7 +26,8 @@ Execute:
    Note: the QR must go inside a code block (```), otherwise non-monospaced characters misalign and it won't scan. If the script printed no QR block (no token), say so and tell the user to enter the URL + code manually.
 
 4. **Force-dispatch the waiter**: run `/sandtable-mobile-wait` to dispatch **one** sub-agent that block-polls the inbox, then stay idle until it returns.
-5. **Handle the message**: only after the sub-agent returns a message — report `agent-state main=working` → handle → `POST /mailbox/inbox/ack` → `main=idle` → `/sandtable-mobile-wait` again. On error report `main=error`.
+5. **Handle the message**: after the sub-agent returns a message, the **first action** is `scripts/sandtable-mobile-main-state.sh working '<actual work>'` → handle → reply/docs/push state → `POST /mailbox/inbox/ack` → `scripts/sandtable-mobile-main-state.sh idle '<waiting for next message>'` → `/sandtable-mobile-wait` again. Report `error` on failure. Never infer main=working from inbox GET; waiter=processing is not main=working.
 6. **Standing proactive sync**: while sync is active, call `scripts/sandtable-mobile-notify.sh <kind> <message>` before / during / after important computer-side work, on phase changes, key decisions, confirmations, or blockers. `agent-state` only updates the status indicator and cannot replace a conversation notification.
+7. **Format contract**: `status/phase` are single-line plain text only. Multi-fact progress, decisions, tests, blockers, and questions must use `chat/question` multi-line Markdown sent through stdin with `scripts/sandtable-mobile-notify.sh <kind> -`. Never send raw JSON, terminal noise, or unstructured long paragraphs.
 
 Port comes from `.sandtable-runtime/session/server.port`. Other than step 1, do not ask whether to continue.

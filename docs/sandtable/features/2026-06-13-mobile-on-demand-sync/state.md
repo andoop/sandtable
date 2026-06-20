@@ -1,8 +1,8 @@
 ---
 feature: 2026-06-13-mobile-on-demand-sync
-phase: DONE
+phase: FEEDBACK
 blocked: false
-updated: 2026-06-19T22:02:19+08:00
+updated: 2026-06-20T08:36:56+08:00
 tasks:
   - { id: T1, title: 4位PIN配对与 mobile-sync API, status: integrated }
   - { id: T2, title: slash 命令与 start/stop/status/wait 脚本, status: integrated }
@@ -23,4 +23,4 @@ selected_impl: main
 ---
 
 ## 当前进展
-FB-2026-06-19-01 与 FB-2026-06-19-02 已完成根因修复、自动回归、真机验证并经开发者确认关闭。手机同步保持 active。
+FB-01、FB-02、FB-04 已关闭；FB-03 已完成实现和回归，仍处于 VERIFYING，等待手机确认真实状态时序。
