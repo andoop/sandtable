@@ -36,7 +36,7 @@ English official prompt:
 - 两条官方提示词同时出现
 - 只是用户自行改写、转述、删改后的非官方版本
 
-不要要求额外 `lang=...` 或独立语言 flag。`.cursor/commands` 只服务 Cursor；Codex 的命令入口由 Sandtable Codex plugin 提供，Kiro / 通用 agent 仍使用 `AGENTS.md` 行为基线与普通消息入口。
+不要要求额外 `lang=...` 或独立语言 flag。`.cursor/commands` 只服务 Cursor；Codex 的命令入口由 Sandtable Codex plugin 提供；Kiro CLI 使用 `.kiro/prompts/*.md`（用 `/prompts <名>` 或 `@<名>` 触发）作为命令入口、`.kiro/steering/sandtable.md`（始终加载的精简方法论基线）作为行为基线；其它通用 agent 仍使用 `AGENTS.md` 行为基线与普通消息入口。
 
 ### 1. 安装总规则（严格遵守）
 
@@ -45,6 +45,7 @@ English official prompt:
 - `AGENTS.md` 仍是受保护文件、绝不覆盖；但在本次 locale-pack 安装规则下，它同时属于语言相关资产，所以只要 `AGENTS.md` 已存在，就视为 locale-pack 冲突，停止复制该语言包并如实报告，而不是继续追加。
 - 外科手术式：只安装本说明列出的文件；不要顺手安装其它仓库文件。
 - 诚实报告（硬性）：只要跳过的是核心项（`skills/`、`templates/`、`commands/`、`plugins/sandtable/commands`、`plugins/sandtable/skills`、`AGENTS.md`、`.cursor/rules/sandtable.mdc`、`plugins/sandtable/.codex-plugin/plugin.json`、`.agents/plugins/marketplace.json`、`hooks/run-hook.cmd`、`hooks/session-start` 之一），最终都必须报告“安装不完整”。存在性检查只是辅助，跳过清单才是权威。
+- Mobile Review Companion 是可选能力；本安装流程不安装 Node、Flutter、Dart 运行时或 npm/pub 依赖，但会复制 `runtime/` server 源码（排除 `node_modules/`、`dist/`、`.vite/`）。需要手机审阅时，安装方法论资产后先 `npm --prefix runtime/server install`，再按 `docs/mobile-review-companion/runtime.md` 显式启用。`apps/`（Flutter App）不随安装复制。
 
 ### 2. 取得 Sandtable 源
 
@@ -68,6 +69,8 @@ git clone --depth 1 https://github.com/andoop/sandtable "$SB_SRC"
   - `plugins/sandtable/commands/*.md` ← `$SB_SRC/plugins/sandtable/commands/*.md`
   - `plugins/sandtable/skills/**` ← `$SB_SRC/plugins/sandtable/skills/**`
   - `.cursor/commands/*.md` ← `$SB_SRC/.cursor/commands/*.md`
+  - `.kiro/prompts/*.md` ← `$SB_SRC/.kiro/prompts/*.md`
+  - `.kiro/steering/sandtable.md` ← `$SB_SRC/.kiro/steering/sandtable.md`
   - `skills/**` ← `$SB_SRC/skills/**`
   - `templates/**` ← `$SB_SRC/templates/**`
   - `scripts/sandtable-init.sh` ← `$SB_SRC/scripts/sandtable-init.sh`
@@ -80,6 +83,8 @@ git clone --depth 1 https://github.com/andoop/sandtable "$SB_SRC"
   - `plugins/sandtable/commands/*.md` ← `$SB_SRC/locales/en/plugins/sandtable/commands/*.md`
   - `plugins/sandtable/skills/**` ← `$SB_SRC/locales/en/plugins/sandtable/skills/**`
   - `.cursor/commands/*.md` ← `$SB_SRC/locales/en/.cursor/commands/*.md`
+  - `.kiro/prompts/*.md` ← `$SB_SRC/locales/en/.kiro/prompts/*.md`
+  - `.kiro/steering/sandtable.md` ← `$SB_SRC/locales/en/.kiro/steering/sandtable.md`
   - `skills/**` ← `$SB_SRC/locales/en/skills/**`
   - `templates/**` ← `$SB_SRC/templates/en/**` 复制到目标项目的 `templates/`
   - `scripts/sandtable-init.sh` ← `$SB_SRC/locales/en/scripts/sandtable-init.sh`
@@ -90,11 +95,26 @@ git clone --depth 1 https://github.com/andoop/sandtable "$SB_SRC"
   - `hooks/hooks-cursor.json` ← `$SB_SRC/hooks/hooks-cursor.json`
   - `plugins/sandtable/.codex-plugin/plugin.json` ← `$SB_SRC/plugins/sandtable/.codex-plugin/plugin.json`
   - `.agents/plugins/marketplace.json` ← `$SB_SRC/.agents/plugins/marketplace.json`
+- 可选 Mobile Companion 脚本（共享机器资产，zh-first；随方法论安装，但需仓库内 `runtime/` 就位才能真正启动 server）：
+  - `scripts/sandtable-mobile-start.sh` ← `$SB_SRC/scripts/sandtable-mobile-start.sh`
+  - `scripts/sandtable-mobile-status.sh` ← `$SB_SRC/scripts/sandtable-mobile-status.sh`
+  - `scripts/sandtable-mobile-stop.sh` ← `$SB_SRC/scripts/sandtable-mobile-stop.sh`
+  - `scripts/sandtable-mobile-wait.sh` ← `$SB_SRC/scripts/sandtable-mobile-wait.sh`
+- 可选 Mobile Companion 文档（共享，供 `/sandtable-mobile-*` 命令引用）：
+  - `docs/mobile-review-companion/protocol.md` ← `$SB_SRC/docs/mobile-review-companion/protocol.md`
+  - `docs/mobile-review-companion/runtime.md` ← `$SB_SRC/docs/mobile-review-companion/runtime.md`
+  - `docs/mobile-review-companion/verification.md` ← `$SB_SRC/docs/mobile-review-companion/verification.md`
+- 可选 Mobile Companion runtime 源码（共享；复制 `runtime/server/` 全部源码文件，**排除** `node_modules/`、`dist/`、`.vite/`）：
+  - `runtime/server/**`（src、scripts、test、`package.json`、`package-lock.json`、`tsconfig.json`、`.gitignore` 等）← `$SB_SRC/runtime/server/**`
 
 说明：
 
 - `templates/` 必须始终是唯一模板根目录；英文模板也必须安装到用户项目的 `templates/`，不能变成第二个平行模板根。
+- `commands/`、`.cursor/commands/`、`plugins/sandtable/commands/` 三处都包含 `sandtable-mobile-*`（可选移动端命令），随各自 locale pack 一起安装；它们依赖上面的 Mobile Companion 脚本与仓库内 `runtime/`。
+- `runtime/`（Node server）随方法论**复制源码**（排除 `node_modules/`、`dist/`、`.vite/`），但**不**自动 `npm install`；`apps/`（Flutter App）属于可选 Mobile Review Companion，本安装流程**绝不复制**，需用户单独 clone 仓库取得。
+- `.claude-plugin/`（Claude Code 插件 / marketplace 清单）与 `.cursor-plugin/plugin.json`（Cursor 插件清单）是**仓库侧分发清单**（指向上游 GitHub 仓库），用于用户从插件市场添加 Sandtable，**不复制进用户项目**。
 - `CLAUDE.md` 不维护独立语言副本；若目标项目没有 `CLAUDE.md`，继续按原规则创建 `CLAUDE.md -> AGENTS.md` 的符号链接即可，语言跟随 `AGENTS.md` 内容本身。
+- Kiro CLI 接线：`.kiro/prompts/*.md` 与 `.kiro/steering/sandtable.md` 都跟随 commands 的 locale pack 一起安装。`.kiro/prompts/*.md` 是命令入口（`/prompts <名>` 或 `@<名>` 触发）；`.kiro/steering/sandtable.md` 是 Kiro CLI 默认 agent 始终加载的**精简方法论基线**（真实文件、含 frontmatter，等价 `.cursor/rules/sandtable.mdc`；只放底线与门禁，完整方法论按需读 `skills/`），按 locale 安装中文或英文版本，**不是**指向 `AGENTS.md` 的符号链接。
 - `scripts/test-sandtable-init.sh` 是仓库内部测试脚本，绝不安装到用户项目。
 - Codex plugin manifest 和 marketplace 注册文件是共享机器资产；它们不随语言切换，但 `plugins/sandtable/commands/*.md` 与 `plugins/sandtable/skills/**` 必须跟随 locale pack。
 
@@ -217,9 +237,39 @@ codex plugin marketplace add "$PWD"
 codex plugin add sandtable --marketplace sandtable-local
 ```
 
-Codex 插件命令使用插件命名空间；安装后优先尝试 `/sandtable:sandtable-start`。若当前 Codex 客户端的 `/` 菜单不展示本地插件命令，不得谎报“slash 提示已生效”；如实报告为客户端 autocomplete 限制，并说明插件仍已在本机注册/启用。
+Codex 插件暴露的是 **skills**（用 `$技能名` 触发，**不**通过插件提供 `/` 斜杠命令）：引导用户用 `$using-sandtable` 作为总入口驱动流程、`$mobile-companion` 用移动端。不得谎报"Codex 已支持 `/sandtable` 斜杠命令"；`/sandtable-*` 是 Cursor/Claude/Kiro 的入口。插件仍在本机注册/启用以提供 skills。
 
 - Kiro / 通用 agent：步骤 5.1 的 `AGENTS.md` 即为行为基线；没有专属 slash 接线时，把 `/sandtable-start` 作为普通消息发给 AI 执行。
+
+#### 5.3 可选 Mobile Companion 资产（脚本 / 文档 / runtime 源码；目标已存在则跳过并报告）
+
+这些资产支撑 `/sandtable-mobile-*` 命令。脚本与 runtime 源码随方法论一起安装；首次启用移动端时需 `npm --prefix runtime/server install` 装一次依赖（见 README「Mobile Review Companion」）。
+
+```bash
+mkdir -p ./scripts
+for s in sandtable-mobile-start.sh sandtable-mobile-status.sh sandtable-mobile-stop.sh sandtable-mobile-wait.sh; do
+  [ -e "./scripts/$s" ] && echo "跳过 ./scripts/$s（已存在）" \
+    || cp "$SB_SRC/scripts/$s" "./scripts/$s"
+done
+mkdir -p ./docs/mobile-review-companion
+for d in protocol.md runtime.md verification.md; do
+  [ -e "./docs/mobile-review-companion/$d" ] && echo "跳过 ./docs/mobile-review-companion/$d（已存在）" \
+    || cp "$SB_SRC/docs/mobile-review-companion/$d" "./docs/mobile-review-companion/$d"
+done
+# runtime server 源码：复制全部源码文件，排除 node_modules/dist/.vite（纯 coreutils）
+if [ -e ./runtime/server ]; then
+  echo "跳过 ./runtime/server（已存在）"
+else
+  ( cd "$SB_SRC/runtime/server" && \
+    find . -type d \( -name node_modules -o -name dist -o -name .vite \) -prune -o -type f -print ) \
+    | while IFS= read -r f; do
+        mkdir -p "./runtime/server/$(dirname "$f")"
+        cp "$SB_SRC/runtime/server/$f" "./runtime/server/$f"
+      done
+fi
+```
+
+不要复制 `scripts/mobile-listening-e2e.sh`、`scripts/test-sandtable-init.sh` 与 `scripts/sandtable-sync.sh`（仓库内部测试/维护脚本，绝不安装到用户项目）。不要复制 `apps/`（Flutter App，需用户单独 clone），也不要复制 `runtime/server/node_modules`、`dist`、`.vite`。`docs/mobile-review-companion/` 是只读参考文档，与用户的 `docs/sandtable/` 战役记忆互不相干。
 
 ### 6. 初始化运行时工作区（可选，推荐）
 
@@ -252,11 +302,15 @@ done
 for p in hooks/hooks.json hooks/hooks-cursor.json hooks/run-hook.cmd hooks/session-start; do
   [ -e "./$p" ] && echo "ok ./$p" || echo "MISSING ./$p（Claude Code 不完整）"
 done
+# 可选 Mobile Companion（装了移动端命令就一并校验脚本与 runtime 源码到位）
+for p in scripts/sandtable-mobile-start.sh scripts/sandtable-mobile-wait.sh commands/sandtable-mobile-start.md runtime/server/package.json runtime/server/src; do
+  [ -e "./$p" ] && echo "ok ./$p" || echo "缺 ./$p（移动端可选，未启用可忽略）"
+done
 ```
 
 Codex 还必须人工或由 AI 读取 `./.agents/plugins/marketplace.json`，确认 `plugins` 数组里存在 `name` 为 `sandtable` 的条目，且 `source.path` 为 `./plugins/sandtable`、`policy.authentication` 为 `ON_INSTALL`、`category` 为 `Developer Tools`；若不符合，报告 `Codex 不完整`。这项 JSON 结构检查不要依赖 `jq`、Python、Node 或其它非 POSIX/coreutils 工具。
 
-Cursor 提示用户重载窗口后 `alwaysApply` 规则生效。Codex 提示用户按 Codex 本地插件流程启用 Sandtable Local，并优先尝试 `/sandtable:sandtable-start`。最后按工具入口开始第一场战役。
+Cursor 提示用户重载窗口后 `alwaysApply` 规则生效。Codex 提示用户按本地插件流程启用 Sandtable Local，并用 `$using-sandtable`（skills，`$` 触发）作为入口。最后按工具入口开始第一场战役。
 
 ### 7. 清理
 

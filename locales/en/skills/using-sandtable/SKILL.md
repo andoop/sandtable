@@ -116,33 +116,34 @@ Only when this turn is a **Sandtable work step** (positive trigger in `closing-t
 | "I already know this workflow; I don’t need to read the skill." | Skills evolve. Read the current version on demand. |
 | "Adding a fallback or extra flexibility would be safer." | Do not add unrequested fallback logic or side quests. Keep changes surgical. |
 
+## Triggering across tools
+
+Same capabilities, different trigger per tool:
+
+- **Cursor / Claude Code / Kiro**: use the `/sandtable-*` slash commands (or send the command name as a plain message). Commands are thin entry points that load the matching skill from the table above.
+- **Codex**: the plugin exposes **skills only** (triggered with `$skill-name`, not `/`). The entry point is `$using-sandtable` — it lays out the whole state machine and loads sub-skills on demand; use `$mobile-companion` for mobile. Codex does not provide `/sandtable-*` slash commands via the plugin.
+
+Commands (action entry points) and skills (methodology knowledge) are many-to-many: one command loads one or more skills, and some skills (`being-truthful` / `closing-the-loop`) have no dedicated command.
+
+## Mobile Review Companion (Optional)
+
+> Full steps in the `mobile-companion` skill (Codex: `$mobile-companion`).
+
+If a project explicitly enables the Sandtable mobile review runtime, the main agent should sync the current feature state after each phase action and keep the agent pipeline in working state until a computer-side stop, stop mailbox event, or explicit developer stop request arrives.
+
+- When MCP is available, prefer the Sandtable MCP handler for phase, document summary, pending confirmation, and blocked-state sync.
+- Without MCP, write `.sandtable-runtime/mailbox/inbox/` messages according to `docs/mobile-review-companion/protocol.md`.
+- Before ending a phase action, the main agent must renew `.sandtable-runtime/session/continuation.json` and hand mailbox waiting to one or more cheap/free waiting workers.
+- Waiting workers may only wait, deduplicate, renew leases, notify, relay, or stop. Unless explicitly assigned, they must not edit PRD/tests/plan or make product decisions for the main agent.
+- If the runtime is not explicitly enabled, do not start the server, do not write mailbox messages, and do not change the default Sandtable flow.
+
 ## Relationship to Existing Methodologies
 
 Sandtable absorbs Karpathy’s four principles (no guessing, minimalism, surgical changes, goal-driven work) and the subagent orchestration ideas from superpowers, then adds **three kinds of rehearsal (mental / red-team / implementation) + a persistent state machine + an anomaly-driven fix loop**. If a project already has superpowers installed, you may still reuse its `test-driven-development`, `requesting-code-review`, and `finishing-a-development-branch` skills during `INTEGRATE` / `VERIFY`.
 
 ## Issue Grading and Restraint (P0–P3, shared rehearsal verdict)
 
-Issues found by rehearsal (mental / red-team) must be **graded from the user's point of view**, not piled up for the sake of "logical perfection". Grade first, then decide whether it drives the fix loop.
-
-Grade along four axes:
-
-- **Trigger probability**: always / likely / unlikely / only theoretical
-- **Functional impact**: core unusable · data loss · redline violation / important feature degraded / cosmetic
-- **Recoverability**: user cannot work around / user retry recovers / system auto-recovers
-- **User perception**: obvious / minor / basically none
-
-| Level | Typical combination | Handling |
-|------|---------|------|
-| **P0** | Always/likely + core unusable / data loss / MUST·MUST-NOT violation, obvious to user and unrecoverable | Must drive the fix loop as `ANOMALY_FOUND`/`BREACH_FOUND`; blocks integration |
-| **P1** | Likely degrades an important feature, or unlikely but severe (data/security/money), perceived and hard to self-recover | Fix in the loop; deferring needs explicit developer consent |
-| **P2** | Edge/unlikely, degraded but retryable or auto-recoverable, minor perception | Record as **residual risk**, explain to developer, who decides whether to fix this round |
-| **P3** | Only theoretical / pure cosmetic, no/negligible perception | Log for the record, does not drive the loop |
-
-**Verdict iron law: only P0/P1 drive the fix loop; P2/P3 are residual risk for the developer to decide—do not auto-trigger reruns, do not polish endlessly for "logical perfection".** The truthfulness lens still holds: report only real, relevant, reproducible issues that affect acceptance / redlines / closure; do not manufacture `ANOMALY_FOUND`/`BREACH_FOUND` from impossible triggers or unrelated scenarios (`being-truthful`'s no-guessing rule is unchanged: do not continue with key unknowns).
-
-**Restraint and reflection**: if one rehearsal round surfaces **many P0/P1**, first suspect the **design itself** (too complex, boundaries not converged, requirement misread) and go back to PLAN/OBJECTIVES, instead of patching one by one. A pile of issues is usually a design signal, not a patch list.
-
-**Explain to the developer**: each round's conclusion in plain language—what was found, what grade, why it is (or is not) a real issue, the real user impact, and the recommendation. No jargon dumps, no perfection-for-its-own-sake pseudo-issues.
+**You must fully read and follow `skills/_shared/issue-grading.md` (the P0–P3 grading rubric and verdict iron law); do not skip or paraphrase from memory.**
 
 ## Rehearsal Intensity by Risk (don't crack a nut with a sledgehammer)
 
@@ -159,11 +160,4 @@ Any choice to "skip / do one / combine" must state the reason in the journal. **
 
 ## PRD Confirmation Gate and Executing Already-Selected Paths
 
-- Priority: real blockers (`blocked=true`, missing product intent, permission, login, external resource, or key fact) come first and require `questions.md`, `blocked=true`, and a question; the PRD confirmation gate comes next; only then execute the user's selected path.
-- If the user already selected the next step via AskQuestion or clearly wrote “confirm and continue / continue with X / choose X”, and there is no real blocker, the agent must execute that step in the same turn. Do not ask again and do not merely print the same copy-paste command.
-- If the selection confirms the PRD, persist traceable PRD confirmation evidence to `state.md` or `journal.md` before or while entering TESTCASES/PLAN/MENTAL/REDTEAM/IMPL/rehearse/live/debrief. AskQuestion evidence records answer id or `source: askquestion:<id>` plus option text and confirmation time; natural-language evidence records quoted user text, confirmation time, and user-message source.
-- `/sandtable-start` still stops after writing an unconfirmed PRD. But if AskQuestion or natural language in the same turn already confirms the PRD and asks to continue, persist the evidence and continue directly to TESTCASES; the old command boundary must not override an already selected path.
-- `/sandtable-objectives`, `/sandtable-refine`, and `/sandtable-resume` receiving “PRD confirmed, continue to tests.md” must record the natural-language evidence and load `writing-tests` directly. With `phase=OBJECTIVES` and an existing `prd.md`, do not re-enter `writing-prd`.
-- `/sandtable-plan`, `writing-tests`, and `writing-plan` must check PRD confirmation first. If the same message confirms the PRD and triggers tests/plan writing, persist evidence before or while writing. Missing `tests.md` with confirmed PRD goes back to TESTCASES; unconfirmed PRD stops at confirmation.
-- Refining the PRD still edits the PRD. Refining tests/plan or continuing to rehearsal requires PRD confirmation first. If `blocked=true` and the user also says continue, blocker wins.
-- Full closeout has two profiles: if no path is selected, include recommendation and copy-paste templates; if a path was selected and executed, report result, current phase, and next recommendation only. Any template must point to the next stage, not repeat the already executed selection.
+**Before this action, you must fully read and follow every rule in `skills/_shared/prd-gate.md` (PRD confirmation gate and already-selected paths); do not skip or paraphrase from memory.**

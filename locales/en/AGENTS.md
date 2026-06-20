@@ -42,7 +42,7 @@ Explicit user instruction > Sandtable methodology > default behavior. If the use
 
 ## Skill Index
 
-When needed, read the full contents of `skills/<name>/SKILL.md`: `using-sandtable`, `being-truthful`, `state-and-memory`, `gathering-intel`, `writing-prd`, `writing-tests`, `writing-plan`, `autonomous-orchestration`, `mental-rehearsal`, `red-team-wargame`, `implementation-rehearsal`, `evaluating-rehearsals`, `closing-the-loop`, `triaging-feedback`, `bugfix-with-evidence`.
+When needed, read the full contents of `skills/<name>/SKILL.md`: `using-sandtable`, `being-truthful`, `state-and-memory`, `gathering-intel`, `writing-prd`, `writing-tests`, `writing-plan`, `autonomous-orchestration`, `mental-rehearsal`, `red-team-wargame`, `implementation-rehearsal`, `evaluating-rehearsals`, `closing-the-loop`, `triaging-feedback`, `bugfix-with-evidence`, `mobile-companion`.
 
 ## Close the Loop (FR8)
 
@@ -65,3 +65,7 @@ Issues found by rehearsal must be **graded from the user's point of view**, not 
 ## PRD Confirmation Gate
 
 - If `prd.md` exists without traceable developer confirmation, do not dispatch mental/OPFOR subagents. If the same message confirms the PRD, persist the confirmation evidence to `state.md` or `journal.md` before or while dispatching.
+
+## Standing Mobile-Sync Duty (only when mobile-sync is active)
+
+Whenever `.sandtable-runtime/session/mobile-sync.json` has `active=true` and the sync server is running, **syncing to the phone is a standing duty, regardless of trigger source** — whether the instruction came from the phone or the developer is talking to you directly on the computer. Before / during / after important actions, on phase changes, key decisions, and whenever a confirmation or blocker arises, call `scripts/sandtable-mobile-notify.sh <status|phase|question|chat> <message>` so visible progress is written to the phone's current conversation. `agent-state` only updates the status indicator and does not replace a conversation notification. Main state must reflect actual execution: report working as the first action after wait returns, report idle as the last action after handling completes, and never let the server infer it from an inbox GET. Phone-visible messages follow a format MUST: `status/phase` are single-line plain text; multi-fact progress, decisions, tests, blockers, and questions use `chat/question` multi-line Markdown; never send raw JSON, terminal noise, or unstructured long paragraphs. The **waiting subagent blocks forever with no timeout** (use `SANDTABLE_WAIT_MAX_SECONDS` only as a fallback when the host imposes a hard execution cap; on timeout, seamlessly dispatch another waiter). See `skills/mobile-companion/SKILL.md`.

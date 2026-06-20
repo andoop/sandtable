@@ -47,7 +47,7 @@ alwaysApply: true
 
 ## 技能索引
 
-需要时读取对应 `skills/<name>/SKILL.md` 的完整内容：`using-sandtable`、`being-truthful`、`state-and-memory`、`gathering-intel`、`writing-prd`、`writing-tests`、`writing-plan`、`autonomous-orchestration`、`mental-rehearsal`、`red-team-wargame`、`implementation-rehearsal`、`evaluating-rehearsals`、`closing-the-loop`、`triaging-feedback`、`bugfix-with-evidence`。
+需要时读取对应 `skills/<name>/SKILL.md` 的完整内容：`using-sandtable`、`being-truthful`、`state-and-memory`、`gathering-intel`、`writing-prd`、`writing-tests`、`writing-plan`、`autonomous-orchestration`、`mental-rehearsal`、`red-team-wargame`、`implementation-rehearsal`、`evaluating-rehearsals`、`closing-the-loop`、`triaging-feedback`、`bugfix-with-evidence`、`mobile-companion`。
 
 ## 回合收尾（FR8）
 
@@ -70,3 +70,7 @@ alwaysApply: true
 ## PRD 确认门禁
 
 - 若 `prd.md` 已存在但无可核实开发者确认记录，不得派发 mental/红军子 agent；同条消息确认 PRD 时，必须在派发前或同时把确认证据持久化到 `state.md` 或 `journal.md`。
+
+## 手机同步常驻义务（仅当 mobile-sync active）
+
+只要 `.sandtable-runtime/session/mobile-sync.json` 的 `active=true` 且 sync server 在跑，**同步手机就是常驻义务，与触发来源无关**——手机指令或开发者在电脑端直接对话都一样。在重要动作的**前/中/后**、阶段切换、关键决策、产生待确认或阻塞时，必须调用 `scripts/sandtable-mobile-notify.sh <status|phase|question|chat> <消息>` 把可见进展写入手机当前会话；`agent-state` 只更新状态灯，不能替代会话通知。main 状态必须反映真实执行：wait 返回后的第一动作报 working，处理完成的最后动作报 idle，禁止 server 根据 inbox GET 猜测。手机可见消息遵循格式 MUST：`status/phase` 单行纯文本；多事实进展、决策、测试、阻塞和问题用 `chat/question` 多行 Markdown，禁止裸 JSON、终端噪声和无结构长段落。**等待子 agent 永久阻塞、不设超时**（仅宿主有硬执行上限才用 `SANDTABLE_WAIT_MAX_SECONDS` 兜底，超时即无缝再派一个）。细节见 `skills/mobile-companion/SKILL.md`。

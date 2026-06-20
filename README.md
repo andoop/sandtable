@@ -11,13 +11,13 @@
 
 中文版：
 
-> 阅读 https://github.com/andoop/sandtable/blob/main/INSTALL.md ，并据此按中文把 Sandtable 安装进当前项目。
+> 阅读 https://github.com/andoop/sandtable/blob/remote/INSTALL.md ，并据此按中文把 Sandtable 安装进当前项目。
 
 English:
 
-> Read https://github.com/andoop/sandtable/blob/main/INSTALL.md and use it to install Sandtable into the current project in English.
+> Read https://github.com/andoop/sandtable/blob/remote/INSTALL.md and use it to install Sandtable into the current project in English.
 
-安装完成后按你的工具进入 Sandtable 命令：Cursor 使用 `.cursor/commands`，Codex 使用 Sandtable Codex plugin/commands，Claude Code / Kiro / 通用 agent 可直接把命令名作为消息发给 AI 执行。详见 [`Quickstart`](#quickstart)。
+安装完成后按你的工具进入 Sandtable 命令：Cursor 使用 `.cursor/commands`，Codex 使用 Sandtable Codex plugin/commands，Kiro CLI 使用 `.kiro/prompts`（`/prompts sandtable-start` 或 `@sandtable-start`），Claude Code / 其它通用 agent 可直接把命令名作为消息发给 AI 执行。详见 [`Quickstart`](#quickstart)。
 
 ```mermaid
 flowchart TD
@@ -65,17 +65,18 @@ Sandtable 让 agent 用三种推演逐层逼出破口，全程落盘可续：
 
    中文：
 
-   > 阅读 https://github.com/andoop/sandtable/blob/main/INSTALL.md ，并据此按中文把 Sandtable 安装进当前项目。
+   > 阅读 https://github.com/andoop/sandtable/blob/remote/INSTALL.md ，并据此按中文把 Sandtable 安装进当前项目。
 
    English:
 
-   > Read https://github.com/andoop/sandtable/blob/main/INSTALL.md and use it to install Sandtable into the current project in English.
+   > Read https://github.com/andoop/sandtable/blob/remote/INSTALL.md and use it to install Sandtable into the current project in English.
 
 2. 按 AI 的安装结果完成最后接线；若它提示重载窗口、重开工作区或启用本地插件以使规则生效，就照做。
 3. 按工具选择命令入口：
    - Cursor：通过 `.cursor/commands` 提供 slash 命令，使用 `/sandtable-start` 开始。
-   - Codex：通过 `plugins/sandtable` 与 `.agents/plugins/marketplace.json` 提供本地 Sandtable plugin；先用 `codex plugin marketplace add "$PWD"` 和 `codex plugin add sandtable --marketplace sandtable-local` 注册/启用后，优先尝试 `/sandtable:sandtable-start`。Codex 当前版本是否在 `/` 菜单展示本地插件命令取决于客户端能力；不把 Cursor 的裸 slash 自动提示当作 Codex 保证。
-   - Claude Code / Kiro / 通用 agent：没有专属 slash 接线时，把 `/sandtable-start` 作为普通消息发给 AI，让它按 `AGENTS.md` 与 `commands/sandtable-start.md` 执行。
+   - Codex：通过 `plugins/sandtable` 与 `.agents/plugins/marketplace.json` 提供本地 Sandtable plugin（先用 `codex plugin marketplace add "$PWD"` 和 `codex plugin add sandtable --marketplace sandtable-local` 注册/启用）。Codex 插件暴露的是 **skills**（用 `$技能名` 触发，不是斜杠命令）：用 `$using-sandtable` 作为总入口驱动整个流程，移动端用 `$mobile-companion`。`/sandtable-*` 斜杠命令是 Cursor/Claude/Kiro 的入口，别当作 Codex 的保证。
+   - Kiro CLI：通过 `.kiro/prompts/*.md` 提供命令入口，用 `/prompts sandtable-start` 或 `@sandtable-start`（`@` + Tab 补全）触发；`.kiro/steering/sandtable.md`（始终加载的精简方法论基线，完整方法论按需读 `skills/`）作为默认 agent 的行为基线。新增 prompts/steering 后需重开会话生效。
+   - Claude Code / 其它通用 agent：没有专属 slash 接线时，把 `/sandtable-start` 作为普通消息发给 AI，让它按 `AGENTS.md` 与 `commands/sandtable-start.md` 执行。
 
 手工安装、不同 AI 工具（Cursor / Claude Code / Codex / Kiro 等）的差异、以及本地试用路径，都写在 `INSTALL.md`，README 不再展开。`.cursor/commands` 只服务 Cursor；Codex 的命令入口来自 Sandtable Codex plugin，不承诺自动发现 Cursor 命令。
 
@@ -84,11 +85,11 @@ Sandtable 让 agent 用三种推演逐层逼出破口，全程落盘可续：
 
 中文：
 
-> 阅读 https://github.com/andoop/sandtable/blob/main/UPDATE.md ，并据此按中文把当前项目里已安装的 Sandtable 更新到最新。
+> 阅读 https://github.com/andoop/sandtable/blob/remote/UPDATE.md ，并据此按中文把当前项目里已安装的 Sandtable 更新到最新。
 
 English：
 
-> Read https://github.com/andoop/sandtable/blob/main/UPDATE.md and use it to update the already-installed Sandtable in the current project to the latest, in English.
+> Read https://github.com/andoop/sandtable/blob/remote/UPDATE.md and use it to update the already-installed Sandtable in the current project to the latest, in English.
 
 细节见 [`UPDATE.md`](UPDATE.md)。注意：**重跑安装提示词无法更新**（安装器"已存在即跳过"）；请用与安装时相同的语言更新。
 
@@ -104,6 +105,21 @@ English：
 - `/sandtable-bugfix`: 证据驱动根因修障（bugfix 模式，根因必靠日志100%确认）。
 - `/sandtable-resume`: 按 `state.md` 与 `journal.md` 恢复现场继续。
 - `/sandtable-status`: 查看阶段、任务、推演结果和未决问题。
+
+可选 Mobile Review Companion 命令（需先按下文启用 runtime）：
+
+- `/sandtable-mobile-start`: 按需开启手机同步，生成 4 位配对码与 Server URL，并拉起 inbox 等待子 agent。
+- `/sandtable-mobile-status`: 查看手机同步状态、配对码、是否已配对。
+- `/sandtable-mobile-stop`: 终止手机同步并停止 runtime server。
+- `/sandtable-mobile-wait`: 启动单职责 inbox 等待子 agent（等到一条手机消息即交给主 agent 并退出）。
+
+## Mobile Review Companion（可选）
+
+Sandtable 现在包含一个可选 mobile review runtime：本机/局域网 server、MCP 风格 handler、文件信箱 fallback、长驻 waiting worker 队列，以及 Android/iOS Flutter App。它用于在手机上查看 PRD/tests/plan/state/journal/questions，并提交确认或回答。
+
+默认 Sandtable 方法论安装仍不安装 Node、Flutter、Dart 运行时或 npm/pub 依赖。安装/更新会**复制并覆盖 `runtime/`（Node server）源码**（排除 `node_modules/`、`dist/`、`.vite/` 等依赖与构建产物），让 `/sandtable-mobile-*` 命令开箱即用；但 **`apps/`（Flutter App）不随方法论安装**，需用户单独 clone 本仓库取得。要启用移动端审阅，先 `npm --prefix runtime/server install` 安装依赖，再按 [`docs/mobile-review-companion/runtime.md`](docs/mobile-review-companion/runtime.md) 启动；协议与真机验证分别见 [`protocol.md`](docs/mobile-review-companion/protocol.md) 与 [`verification.md`](docs/mobile-review-companion/verification.md)。
+
+安装/更新方法论资产时会带上 `/sandtable-mobile-*` 命令、`scripts/sandtable-mobile-*.sh` 与 `runtime/` server 源码；这些就绪后，移动端命令即可在本机启动 server（首次需先装一次 npm 依赖）。
 
 ## Sandtable vs Superpowers
 [Superpowers](https://github.com/obra/superpowers) 是一套优秀的、被广泛使用的 agent 方法论，Sandtable 与它同源同宗：都不让 agent“看见需求就开写”，都用自动触发的 skill、都在隔离 worktree 里干活、都把设计落盘。
@@ -126,11 +142,18 @@ English：
 ```text
 sandtable/
   README.md
+  INSTALL.md / UPDATE.md
   AGENTS.md / CLAUDE.md
   .cursor/rules/sandtable.mdc
   .cursor/commands/*.md
-  commands/*.md
-  .agents/plugins/marketplace.json
+  .kiro/prompts/*.md                 # Kiro CLI 命令入口（/prompts <名> 或 @<名>）
+  .kiro/steering/sandtable.md        # Kiro CLI 始终加载的精简方法论基线
+  commands/*.md                      # 含 sandtable-mobile-*（可选移动端命令）
+  scripts/                           # sandtable-init.sh + sandtable-mobile-*.sh；sandtable-sync.sh 为仓库维护工具（不安装到用户项目）
+  locales/en/**                      # 英文 locale pack（与根目录中文资产镜像）
+  .claude-plugin/                    # Claude Code 插件 / marketplace 清单（仓库侧分发，不复制进用户项目）
+  .cursor-plugin/plugin.json         # Cursor 插件清单（仓库侧分发）
+  .agents/plugins/marketplace.json   # Codex 本地 marketplace 注册
   plugins/sandtable/
     .codex-plugin/plugin.json
     commands/*.md
@@ -142,8 +165,13 @@ sandtable/
     red-team-wargame/
     implementation-rehearsal/
     state-and-memory/
+    mobile-companion/
+    _shared/                         # 跨命令/skill 复用的方法论片段（单一真源）
     ... more skills
   templates/
+  docs/mobile-review-companion/      # 可选 runtime 的协议/启动/验证文档
+  runtime/                           # 可选 Node server 源码（随方法论安装/更新，排除 node_modules 等）
+  apps/                              # 可选 Android/iOS Flutter App（不随方法论安装，需单独 clone）
 ```
 
 运行时会在目标项目生成:
